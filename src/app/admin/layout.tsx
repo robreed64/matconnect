@@ -42,7 +42,10 @@ export default async function AdminLayout({ children }: { children: ReactNode })
         {user && (
           <div className="px-4 py-4 border-t border-gray-800">
             <p className="text-xs font-medium text-gray-300 truncate">{user.name}</p>
-            <p className="text-xs text-gray-600 truncate mb-2">{(user as { role?: string }).role ?? "staff"}</p>
+            <p className="text-xs text-gray-600 truncate">{(user as { role?: string }).role ?? "staff"}</p>
+            <Link href="/admin/settings" className="block text-xs text-gray-500 hover:text-gray-300 transition mt-1 mb-2">
+              Change password
+            </Link>
             <LogoutButton />
           </div>
         )}
