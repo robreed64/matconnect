@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getGymSettings } from "@/lib/gym-settings";
 import LogoutButton from "../portal/LogoutButton";
+import InstallPrompt from "@/components/InstallPrompt";
 
 const NAV = [
   { href: "/member",            label: "Home",       icon: "🏠" },
@@ -47,6 +48,7 @@ export default async function MemberLayout({ children }: { children: ReactNode }
       <main className="flex-1 p-6 max-w-4xl mx-auto w-full">
         {children}
       </main>
+      <InstallPrompt />
     </div>
   );
 }
