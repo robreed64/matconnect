@@ -22,6 +22,8 @@ type GymSettings = {
   brevoSenderEmail: string | null;
   brevoSenderName: string | null;
   brevoSmsFrom: string | null;
+  familyDiscountEnabled: boolean;
+  familyDiscountPercent: number;
 };
 
 function maskKey(key: string | null | undefined): string {
@@ -103,10 +105,11 @@ export default function SettingsPage() {
   const [pwMsg,     setPwMsg]      = useState("");
 
   // Per-section save status
-  const [infoStatus,   setInfoStatus]   = useState<"idle" | "loading" | "ok" | "error">("idle");
-  const [regionStatus, setRegionStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
-  const [waiverStatus, setWaiverStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
-  const [taxStatus,    setTaxStatus]    = useState<"idle" | "loading" | "ok" | "error">("idle");
+  const [infoStatus,     setInfoStatus]     = useState<"idle" | "loading" | "ok" | "error">("idle");
+  const [regionStatus,   setRegionStatus]   = useState<"idle" | "loading" | "ok" | "error">("idle");
+  const [waiverStatus,   setWaiverStatus]   = useState<"idle" | "loading" | "ok" | "error">("idle");
+  const [taxStatus,      setTaxStatus]      = useState<"idle" | "loading" | "ok" | "error">("idle");
+  const [discountStatus, setDiscountStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
 
   useEffect(() => {
     fetch("/api/admin/settings").then(r => r.json()).then(setSettings);
@@ -398,6 +401,42 @@ export default function SettingsPage() {
           </div>
 
           <SaveButton loading={brevoStatus === "loading"} status={brevoStatus} />
+        </form>
+      </Section>
+
+      {/* Family Discounts */}
+      <Section title="Family Discounts">
+        <form onSubmit={e => { e.preventDefault(); save({ familyDiscountEnabled: settings.familyDiscountEnabled, familyDiscountPercent: settings.familyDiscountPercent }, setDiscountStatus); }} className="space-y-4">
+          <p className="text-xs text-gray-500">
+            When enabled, staff can apply a discount to sibling subscriptions from the{" "}
+            <a href="/admin/families" className="underline text-blue-400 hover:text-blue-300">Family Accounts</a>{" "}
+            page. Discounts are applied via Stripe coupons.
+          </p>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setSettings({ ...settings, familyDiscountEnabled: !settings.familyDiscountEnabled })}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settings.familyDiscountEnabled ? "bg-blue-600" : "bg-gray-700"}`}
+            >
+              <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${settings.familyDiscountEnabled ? "translate-x-6" : "translate-x-1"}`} />
+            </button>
+            <label className="text-sm text-gray-300">
+              {settings.familyDiscountEnabled ? "Enabled" : "Disabled"}
+            </label>
+          </div>
+          {settings.familyDiscountEnabled && (
+            <div>
+              <label className="block text-xs font-medium text-gray-400 mb-1">Sibling Discount (%)</label>
+              <input
+                type="number" min={1} max={100} step={1}
+                value={settings.familyDiscountPercent}
+                onChange={e => setSettings({ ...settings, familyDiscountPercent: parseInt(e.target.value) || 10 })}
+                className="w-32 px-4 py-2.5 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:border-blue-500 text-sm"
+              />
+              <p className="text-xs text-gray-500 mt-1">Applied to each child member&apos;s active subscription.</p>
+            </div>
+          )}
+          <SaveButton loading={discountStatus === "loading"} status={discountStatus} />
         </form>
       </Section>
 

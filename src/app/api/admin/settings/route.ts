@@ -25,6 +25,7 @@ export async function PATCH(req: Request) {
     "beltConfig", "instructorNames", "posCategories",
     "stripePublishableKey", "stripeSecretKey", "stripeWebhookSecret",
     "brevoApiKey", "brevoSenderEmail", "brevoSenderName", "brevoSmsFrom",
+    "familyDiscountEnabled", "familyDiscountPercent",
   ];
   const data: Record<string, unknown> = {};
   for (const key of allowed) {

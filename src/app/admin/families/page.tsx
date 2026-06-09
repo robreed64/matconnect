@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { getGymSettings } from "@/lib/gym-settings";
 import CreatePortalAccount from "./CreatePortalAccount";
+import FamilyDiscountActions from "./FamilyDiscountActions";
 
 const BELT_DOT: Record<string, string> = {
   white:  "bg-white border border-gray-400",
@@ -11,26 +13,34 @@ const BELT_DOT: Record<string, string> = {
 };
 
 export default async function FamiliesPage() {
-  // All parent members (those who have at least one child)
-  const families = await prisma.member.findMany({
-    where:   { parentId: null, children: { some: {} } },
-    include: {
-      children: {
-        include: { _count: { select: { attendance: true } } },
-        orderBy: { name: "asc" },
+  const [families, potentialParents, settings] = await Promise.all([
+    prisma.member.findMany({
+      where:   { parentId: null, children: { some: {} } },
+      include: {
+        children: {
+          include: {
+            _count: { select: { attendance: true } },
+            subscriptions: {
+              where:   { status: { in: ["active", "trial"] } },
+              orderBy: { createdAt: "desc" },
+              take: 1,
+              select: { id: true, familyDiscountApplied: true, status: true },
+            },
+          },
+          orderBy: { name: "asc" },
+        },
+        _count: { select: { attendance: true } },
+        user:   { select: { id: true, email: true, role: true } },
       },
-      _count: { select: { attendance: true } },
-      user:   { select: { id: true, email: true, role: true } },
-    },
-    orderBy: { name: "asc" },
-  });
-
-  // Members without a parent and without children (potential parents to link)
-  const potentialParents = await prisma.member.findMany({
-    where:   { parentId: null, ageGroup: { not: "kids" } },
-    select:  { id: true, name: true, email: true },
-    orderBy: { name: "asc" },
-  });
+      orderBy: { name: "asc" },
+    }),
+    prisma.member.findMany({
+      where:   { parentId: null, ageGroup: { not: "kids" } },
+      select:  { id: true, name: true, email: true },
+      orderBy: { name: "asc" },
+    }),
+    getGymSettings(),
+  ]);
 
   const totalFamilyMembers = families.reduce((s, f) => s + f.children.length + 1, 0);
 
@@ -81,16 +91,27 @@ export default async function FamiliesPage() {
 
               {/* Children */}
               <div className="pl-6 space-y-2 border-l border-gray-800">
-                {family.children.map((child) => (
-                  <div key={child.id} className="flex items-center gap-3">
-                    <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${BELT_DOT[child.beltRank?.toLowerCase() ?? "white"] ?? "bg-gray-600"}`} />
-                    <Link href={`/admin/members/${child.id}`} className="text-sm text-gray-300 hover:text-white transition">
-                      {child.name}
-                    </Link>
-                    <span className="text-xs text-gray-600 capitalize">{child.ageGroup ?? ""}</span>
-                    <span className="text-xs text-gray-600">{child._count.attendance} classes</span>
-                  </div>
-                ))}
+                {family.children.map((child) => {
+                  const activeSub = child.subscriptions[0] ?? null;
+                  return (
+                    <div key={child.id} className="flex items-center gap-3 flex-wrap">
+                      <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${BELT_DOT[child.beltRank?.toLowerCase() ?? "white"] ?? "bg-gray-600"}`} />
+                      <Link href={`/admin/members/${child.id}`} className="text-sm text-gray-300 hover:text-white transition">
+                        {child.name}
+                      </Link>
+                      <span className="text-xs text-gray-600 capitalize">{child.ageGroup ?? ""}</span>
+                      <span className="text-xs text-gray-600">{child._count.attendance} classes</span>
+                      {settings.familyDiscountEnabled && (
+                        <FamilyDiscountActions
+                          memberId={child.id}
+                          discountApplied={activeSub?.familyDiscountApplied ?? false}
+                          discountPercent={settings.familyDiscountPercent}
+                          hasActiveSubscription={!!activeSub}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ))}

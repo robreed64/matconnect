@@ -81,6 +81,7 @@ model Subscription {
   status               String    // 'active','past_due','canceled'
   startDate            DateTime  @map("start_date") @db.Date
   endDate              DateTime? @map("end_date") @db.Date
+  familyDiscountApplied Boolean  @default(false) @map("family_discount_applied")
   createdAt            DateTime  @default(now()) @map("created_at")
   updatedAt            DateTime  @updatedAt @map("updated_at")
 
@@ -295,6 +296,8 @@ model GymSettings {
   beltConfig           Json     @default("[]") @map("belt_config")
   instructorNames      Json     @default("[]") @map("instructor_names")
   posCategories        Json     @default("[\"drinks\",\"gear\",\"events\"]") @map("pos_categories")
+  familyDiscountEnabled  Boolean @default(false) @map("family_discount_enabled")
+  familyDiscountPercent  Int     @default(10) @map("family_discount_percent")
   updatedAt            DateTime @updatedAt @map("updated_at")
 
   @@map("gym_settings")
