@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/require-auth";
 
@@ -43,5 +44,6 @@ export async function POST(req: Request) {
     select: { id: true, email: true, name: true, role: true, createdAt: true },
   });
 
+  revalidatePath("/admin/users");
   return NextResponse.json(user, { status: 201 });
 }

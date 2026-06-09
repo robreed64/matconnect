@@ -25,7 +25,11 @@ export default function QRScannerView({ onScan }: { onScan: (token: string) => v
       .catch(console.error);
 
     return () => {
-      scanner.stop().then(() => scanner.clear()).catch(() => {});
+      try {
+        scanner.stop().then(() => scanner.clear()).catch(() => {});
+      } catch {
+        try { scanner.clear(); } catch {}
+      }
     };
   }, []);
 

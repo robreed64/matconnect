@@ -170,7 +170,12 @@ export default async function MemberDetailPage({ params }: { params: Params }) {
 
         {/* QR check-in */}
         <Section title="Check-In QR Code">
-          <MemberQRCode memberId={member.id} />
+          <MemberQRCode
+            memberId={member.id}
+            memberName={member.name}
+            gymName={gymSettings.gymName}
+            beltRank={member.beltRank}
+          />
         </Section>
 
         {/* Family */}

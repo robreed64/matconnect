@@ -35,8 +35,8 @@ export default function NewUserPage() {
       return;
     }
 
-    router.push("/admin/users");
     router.refresh();
+    router.push("/admin/users");
   };
 
   return (
