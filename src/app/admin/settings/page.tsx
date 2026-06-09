@@ -18,6 +18,10 @@ type GymSettings = {
   stripePublishableKey: string | null;
   stripeSecretKey: string | null;
   stripeWebhookSecret: string | null;
+  brevoApiKey: string | null;
+  brevoSenderEmail: string | null;
+  brevoSenderName: string | null;
+  brevoSmsFrom: string | null;
 };
 
 function maskKey(key: string | null | undefined): string {
@@ -83,6 +87,10 @@ export default function SettingsPage() {
   const [stripeWh,      setStripeWh]      = useState("");
   const [stripeStatus,  setStripeStatus]  = useState<"idle" | "loading" | "ok" | "error">("idle");
 
+  // Brevo state
+  const [brevoKey,      setBrevoKey]      = useState("");
+  const [brevoStatus,   setBrevoStatus]   = useState<"idle" | "loading" | "ok" | "error">("idle");
+
   // Password change state
   const [pwCurrent, setPwCurrent]  = useState("");
   const [pwNext,    setPwNext]     = useState("");
@@ -138,6 +146,27 @@ export default function SettingsPage() {
     if (ok) { setStripePk(""); setStripeSk(""); setStripeWh(""); router.refresh(); }
     setStripeStatus(ok ? "ok" : "error");
     setTimeout(() => setStripeStatus("idle"), 2500);
+  };
+
+  const handleBrevo = async (e: FormEvent) => {
+    e.preventDefault();
+    setBrevoStatus("loading");
+    const payload: Record<string, string> = {};
+    if (brevoKey.trim()) payload.brevoApiKey = brevoKey.trim();
+    if (settings!.brevoSenderEmail !== null) payload.brevoSenderEmail = settings!.brevoSenderEmail ?? "";
+    if (settings!.brevoSenderName  !== null) payload.brevoSenderName  = settings!.brevoSenderName  ?? "";
+    if (settings!.brevoSmsFrom     !== null) payload.brevoSmsFrom     = settings!.brevoSmsFrom     ?? "";
+    // always send the non-secret fields from current settings
+    const full = {
+      brevoSenderEmail: settings!.brevoSenderEmail ?? "",
+      brevoSenderName:  settings!.brevoSenderName  ?? "",
+      brevoSmsFrom:     settings!.brevoSmsFrom     ?? "",
+      ...payload,
+    };
+    const ok = await patch(full as Partial<GymSettings>);
+    if (ok) { setBrevoKey(""); router.refresh(); }
+    setBrevoStatus(ok ? "ok" : "error");
+    setTimeout(() => setBrevoStatus("idle"), 2500);
   };
 
   const handlePassword = async (e: FormEvent) => {
@@ -302,6 +331,69 @@ export default function SettingsPage() {
           </div>
 
           <SaveButton loading={stripeStatus === "loading"} status={stripeStatus} />
+        </form>
+      </Section>
+
+      {/* Brevo Email & SMS */}
+      <Section title="Email & SMS (Brevo)">
+        <form onSubmit={handleBrevo} className="space-y-4">
+          <p className="text-xs text-gray-500">
+            <a href="https://app.brevo.com" target="_blank" rel="noreferrer" className="underline">Sign up at brevo.com</a> for a free account (300 emails/day). Enter your API key and sender details below.
+            {settings.brevoApiKey && <span className="ml-2 px-2 py-0.5 rounded text-xs font-semibold bg-green-900/50 text-green-400">Configured</span>}
+          </p>
+
+          <div>
+            <label className="block text-xs font-medium text-gray-400 mb-1">
+              API Key
+              {settings.brevoApiKey && <span className="ml-2 font-mono text-gray-600 text-xs">(current: {maskKey(settings.brevoApiKey)})</span>}
+            </label>
+            <input
+              type="password"
+              value={brevoKey}
+              onChange={e => setBrevoKey(e.target.value)}
+              className={input}
+              placeholder={settings.brevoApiKey ? "Enter new key to replace…" : "xkeysib-…"}
+              autoComplete="new-password"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-400 mb-1">Sender Email</label>
+              <input
+                type="email"
+                value={settings.brevoSenderEmail ?? ""}
+                onChange={e => setSettings({ ...settings, brevoSenderEmail: e.target.value })}
+                className={input}
+                placeholder="noreply@yourgym.com"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-400 mb-1">Sender Name</label>
+              <input
+                type="text"
+                value={settings.brevoSenderName ?? ""}
+                onChange={e => setSettings({ ...settings, brevoSenderName: e.target.value })}
+                className={input}
+                placeholder="City BJJ"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-gray-400 mb-1">SMS From (max 11 chars)</label>
+            <input
+              type="text"
+              maxLength={11}
+              value={settings.brevoSmsFrom ?? ""}
+              onChange={e => setSettings({ ...settings, brevoSmsFrom: e.target.value })}
+              className="w-48 px-4 py-2.5 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:border-blue-500 text-sm"
+              placeholder="CityBJJ"
+            />
+            <p className="text-xs text-gray-500 mt-1">Shown as the sender name on SMS messages. Leave blank to skip SMS.</p>
+          </div>
+
+          <SaveButton loading={brevoStatus === "loading"} status={brevoStatus} />
         </form>
       </Section>
 

@@ -24,11 +24,15 @@ export async function PATCH(req: Request) {
     "defaultTaxRate", "setupComplete",
     "beltConfig", "instructorNames", "posCategories",
     "stripePublishableKey", "stripeSecretKey", "stripeWebhookSecret",
+    "brevoApiKey", "brevoSenderEmail", "brevoSenderName", "brevoSmsFrom",
   ];
   const data: Record<string, unknown> = {};
   for (const key of allowed) {
     if (key in body) data[key] = body[key];
   }
+
+  // Don't overwrite secrets with empty strings
+  if (!data.brevoApiKey) delete data.brevoApiKey;
 
   if (data.defaultTaxRate !== undefined) {
     const rate = Number(data.defaultTaxRate);

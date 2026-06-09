@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/require-auth";
+import { sendEmail } from "@/lib/email";
+import { sendSMS } from "@/lib/sms";
 
 type WorkflowConfig = {
   channel:        string;
@@ -9,6 +11,14 @@ type WorkflowConfig = {
   inactivity_days?: number;
   trial_classes?:   number;
   cooldown_days?:   number;
+};
+
+type Target = {
+  id: number;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  vars: Record<string, string>;
 };
 
 function render(template: string, vars: Record<string, string>) {
@@ -25,6 +35,14 @@ async function recentlyMessaged(workflowId: number, memberIds: number[], cooldow
   return new Set(recent.map((m) => m.memberId));
 }
 
+async function deliver(channel: string, target: Target, subject: string | null, body: string) {
+  if (channel === "email" && target.email) {
+    await sendEmail(target.email, subject ?? "(no subject)", `<p>${body.replace(/\n/g, "<br>")}</p>`);
+  } else if (channel === "sms" && target.phone) {
+    await sendSMS(target.phone, body);
+  }
+}
+
 export async function POST(req: Request) {
   const { error } = await requireAuth("marketing");
   if (error) return error;
@@ -39,7 +57,7 @@ export async function POST(req: Request) {
   const config    = workflow.config as WorkflowConfig;
   const cooldown  = config.cooldown_days ?? 30;
   const now       = new Date();
-  let   targets: { id: number; name: string; vars: Record<string, string> }[] = [];
+  let   targets: Target[] = [];
 
   // ── Inactivity ──────────────────────────────────────────────────────────────
   if (workflow.triggerType === "inactivity") {
@@ -51,7 +69,7 @@ export async function POST(req: Request) {
         status: "active",
         attendance: { none: { timestamp: { gte: cutoff } } },
       },
-      select: { id: true, name: true, attendance: { orderBy: { timestamp: "desc" }, take: 1 } },
+      select: { id: true, name: true, email: true, phone: true, attendance: { orderBy: { timestamp: "desc" }, take: 1 } },
     });
 
     targets = members.map((m) => {
@@ -59,7 +77,7 @@ export async function POST(req: Request) {
       const daysAgo = last
         ? Math.floor((now.getTime() - last.getTime()) / (1000 * 60 * 60 * 24))
         : days;
-      return { id: m.id, name: m.name, vars: { name: m.name.split(" ")[0], days: String(daysAgo) } };
+      return { id: m.id, name: m.name, email: m.email, phone: m.phone, vars: { name: m.name.split(" ")[0], days: String(daysAgo) } };
     });
   }
 
@@ -72,7 +90,7 @@ export async function POST(req: Request) {
     });
     const eligible = members.filter((m) => m._count.attendance >= minClasses);
     targets = eligible.map((m) => ({
-      id: m.id, name: m.name,
+      id: m.id, name: m.name, email: m.email, phone: m.phone,
       vars: { name: m.name.split(" ")[0], classes: String(m._count.attendance) },
     }));
   }
@@ -81,22 +99,22 @@ export async function POST(req: Request) {
   if (workflow.triggerType === "birthday") {
     const month = now.getMonth() + 1;
     const day   = now.getDate();
-    const members = await prisma.$queryRaw<{ id: number; name: string }[]>`
-      SELECT id, name FROM members
+    const members = await prisma.$queryRaw<{ id: number; name: string; email: string | null; phone: string | null }[]>`
+      SELECT id, name, email, phone FROM members
       WHERE date_of_birth IS NOT NULL
         AND EXTRACT(MONTH FROM date_of_birth) = ${month}
         AND EXTRACT(DAY   FROM date_of_birth) = ${day}
     `;
-    targets = members.map((m) => ({ id: m.id, name: m.name, vars: { name: m.name.split(" ")[0] } }));
+    targets = members.map((m) => ({ id: m.id, name: m.name, email: m.email, phone: m.phone, vars: { name: m.name.split(" ")[0] } }));
   }
 
   // ── Failed payment ───────────────────────────────────────────────────────────
   if (workflow.triggerType === "failed_payment") {
     const members = await prisma.member.findMany({
       where:  { status: "past_due" },
-      select: { id: true, name: true },
+      select: { id: true, name: true, email: true, phone: true },
     });
-    targets = members.map((m) => ({ id: m.id, name: m.name, vars: { name: m.name.split(" ")[0] } }));
+    targets = members.map((m) => ({ id: m.id, name: m.name, email: m.email, phone: m.phone, vars: { name: m.name.split(" ")[0] } }));
   }
 
   // ── Promotion ────────────────────────────────────────────────────────────────
@@ -113,21 +131,25 @@ export async function POST(req: Request) {
   const spamSet = await recentlyMessaged(workflow.id, targets.map((t) => t.id), cooldown);
   const eligible = targets.filter((t) => !spamSet.has(t.id));
 
-  // Create messages
-  const messages = await Promise.all(
-    eligible.map((t) =>
-      prisma.message.create({
-        data: {
-          memberId:   t.id,
-          workflowId: workflow.id,
-          channel:    config.channel,
-          subject:    config.subject ? render(config.subject, t.vars) : null,
-          body:       render(config.body, t.vars),
-          sentAt:     now,
-        },
-      })
-    )
+  // Create message records and deliver
+  let sent = 0;
+  await Promise.all(
+    eligible.map(async (t) => {
+      const subject = config.subject ? render(config.subject, t.vars) : null;
+      const body    = render(config.body, t.vars);
+
+      await prisma.message.create({
+        data: { memberId: t.id, workflowId: workflow.id, channel: config.channel, subject, body, sentAt: now },
+      });
+
+      try {
+        await deliver(config.channel, t, subject, body);
+        sent++;
+      } catch (err) {
+        console.error(`Delivery failed for member ${t.id}:`, err);
+      }
+    })
   );
 
-  return NextResponse.json({ sent: messages.length, skipped: targets.length - eligible.length });
+  return NextResponse.json({ sent, skipped: targets.length - eligible.length });
 }
