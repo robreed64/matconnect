@@ -103,7 +103,7 @@ export default function EditUserPage() {
 
         <div>
           <label className="block text-xs font-medium text-gray-400 mb-1">Email</label>
-          <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className={input} />
+          <input type="text" inputMode="email" autoComplete="email" autoCorrect="off" autoCapitalize="none" required value={email} onChange={e => setEmail(e.target.value)} className={input} />
         </div>
 
         <div>

@@ -103,7 +103,7 @@ export default function CreateMemberAccount({
             <div className="space-y-3">
               <div>
                 <label className="block text-xs text-gray-400 mb-1">Email</label>
-                <input value={email} onChange={(e) => setEmail(e.target.value)} type="email"
+                <input value={email} onChange={(e) => setEmail(e.target.value)} type="text" inputMode="email" autoComplete="email" autoCorrect="off" autoCapitalize="none"
                   className="w-full px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white text-sm focus:outline-none focus:border-blue-500 transition"
                   placeholder="member@email.com" />
               </div>

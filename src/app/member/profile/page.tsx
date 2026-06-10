@@ -49,7 +49,7 @@ function ContactSection() {
       <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500">Contact Info</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="Name"    value={form.name}    onChange={v => setForm(p => ({ ...p, name: v }))} />
-        <Field label="Email"   value={form.email}   onChange={v => setForm(p => ({ ...p, email: v }))} type="email" />
+        <Field label="Email"   value={form.email}   onChange={v => setForm(p => ({ ...p, email: v }))} type="text" inputMode="email" autoComplete="email" />
         <Field label="Phone"   value={form.phone}   onChange={v => setForm(p => ({ ...p, phone: v }))} type="tel" />
         <Field label="Address" value={form.address} onChange={v => setForm(p => ({ ...p, address: v }))} />
       </div>
@@ -542,17 +542,23 @@ function Field({
   value,
   onChange,
   type = "text",
+  inputMode,
+  autoComplete,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   type?: string;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+  autoComplete?: string;
 }) {
   return (
     <div>
       <label className="block text-xs text-gray-500 mb-1">{label}</label>
       <input
         type={type}
+        inputMode={inputMode}
+        autoComplete={autoComplete}
         value={value}
         onChange={e => onChange(e.target.value)}
         className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 transition"

@@ -82,7 +82,7 @@ export default function NewMemberPage() {
 
         <div className="grid grid-cols-2 gap-4">
           <Field label="Email *" error={errors.email}>
-            <input type="email" placeholder="you@example.com" value={form.email}
+            <input type="text" inputMode="email" autoComplete="email" autoCorrect="off" autoCapitalize="none" placeholder="you@example.com" value={form.email}
               onChange={(e) => set("email", e.target.value)} className={inp(!!errors.email)} />
           </Field>
           <Field label="Phone *" error={errors.phone}>

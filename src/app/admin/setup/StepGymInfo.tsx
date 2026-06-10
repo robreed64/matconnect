@@ -22,7 +22,7 @@ export default function StepGymInfo({ values, onChange, onNext }: Props) {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-400 mb-1.5">Email</label>
-          <input type="email" value={values.gymEmail} onChange={e => onChange({ gymEmail: e.target.value })} className={field} placeholder="info@yourgym.com" />
+          <input type="text" inputMode="email" autoComplete="email" autoCorrect="off" autoCapitalize="none" value={values.gymEmail} onChange={e => onChange({ gymEmail: e.target.value })} className={field} placeholder="info@yourgym.com" />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-400 mb-1.5">Phone</label>

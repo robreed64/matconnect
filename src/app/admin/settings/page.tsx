@@ -208,7 +208,7 @@ export default function SettingsPage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-gray-400 mb-1">Email</label>
-              <input type="email" value={settings.gymEmail} onChange={e => setSettings({ ...settings, gymEmail: e.target.value })} className={input} />
+              <input type="text" inputMode="email" autoComplete="email" autoCorrect="off" autoCapitalize="none" value={settings.gymEmail} onChange={e => setSettings({ ...settings, gymEmail: e.target.value })} className={input} />
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-400 mb-1">Phone</label>
@@ -366,7 +366,7 @@ export default function SettingsPage() {
             <div>
               <label className="block text-xs font-medium text-gray-400 mb-1">Sender Email</label>
               <input
-                type="email"
+                type="text" inputMode="email" autoComplete="email" autoCorrect="off" autoCapitalize="none"
                 value={settings.brevoSenderEmail ?? ""}
                 onChange={e => setSettings({ ...settings, brevoSenderEmail: e.target.value })}
                 className={input}

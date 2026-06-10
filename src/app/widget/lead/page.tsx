@@ -95,7 +95,7 @@ export default function LeadWidgetPage() {
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">Email address *</label>
             <input
-              type="email"
+              type="text" inputMode="email" autoComplete="email" autoCorrect="off" autoCapitalize="none"
               required
               value={form.email}
               onChange={e => setForm(p => ({ ...p, email: e.target.value }))}

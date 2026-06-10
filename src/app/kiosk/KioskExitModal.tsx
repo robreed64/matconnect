@@ -47,7 +47,7 @@ export default function KioskExitModal({ onClose }: { onClose: () => void }) {
         {error && <p className="text-sm text-red-400">{error}</p>}
         <div className="space-y-3">
           <input
-            type="email"
+            type="text" inputMode="email" autoComplete="email" autoCorrect="off" autoCapitalize="none"
             value={email}
             onChange={e => setEmail(e.target.value)}
             placeholder="Admin email"

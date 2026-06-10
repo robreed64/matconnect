@@ -57,7 +57,7 @@ export default function CreatePortalAccount({ members }: { members: Member[] }) 
           ))}
         </select>
         <input
-          type="email"
+          type="text" inputMode="email" autoComplete="email" autoCorrect="off" autoCapitalize="none"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}

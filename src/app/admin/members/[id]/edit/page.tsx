@@ -121,7 +121,7 @@ export default function EditMemberPage() {
                   </Field>
                   <div className="grid grid-cols-2 gap-4">
                     <Field label="Email">
-                      <input type="email" value={form.email} onChange={(e) => set("email", e.target.value)}
+                      <input type="text" inputMode="email" autoComplete="email" autoCorrect="off" autoCapitalize="none" value={form.email} onChange={(e) => set("email", e.target.value)}
                         className={inp} placeholder="jane@email.com" />
                     </Field>
                     <Field label="Phone">

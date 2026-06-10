@@ -63,9 +63,8 @@ function LoginForm() {
           <div>
             <label className="block text-sm font-medium text-gray-400 mb-1.5">Email</label>
             <input
-              type="email"
+              type="text" inputMode="email" autoComplete="email" autoCorrect="off" autoCapitalize="none"
               required
-              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2.5 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm transition"
