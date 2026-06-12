@@ -12,7 +12,7 @@ export default function PosSetupClient({ categories: initial, items: initial_ite
   const [newCat, setNewCat] = useState("");
   const [savingCats, setSavingCats] = useState(false);
   const [catStatus, setCatStatus] = useState<"idle" | "ok" | "error">("idle");
-  const [editingItem, setEditingItem] = useState<number | null>(null);
+  const [editingItem, setEditingItem] = useState<number | "new" | null>(null);
   const [itemForm, setItemForm] = useState<Partial<Item & { priceStr: string }>>({});
   const [savingItem, setSavingItem] = useState(false);
   const [error, setError] = useState("");
@@ -58,24 +58,32 @@ export default function PosSetupClient({ categories: initial, items: initial_ite
     setError("");
   };
 
+  const startAddItem = () => {
+    setEditingItem("new");
+    setItemForm({ name: "", category: categories[0], priceStr: "", taxRate: 0, stock: null });
+    setError("");
+  };
+
   const saveItem = async () => {
     if (!editingItem) return;
+    if (!itemForm.name?.trim()) { setError("Item name is required"); return; }
     setSavingItem(true); setError("");
     const priceCents = Math.round(parseFloat(itemForm.priceStr ?? "0") * 100);
-    const res = await fetch(`/api/admin/pos/items/${editingItem}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: itemForm.name,
-        category: itemForm.category,
-        priceCents,
-        taxRate: itemForm.taxRate,
-        stock: itemForm.stock ?? null,
-      }),
+    const body = JSON.stringify({
+      name: itemForm.name,
+      category: itemForm.category,
+      priceCents,
+      taxRate: itemForm.taxRate,
+      stock: itemForm.stock ?? null,
     });
+    const res = editingItem === "new"
+      ? await fetch("/api/admin/pos/items", { method: "POST", headers: { "Content-Type": "application/json" }, body })
+      : await fetch(`/api/admin/pos/items/${editingItem}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body });
     const data = await res.json();
     if (!res.ok) { setError(data.error ?? "Save failed"); setSavingItem(false); return; }
-    setItems(prev => prev.map(i => i.id === editingItem ? { ...i, ...data, taxRate: Number(data.taxRate) } : i));
+    setItems(prev => editingItem === "new"
+      ? [...prev, { ...data, taxRate: Number(data.taxRate) }]
+      : prev.map(i => i.id === editingItem ? { ...i, ...data, taxRate: Number(data.taxRate) } : i));
     setEditingItem(null);
     setSavingItem(false);
     router.refresh();
@@ -93,6 +101,45 @@ export default function PosSetupClient({ categories: initial, items: initial_ite
   const inp = "px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white text-sm focus:outline-none focus:border-blue-500";
   const [renamingCat, setRenamingCat] = useState<string | null>(null);
   const [renameVal, setRenameVal] = useState("");
+
+  // Shared between the inline edit rows and the add-item slot
+  const itemFormFields = (
+    <div className="px-5 py-4 space-y-3">
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="text-xs text-gray-500 mb-1 block">Name</label>
+          <input className={`${inp} w-full`} value={itemForm.name ?? ""} onChange={e => setItemForm(f => ({ ...f, name: e.target.value }))} />
+        </div>
+        <div>
+          <label className="text-xs text-gray-500 mb-1 block">Category</label>
+          <select className={`${inp} w-full`} value={itemForm.category ?? ""} onChange={e => setItemForm(f => ({ ...f, category: e.target.value }))}>
+            {categories.map(c => <option key={c} value={c}>{c.replace(/_/g, " ")}</option>)}
+          </select>
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        <div>
+          <label className="text-xs text-gray-500 mb-1 block">Price ($)</label>
+          <input type="number" step="0.01" min="0" className={`${inp} w-full`}
+            value={itemForm.priceStr ?? ""} onChange={e => setItemForm(f => ({ ...f, priceStr: e.target.value }))} />
+        </div>
+        <div>
+          <label className="text-xs text-gray-500 mb-1 block">Tax %</label>
+          <input type="number" step="0.01" min="0" max="100" className={`${inp} w-full`}
+            value={itemForm.taxRate ?? ""} onChange={e => setItemForm(f => ({ ...f, taxRate: parseFloat(e.target.value) || 0 }))} />
+        </div>
+        <div>
+          <label className="text-xs text-gray-500 mb-1 block">Stock</label>
+          <input type="number" min="0" placeholder="Unlimited" className={`${inp} w-full`}
+            value={itemForm.stock ?? ""} onChange={e => setItemForm(f => ({ ...f, stock: e.target.value ? parseInt(e.target.value) : null }))} />
+        </div>
+      </div>
+      <div className="flex gap-2">
+        <button onClick={saveItem} disabled={savingItem} className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium disabled:opacity-50 transition">{savingItem ? "…" : "Save"}</button>
+        <button onClick={() => setEditingItem(null)} className="px-3 py-1.5 rounded-lg bg-gray-700 text-xs text-gray-300 transition">Cancel</button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -145,47 +192,20 @@ export default function PosSetupClient({ categories: initial, items: initial_ite
       <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-800 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Items</h2>
-          <span className="text-xs text-gray-600">{items.length} total</span>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-gray-600">{items.length} total</span>
+            <button onClick={startAddItem}
+              className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium transition">
+              + Add Item
+            </button>
+          </div>
         </div>
         <div className="divide-y divide-gray-800">
+          {editingItem === "new" && itemFormFields}
           {items.map(item => (
             <div key={item.id}>
               {editingItem === item.id ? (
-                <div className="px-5 py-4 space-y-3">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-xs text-gray-500 mb-1 block">Name</label>
-                      <input className={`${inp} w-full`} value={itemForm.name ?? ""} onChange={e => setItemForm(f => ({ ...f, name: e.target.value }))} />
-                    </div>
-                    <div>
-                      <label className="text-xs text-gray-500 mb-1 block">Category</label>
-                      <select className={`${inp} w-full`} value={itemForm.category ?? ""} onChange={e => setItemForm(f => ({ ...f, category: e.target.value }))}>
-                        {categories.map(c => <option key={c} value={c}>{c.replace(/_/g, " ")}</option>)}
-                      </select>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div>
-                      <label className="text-xs text-gray-500 mb-1 block">Price ($)</label>
-                      <input type="number" step="0.01" min="0" className={`${inp} w-full`}
-                        value={itemForm.priceStr ?? ""} onChange={e => setItemForm(f => ({ ...f, priceStr: e.target.value }))} />
-                    </div>
-                    <div>
-                      <label className="text-xs text-gray-500 mb-1 block">Tax %</label>
-                      <input type="number" step="0.01" min="0" max="100" className={`${inp} w-full`}
-                        value={itemForm.taxRate ?? ""} onChange={e => setItemForm(f => ({ ...f, taxRate: parseFloat(e.target.value) || 0 }))} />
-                    </div>
-                    <div>
-                      <label className="text-xs text-gray-500 mb-1 block">Stock</label>
-                      <input type="number" min="0" placeholder="Unlimited" className={`${inp} w-full`}
-                        value={itemForm.stock ?? ""} onChange={e => setItemForm(f => ({ ...f, stock: e.target.value ? parseInt(e.target.value) : null }))} />
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <button onClick={saveItem} disabled={savingItem} className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium disabled:opacity-50 transition">{savingItem ? "…" : "Save"}</button>
-                    <button onClick={() => setEditingItem(null)} className="px-3 py-1.5 rounded-lg bg-gray-700 text-xs text-gray-300 transition">Cancel</button>
-                  </div>
-                </div>
+                itemFormFields
               ) : (
                 <div className="px-5 py-3 flex items-center gap-4">
                   <div className="flex-1">
@@ -200,7 +220,9 @@ export default function PosSetupClient({ categories: initial, items: initial_ite
               )}
             </div>
           ))}
-          {items.length === 0 && <p className="px-5 py-8 text-center text-sm text-gray-600">No items yet.</p>}
+          {items.length === 0 && editingItem !== "new" && (
+            <p className="px-5 py-8 text-center text-sm text-gray-600">No items yet — use + Add Item above.</p>
+          )}
         </div>
       </div>
     </div>
