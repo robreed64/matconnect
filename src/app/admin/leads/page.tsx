@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ConvertButton, DeleteLeadButton } from "./LeadActions";
+import EmbedSnippetCard from "./EmbedSnippetCard";
 
 export default async function LeadsPage() {
   const leads = await prisma.member.findMany({
@@ -40,16 +41,13 @@ export default async function LeadsPage() {
       </div>
 
       {leads.length === 0 ? (
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-12 text-center">
-          <p className="text-gray-600 text-sm">
-            No leads yet. Add the lead capture form to your website to start collecting prospects.
-          </p>
-          <Link
-            href="/admin/settings#lead-capture"
-            className="mt-4 inline-block text-sm text-blue-400 hover:text-blue-300 transition"
-          >
-            Get embed code →
-          </Link>
+        <div className="space-y-6">
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-12 text-center">
+            <p className="text-gray-600 text-sm">
+              No leads yet. Add the lead capture form to your website to start collecting prospects.
+            </p>
+          </div>
+          <EmbedSnippetCard />
         </div>
       ) : (
         <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
@@ -96,6 +94,12 @@ export default async function LeadsPage() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {leads.length > 0 && (
+        <div className="mt-6">
+          <EmbedSnippetCard />
         </div>
       )}
     </div>
