@@ -129,8 +129,12 @@ export async function POST(req: Request) {
   }
 
   try {
+    let checkedIn = false;
+    let waiverPending = false;
+
     const sale = await prisma.$transaction(async (tx) => {
       let saleMemberId = memberId ?? null;
+      let hasWaiver = false;
 
       // Day-pass walk-in: create a trial member so they're trackable in the funnel
       if (hasDayPass && !saleMemberId && walkIn?.name?.trim()) {
@@ -144,6 +148,12 @@ export async function POST(req: Request) {
           },
         });
         saleMemberId = created.id;
+      } else if (hasDayPass && saleMemberId) {
+        const buyer = await tx.member.findUnique({
+          where: { id: saleMemberId },
+          select: { waiverSignedAt: true },
+        });
+        hasWaiver = !!buyer?.waiverSignedAt;
       }
 
       const created = await tx.sale.create({
@@ -168,17 +178,24 @@ export async function POST(req: Request) {
         });
       }
 
-      // Day pass includes immediate check-in
+      // Day pass includes immediate check-in — but only with a waiver on file.
+      // Unwaivered buyers (all walk-ins) sign at the kiosk, which completes the
+      // check-in; /api/checkin is idempotent so this never double-counts.
       if (hasDayPass && saleMemberId) {
-        await tx.attendance.create({
-          data: { memberId: saleMemberId, classId: null, source: "staff" },
-        });
+        if (hasWaiver) {
+          await tx.attendance.create({
+            data: { memberId: saleMemberId, classId: null, source: "staff" },
+          });
+          checkedIn = true;
+        } else {
+          waiverPending = true;
+        }
       }
 
       return created;
     });
 
-    return NextResponse.json({ ...sale, checkedIn: hasDayPass }, { status: 201 });
+    return NextResponse.json({ ...sale, checkedIn, waiverPending }, { status: 201 });
   } catch (err) {
     // Card was already charged; surface the PI id so the sale can be reconciled in Stripe
     console.error(`POS sale record failed (paymentIntent: ${stripePaymentIntentId ?? "none"}):`, err);

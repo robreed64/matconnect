@@ -47,7 +47,7 @@ export default function POSTerminal({ initialItems, categories }: { initialItems
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [walkInName, setWalkInName]   = useState("");
   const [walkInEmail, setWalkInEmail] = useState("");
-  const [receipt, setReceipt]       = useState<{ total: number; id: number; checkedIn?: boolean } | null>(null);
+  const [receipt, setReceipt]       = useState<{ total: number; id: number; checkedIn?: boolean; waiverPending?: boolean } | null>(null);
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const visibleItems = items.filter((i) => i.category === tab);
@@ -107,7 +107,7 @@ export default function POSTerminal({ initialItems, categories }: { initialItems
       });
       if (res.ok) {
         const sale = await res.json();
-        setReceipt({ total: sale.totalCents, id: sale.id, checkedIn: sale.checkedIn });
+        setReceipt({ total: sale.totalCents, id: sale.id, checkedIn: sale.checkedIn, waiverPending: sale.waiverPending });
         setCart([]);
         setSelectedMember(null);
         setMemberQ("");
@@ -131,7 +131,10 @@ export default function POSTerminal({ initialItems, categories }: { initialItems
           <p className="text-2xl font-bold text-green-400">{fmt(receipt.total)} charged</p>
           <p className="text-gray-500 text-sm mt-1">Sale #{receipt.id}</p>
           {receipt.checkedIn && (
-            <p className="text-green-400 text-sm mt-2 font-medium">✓ Checked in — remind them to sign the waiver at the kiosk</p>
+            <p className="text-green-400 text-sm mt-2 font-medium">✓ Checked in</p>
+          )}
+          {receipt.waiverPending && (
+            <p className="text-amber-300 text-sm mt-2 font-medium">→ Send them to the kiosk to sign the waiver — signing completes check-in</p>
           )}
         </div>
         <button

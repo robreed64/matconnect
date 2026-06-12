@@ -5,7 +5,7 @@ import { requireAuth } from "@/lib/require-auth";
 export async function POST(req: NextRequest) {
   const { error } = await requireAuth("members");
   if (error) return error;
-  const { name, email, phone, dateOfBirth, ageGroup, beltRank, trainingType, status, planId } = await req.json();
+  const { name, email, phone, dateOfBirth, ageGroup, beltRank, trainingType, status, planId, waiverSigned } = await req.json();
 
   if (!name?.trim() || !email?.trim() || !phone?.trim()) {
     return NextResponse.json({ error: "Name, email, and phone are required" }, { status: 400 });
@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
       trainingType: trainingType || null,
       status:      status    || "active",
       trialStartedAt: status === "trial" ? new Date() : null,
+      waiverSignedAt: waiverSigned ? new Date() : null,
     },
   });
 

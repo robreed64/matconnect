@@ -11,6 +11,7 @@ import { getNextBelt } from "@/lib/belt-data";
 import { getGymSettings } from "@/lib/gym-settings";
 import { trialDaysLeft, trialBadge } from "@/lib/trial";
 import MemberQRCode from "./MemberQRCode";
+import WaiverToggle from "./WaiverToggle";
 
 const BELT_STYLES: Record<string, { bg: string; text: string }> = {
   white:  { bg: "bg-white",      text: "text-gray-900" },
@@ -124,6 +125,9 @@ export default async function MemberDetailPage({ params }: { params: Params }) {
             {member.trainingType && (
               <span className="text-sm text-gray-400">{member.trainingType}</span>
             )}
+          </div>
+          <div className="mt-2">
+            <WaiverToggle memberId={member.id} waiverSignedAt={member.waiverSignedAt?.toISOString() ?? null} />
           </div>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">

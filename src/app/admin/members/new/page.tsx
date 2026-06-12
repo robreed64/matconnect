@@ -22,6 +22,7 @@ export default function NewMemberPage() {
     beltRank: "white", trainingType: "",
     status: "active", planId: "",
   });
+  const [waiverSigned, setWaiverSigned] = useState(true);
 
   useEffect(() => {
     fetch("/api/plans").then((r) => r.json()).then(setPlans);
@@ -57,6 +58,7 @@ export default function NewMemberPage() {
         ...form,
         planId: form.planId || null,
         dateOfBirth: form.dateOfBirth || null,
+        waiverSigned,
       }),
     });
 
@@ -126,6 +128,21 @@ export default function NewMemberPage() {
             ))}
           </select>
         </Field>
+
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={waiverSigned}
+            onChange={(e) => setWaiverSigned(e.target.checked)}
+            className="mt-0.5 w-4 h-4 rounded accent-blue-600"
+          />
+          <span className="text-sm text-gray-300">
+            Waiver signed (paper or prior record)
+            <span className="block text-xs text-gray-500 mt-0.5">
+              Unchecked members will be asked to sign at the kiosk on their first check-in.
+            </span>
+          </span>
+        </label>
 
         {errors.submit && <p className="text-red-400 text-sm">{errors.submit}</p>}
 
