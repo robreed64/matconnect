@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/require-auth";
+import { countActiveBookings } from "@/lib/waitlist";
 
 type Params = Promise<{ id: string }>;
 
@@ -41,12 +42,27 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 
   if (!memberId) return NextResponse.json({ error: "memberId required" }, { status: 400 });
 
-  // Upsert booking
-  const existing = await prisma.booking.findFirst({ where: { memberId, classId } });
+  const existing = await prisma.booking.findFirst({
+    where: { memberId, classId, status: { in: ["booked", "attended", "waitlisted"] } },
+  });
+
+  // Booking (not checking in) respects capacity so staff can't silently
+  // oversubscribe or queue-jump the waitlist; an explicit Check In is the
+  // front desk's call and always goes through.
+  let targetStatus = markAttended ? "attended" : "booked";
+  if (!markAttended && existing?.status === "attended") targetStatus = "attended"; // never downgrade
+  if (!markAttended && (!existing || existing.status === "waitlisted")) {
+    const cls = await prisma.class.findUnique({ where: { id: classId }, select: { capacity: true } });
+    if (cls?.capacity != null && (await countActiveBookings(classId)) >= cls.capacity) {
+      targetStatus = "waitlisted";
+    }
+  }
 
   const booking = existing
-    ? await prisma.booking.update({ where: { id: existing.id }, data: { status: markAttended ? "attended" : "booked" } })
-    : await prisma.booking.create({ data: { memberId, classId, status: markAttended ? "attended" : "booked" } });
+    ? existing.status === targetStatus
+      ? existing
+      : await prisma.booking.update({ where: { id: existing.id }, data: { status: targetStatus } })
+    : await prisma.booking.create({ data: { memberId, classId, status: targetStatus } });
 
   // Create attendance record if marking attended and not already present
   if (markAttended) {
