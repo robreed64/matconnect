@@ -178,6 +178,12 @@ export default function KioskSignup({
               <label className={lbl}>Full Name *</label>
               <input
                 className={`${inp} ${errors.name ? "border-red-500" : ""}`}
+                type="text"
+                inputMode="text"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="words"
+                spellCheck={false}
                 placeholder="Jane Smith"
                 value={name}
                 onChange={(e) => {
@@ -193,8 +199,12 @@ export default function KioskSignup({
               <label className={lbl}>Email *</label>
               <input
                 className={`${inp} ${errors.email ? "border-red-500" : ""}`}
-                type="email"
+                type="text"
                 inputMode="email"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="none"
+                spellCheck={false}
                 placeholder="jane@email.com"
                 value={email}
                 onChange={(e) => {
@@ -210,8 +220,12 @@ export default function KioskSignup({
               <label className={lbl}>Phone *</label>
               <input
                 className={`${inp} ${errors.phone ? "border-red-500" : ""}`}
-                type="tel"
+                type="text"
                 inputMode="tel"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="none"
+                spellCheck={false}
                 placeholder="(555) 000-0000"
                 value={phone}
                 onChange={(e) => {
