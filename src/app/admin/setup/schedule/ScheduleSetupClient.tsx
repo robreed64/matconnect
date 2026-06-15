@@ -87,25 +87,31 @@ export default function ScheduleSetupClient({
     }
   };
 
-  // Program types
-  const addProgType = () => {
-    const trimmed = newType.trim().toLowerCase();
-    if (!trimmed || progTypes.includes(trimmed)) return;
-    setProgTypes(prev => [...prev, trimmed]);
-    setNewType("");
-  };
-
-  const removeProgType = (t: string) => setProgTypes(prev => prev.filter(x => x !== t));
-
-  const saveProgTypes = async () => {
+  // Program types — auto-save on every add/remove
+  const persistProgTypes = async (updated: string[]) => {
     setSavingTypes(true);
     await fetch("/api/admin/settings", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ programTypes: progTypes }),
+      body: JSON.stringify({ programTypes: updated }),
     });
     setSavingTypes(false);
     router.refresh();
+  };
+
+  const addProgType = () => {
+    const trimmed = newType.trim().toLowerCase();
+    if (!trimmed || progTypes.includes(trimmed)) return;
+    const updated = [...progTypes, trimmed];
+    setProgTypes(updated);
+    setNewType("");
+    persistProgTypes(updated);
+  };
+
+  const removeProgType = (t: string) => {
+    const updated = progTypes.filter(x => x !== t);
+    setProgTypes(updated);
+    persistProgTypes(updated);
   };
 
   // Instructors
@@ -239,11 +245,10 @@ export default function ScheduleSetupClient({
             onChange={e => setNewType(e.target.value)}
             onKeyDown={e => e.key === "Enter" && addProgType()}
           />
-          <button onClick={addProgType} className="px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm text-gray-300 transition">Add</button>
+          <button onClick={addProgType} disabled={savingTypes} className="px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm text-gray-300 disabled:opacity-50 transition">
+            {savingTypes ? "…" : "Add"}
+          </button>
         </div>
-        <button onClick={saveProgTypes} disabled={savingTypes} className="mt-3 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium disabled:opacity-50 transition">
-          {savingTypes ? "Saving…" : "Save Types"}
-        </button>
       </div>
 
       {/* Instructor Names */}
