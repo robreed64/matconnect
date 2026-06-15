@@ -36,6 +36,7 @@ export default async function PortalPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
+
   const userRow  = await prisma.user.findUnique({
     where: { email: session.user.email! },
     include: {

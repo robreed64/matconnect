@@ -2,15 +2,7 @@
 
 import { useEffect, useState, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-
-const TYPE_COLORS: Record<string, string> = {
-  gi:      "bg-blue-700   border-blue-500   text-white",
-  "no-gi": "bg-orange-700 border-orange-500 text-white",
-  youth:   "bg-green-700  border-green-500  text-white",
-  seminar: "bg-purple-700 border-purple-500 text-white",
-  intro:   "bg-yellow-700 border-yellow-500 text-white",
-  private: "bg-gray-700   border-gray-500   text-white",
-};
+import { PRESET_COLORS, buildColorMap } from "@/lib/program-colors";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const HOUR_START = 6;
@@ -64,14 +56,22 @@ function ScheduleInner() {
     if (weekParam) return getMondayOf(new Date(weekParam + "T12:00:00"));
     return getMondayOf(new Date());
   });
-  const [classes,   setClasses]   = useState<ScheduleClass[]>([]);
-  const [loading,   setLoading]   = useState(true);
-  const [selected,  setSelected]  = useState<ScheduleClass | null>(null);
-  const [busy,      setBusy]      = useState(false);
-  const [toast,     setToast]     = useState<string | null>(null);
-  const [today,     setToday]     = useState("");
+  const [classes,    setClasses]    = useState<ScheduleClass[]>([]);
+  const [loading,    setLoading]    = useState(true);
+  const [selected,   setSelected]   = useState<ScheduleClass | null>(null);
+  const [busy,       setBusy]       = useState(false);
+  const [toast,      setToast]      = useState<string | null>(null);
+  const [today,      setToday]      = useState("");
+  const [typeColors, setTypeColors] = useState<Record<string, string>>(PRESET_COLORS);
 
   useEffect(() => { setToday(toLocalISO(new Date())); }, []);
+
+  useEffect(() => {
+    fetch("/api/meta/program-types")
+      .then(r => r.ok ? r.json() : [])
+      .then((types: string[]) => setTypeColors(buildColorMap(types)))
+      .catch(() => {});
+  }, []);
 
   // Sync weekStart when URL param changes
   useEffect(() => {
@@ -169,7 +169,7 @@ function ScheduleInner() {
         </div>
         <div className="flex items-center gap-3">
           <div className="flex gap-1.5 flex-wrap text-xs">
-            {Object.entries(TYPE_COLORS).map(([type, cls]) => (
+            {Object.entries(typeColors).map(([type, cls]) => (
               <span key={type} className={`px-2 py-0.5 rounded border ${cls} capitalize hidden sm:inline`}>{type}</span>
             ))}
           </div>
@@ -245,7 +245,7 @@ function ScheduleInner() {
                       style={{ top: (h - HOUR_START) * 60 * PX_PER_MIN }} />
                   ))}
                   {dayCls.map(cls => {
-                    const color  = TYPE_COLORS[cls.program?.type ?? ""] ?? TYPE_COLORS.private;
+                    const color  = typeColors[cls.program?.type ?? ""] ?? PRESET_COLORS.private;
                     const top    = Math.max(0, (minutesSinceMidnight(cls.startTime) - HOUR_START * 60) * PX_PER_MIN);
                     const height = Math.max(24, (new Date(cls.endTime).getTime() - new Date(cls.startTime).getTime()) / 60000 * PX_PER_MIN);
                     const booked = !!cls.booking && cls.booking.status !== "waitlisted";
