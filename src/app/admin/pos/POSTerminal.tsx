@@ -61,7 +61,7 @@ export default function POSTerminal({
   const [memberQ, setMemberQ]     = useState("");
   const [memberResults, setMemberResults] = useState<Member[]>([]);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
-  const [payMethod, setPayMethod] = useState<PayMethod>("cash");
+  const [payMethod, setPayMethod] = useState<PayMethod>(squareCardConfig ? "square_card" : "cash");
   const [pendingTerminalId, setPendingTerminalId] = useState<number | null>(null);
   const [pendingTerminalTotal, setPendingTerminalTotal] = useState<number | null>(null);
   const [processing, setProcessing] = useState(false);
