@@ -74,6 +74,32 @@ function minutesSinceMidnight(iso: string) {
   return d.getHours() * 60 + d.getMinutes();
 }
 
+function layoutClasses(classes: ClassEvent[]) {
+  if (classes.length === 0) return [];
+  const sorted = [...classes].sort(
+    (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+  );
+  const colEnds: number[] = [];
+  const assignments = sorted.map(cls => {
+    const start = new Date(cls.startTime).getTime();
+    const end   = new Date(cls.endTime).getTime();
+    let col = colEnds.findIndex(t => t <= start);
+    if (col === -1) { col = colEnds.length; colEnds.push(end); }
+    else colEnds[col] = end;
+    return { cls, col };
+  });
+  return assignments.map(({ cls, col }) => {
+    const start = new Date(cls.startTime).getTime();
+    const end   = new Date(cls.endTime).getTime();
+    const span  = Math.max(
+      ...assignments
+        .filter(({ cls: o }) => new Date(o.startTime).getTime() < end && new Date(o.endTime).getTime() > start)
+        .map(({ col: c }) => c)
+    ) + 1;
+    return { cls, col, span };
+  });
+}
+
 export default function WeekCalendar({
   classes,
   weekStartISO,
@@ -217,17 +243,19 @@ export default function WeekCalendar({
                   ))}
 
                   {/* Class blocks */}
-                  {dayCls.map((cls) => {
-                    const color = typeColors[cls.program?.type ?? ""] ?? PRESET_COLORS.private;
-                    const top   = topPx(cls.startTime);
-                    const h     = heightPx(cls.startTime, cls.endTime);
+                  {layoutClasses(dayCls).map(({ cls, col, span }) => {
+                    const color    = typeColors[cls.program?.type ?? ""] ?? PRESET_COLORS.private;
+                    const top      = topPx(cls.startTime);
+                    const h        = heightPx(cls.startTime, cls.endTime);
+                    const leftPct  = (col / span) * 100;
+                    const widthPct = (1 / span) * 100;
 
                     return (
                       <button
                         key={cls.id}
                         onClick={() => setSelected(cls)}
-                        className={`absolute left-0.5 right-0.5 rounded border-l-2 px-1 py-0.5 text-left overflow-hidden transition hover:brightness-110 ${color}`}
-                        style={{ top, height: h }}
+                        className={`absolute rounded border-l-2 px-1 py-0.5 text-left overflow-hidden transition hover:brightness-110 ${color}`}
+                        style={{ top, height: h, left: `calc(${leftPct}% + 2px)`, width: `calc(${widthPct}% - 4px)` }}
                       >
                         <div className="text-xs font-semibold leading-tight truncate">{cls.name}</div>
                         {h > 30 && (
