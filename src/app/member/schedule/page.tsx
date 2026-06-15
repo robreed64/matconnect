@@ -25,6 +25,7 @@ type ScheduleClass = {
   endTime: string;
   capacity: number | null;
   program: { name: string; type: string } | null;
+  seriesId: string | null;
   booking: { id: number; status: string } | null;
 };
 
@@ -57,6 +58,7 @@ function ScheduleInner() {
   const searchParams = useSearchParams();
   const weekParam    = searchParams.get("week");
 
+  const [exportOpen, setExportOpen] = useState(false);
   const [weekStart, setWeekStart] = useState<Date>(() => {
     if (weekParam) return getMondayOf(new Date(weekParam + "T12:00:00"));
     return getMondayOf(new Date());
@@ -108,9 +110,12 @@ function ScheduleInner() {
     if (res.ok) {
       const b = await res.json();
       const status = b.waitlisted ? "waitlisted" : "booked";
-      setClasses(prev => prev.map(c => c.id === cls.id ? { ...c, booking: { id: b.id, status } } : c));
       setSelected(prev => prev?.id === cls.id ? { ...prev, booking: { id: b.id, status } } : prev);
-      showToast(b.waitlisted ? `You're #${b.position} on the waitlist` : "Class booked!");
+      // Reload full week so series siblings show as booked too
+      loadWeek(weekStart);
+      showToast(cls.seriesId
+        ? (b.waitlisted ? `You're on the waitlist for this class` : "Booked for all classes in this series!")
+        : (b.waitlisted ? `You're #${b.position} on the waitlist` : "Class booked!"));
     } else {
       const err = await res.json().catch(() => ({}));
       showToast(err.error ?? "Could not book class");
@@ -152,10 +157,43 @@ function ScheduleInner() {
             {weekStart.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
           </span>
         </div>
-        <div className="flex gap-1.5 flex-wrap text-xs">
-          {Object.entries(TYPE_COLORS).map(([type, cls]) => (
-            <span key={type} className={`px-2 py-0.5 rounded border ${cls} capitalize hidden sm:inline`}>{type}</span>
-          ))}
+        <div className="flex items-center gap-3">
+          <div className="flex gap-1.5 flex-wrap text-xs">
+            {Object.entries(TYPE_COLORS).map(([type, cls]) => (
+              <span key={type} className={`px-2 py-0.5 rounded border ${cls} capitalize hidden sm:inline`}>{type}</span>
+            ))}
+          </div>
+          {/* Export dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setExportOpen(o => !o)}
+              className="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm text-gray-300 transition flex items-center gap-1"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Export
+            </button>
+            {exportOpen && (
+              <div className="absolute right-0 top-full mt-1 w-48 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl z-30 overflow-hidden"
+                onClick={() => setExportOpen(false)}>
+                <a
+                  href="/api/member/schedule/export?filter=all"
+                  download="my-schedule.ics"
+                  className="flex items-center gap-2 px-4 py-3 text-sm text-gray-200 hover:bg-gray-800 transition"
+                >
+                  <span>📅</span> All classes
+                </a>
+                <a
+                  href="/api/member/schedule/export?filter=booked"
+                  download="my-bookings.ics"
+                  className="flex items-center gap-2 px-4 py-3 text-sm text-gray-200 hover:bg-gray-800 transition border-t border-gray-800"
+                >
+                  <span>✓</span> My bookings only
+                </a>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -200,12 +238,13 @@ function ScheduleInner() {
                     const color  = TYPE_COLORS[cls.program?.type ?? ""] ?? TYPE_COLORS.private;
                     const top    = Math.max(0, (minutesSinceMidnight(cls.startTime) - HOUR_START * 60) * PX_PER_MIN);
                     const height = Math.max(24, (new Date(cls.endTime).getTime() - new Date(cls.startTime).getTime()) / 60000 * PX_PER_MIN);
-                    const booked = !!cls.booking;
+                    const booked = !!cls.booking && cls.booking.status !== "waitlisted";
+                    const waitlisted = cls.booking?.status === "waitlisted";
                     return (
                       <button
                         key={cls.id}
                         onClick={() => setSelected(cls)}
-                        className={`absolute left-0.5 right-0.5 rounded border-l-2 px-1 py-0.5 text-left overflow-hidden transition hover:brightness-110 ${color} ${booked ? "ring-2 ring-white/30" : ""}`}
+                        className={`absolute left-0.5 right-0.5 rounded border-l-2 px-1 py-0.5 text-left overflow-hidden transition hover:brightness-110 ${color} ${booked ? "ring-2 ring-white ring-offset-1 ring-offset-gray-950 brightness-125" : waitlisted ? "ring-2 ring-amber-400/70" : ""}`}
                         style={{ top, height }}
                       >
                         <div className="text-xs font-semibold leading-tight truncate">{cls.name}</div>
@@ -214,8 +253,11 @@ function ScheduleInner() {
                             {formatTime(cls.startTime)}
                           </div>
                         )}
-                        {booked && height > 44 && (
-                          <div className="text-xs opacity-90">✓ booked</div>
+                        {booked && (
+                          <div className="text-xs font-bold text-white drop-shadow leading-tight">✓ Booked</div>
+                        )}
+                        {waitlisted && height > 30 && (
+                          <div className="text-xs font-semibold text-amber-300 leading-tight">Waitlist</div>
                         )}
                       </button>
                     );

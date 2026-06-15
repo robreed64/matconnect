@@ -16,26 +16,40 @@ export async function POST(req: NextRequest) {
   });
   if (existing) return NextResponse.json({ error: "Already booked" }, { status: 409 });
 
-  const cls = await prisma.class.findUnique({ where: { id: classId }, select: { capacity: true } });
+  const cls = await prisma.class.findUnique({ where: { id: classId }, select: { capacity: true, seriesId: true, startTime: true } });
   if (!cls) return NextResponse.json({ error: "Class not found" }, { status: 404 });
 
-  // Note: count-then-create isn't atomic; under simultaneous bookings the class
-  // can exceed capacity by one. Acceptable for v1.
-  if (cls.capacity != null) {
-    const active = await countActiveBookings(classId);
-    if (active >= cls.capacity) {
-      const booking = await prisma.booking.create({
-        data: { memberId, classId, status: "waitlisted" },
+  // Book the requested class (with waitlist check)
+  async function bookSingleClass(cid: number, cap: number | null) {
+    if (cap != null) {
+      const active = await countActiveBookings(cid);
+      if (active >= cap) {
+        const b = await prisma.booking.create({ data: { memberId, classId: cid, status: "waitlisted" } });
+        const position = await prisma.booking.count({ where: { classId: cid, status: "waitlisted", createdAt: { lte: b.createdAt } } });
+        return { ...b, waitlisted: true, position };
+      }
+    }
+    return prisma.booking.create({ data: { memberId, classId: cid, status: "booked" } });
+  }
+
+  const booking = await bookSingleClass(classId, cls.capacity);
+
+  // Auto-book all future occurrences in the same series
+  if (cls.seriesId) {
+    const siblings = await prisma.class.findMany({
+      where: { seriesId: cls.seriesId, startTime: { gt: cls.startTime } },
+      select: { id: true, capacity: true },
+      orderBy: { startTime: "asc" },
+    });
+    for (const sibling of siblings) {
+      const alreadyBooked = await prisma.booking.findFirst({
+        where: { memberId, classId: sibling.id, status: { in: ["booked", "attended", "waitlisted"] } },
       });
-      const position = await prisma.booking.count({
-        where: { classId, status: "waitlisted", createdAt: { lte: booking.createdAt } },
-      });
-      return NextResponse.json({ ...booking, waitlisted: true, position }, { status: 201 });
+      if (!alreadyBooked) {
+        await bookSingleClass(sibling.id, sibling.capacity);
+      }
     }
   }
 
-  const booking = await prisma.booking.create({
-    data: { memberId, classId, status: "booked" },
-  });
   return NextResponse.json(booking, { status: 201 });
 }

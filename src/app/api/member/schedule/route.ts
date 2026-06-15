@@ -39,6 +39,7 @@ export async function GET(req: NextRequest) {
       endTime: cls.endTime.toISOString(),
       capacity: cls.capacity,
       program: cls.program,
+      seriesId: cls.seriesId ?? null,
       booking: active ?? null,
     };
   });

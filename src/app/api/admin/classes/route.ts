@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/require-auth";
+import { randomUUID } from "crypto";
 
 export async function GET(req: NextRequest) {
   const sp        = req.nextUrl.searchParams;
@@ -79,6 +80,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No occurrences generated for that date range." }, { status: 400 });
     }
 
+    const seriesId = randomUUID();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const rows: any[] = occurrences.map((o) => ({
       name,
@@ -87,6 +89,7 @@ export async function POST(req: NextRequest) {
       instructorName: instructorName || null,
       capacity:       capInt,
       recurrenceRule,
+      seriesId,
       ...(pidInt ? { programId: pidInt } : {}),
     }));
     await prisma.class.createMany({ data: rows });

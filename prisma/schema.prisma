@@ -136,6 +136,7 @@ model Class {
   instructorName String?  @map("instructor_name")
   capacity       Int?
   recurrenceRule String?  @map("recurrence_rule")
+  seriesId       String?  @map("series_id")
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 

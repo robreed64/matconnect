@@ -75,12 +75,14 @@ export default async function MembersPage({ searchParams }: { searchParams: Sear
           <p className="text-gray-400 text-sm mt-0.5">{total} total</p>
         </div>
         <div className="flex items-center gap-2">
-          <Link
-            href="/admin/members/at-risk"
-            className="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm font-semibold text-gray-300 hover:text-white transition"
-          >
-            At-risk
-          </Link>
+          {canManage && (
+            <Link
+              href="/admin/members/at-risk"
+              className="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm font-semibold text-gray-300 hover:text-white transition"
+            >
+              At-risk
+            </Link>
+          )}
           {canManage && (
             <Link
               href="/admin/members/new"
