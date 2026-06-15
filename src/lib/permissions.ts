@@ -1,13 +1,13 @@
 export type Feature =
   | "settings" | "setup" | "users"
-  | "members" | "plans" | "schedule"
+  | "members" | "plans" | "schedule" | "manage_schedule"
   | "belts" | "curriculum" | "families"
   | "pos" | "marketing" | "reports" | "kiosk" | "leads" | "notifications";
 
 const ROLE_FEATURES: Record<string, Feature[]> = {
-  admin:      ["settings", "setup", "users", "members", "plans", "schedule", "belts", "curriculum", "families", "pos", "marketing", "reports", "kiosk", "leads", "notifications"],
-  manager:    ["members", "plans", "schedule", "belts", "curriculum", "families", "pos", "marketing", "reports", "kiosk", "leads", "notifications"],
-  staff:      ["members", "plans", "schedule", "belts", "curriculum", "families", "pos", "marketing", "reports", "kiosk", "leads", "notifications"],
+  admin:      ["settings", "setup", "users", "members", "plans", "schedule", "manage_schedule", "belts", "curriculum", "families", "pos", "marketing", "reports", "kiosk", "leads", "notifications"],
+  manager:    ["members", "plans", "schedule", "manage_schedule", "belts", "curriculum", "families", "pos", "marketing", "reports", "kiosk", "leads", "notifications"],
+  staff:      ["members", "plans", "schedule", "manage_schedule", "belts", "curriculum", "families", "pos", "marketing", "reports", "kiosk", "leads", "notifications"],
   front_desk: ["members", "pos", "schedule", "kiosk"],
 };
 

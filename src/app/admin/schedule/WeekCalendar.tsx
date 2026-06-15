@@ -53,9 +53,11 @@ function minutesSinceMidnight(iso: string) {
 export default function WeekCalendar({
   classes,
   weekStartISO,
+  canManage = false,
 }: {
   classes: ClassEvent[];
   weekStartISO: string;
+  canManage?: boolean;
 }) {
   const router    = useRouter();
   const weekStart = new Date(weekStartISO);
@@ -122,12 +124,14 @@ export default function WeekCalendar({
               <span key={type} className={`px-2 py-0.5 rounded border ${cls} capitalize`}>{type}</span>
             ))}
           </div>
-          <Link
-            href="/admin/schedule/new"
-            className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-sm font-semibold text-white transition"
-          >
-            + Add Class
-          </Link>
+          {canManage && (
+            <Link
+              href="/admin/schedule/new"
+              className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-sm font-semibold text-white transition"
+            >
+              + Add Class
+            </Link>
+          )}
         </div>
       </div>
 
