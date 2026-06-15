@@ -34,10 +34,10 @@ export async function POST(req: NextRequest) {
 
   const booking = await bookSingleClass(classId, cls.capacity);
 
-  // Auto-book all future occurrences in the same series
+  // Auto-book all remaining occurrences in the same series (from today, not just after the clicked class)
   if (cls.seriesId) {
     const siblings = await prisma.class.findMany({
-      where: { seriesId: cls.seriesId, startTime: { gt: cls.startTime } },
+      where: { seriesId: cls.seriesId, startTime: { gte: new Date() }, id: { not: classId } },
       select: { id: true, capacity: true },
       orderBy: { startTime: "asc" },
     });
