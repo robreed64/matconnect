@@ -29,34 +29,44 @@ export default function ScheduleSetupClient({
   // Programs
   const saveProgram = async (id?: number) => {
     setSavingProg(true); setError("");
-    const body = id ? progForm : newProg;
-    const res = await fetch(id ? `/api/admin/programs/${id}` : "/api/admin/programs", {
-      method: id ? "PATCH" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    const data = await res.json();
-    if (!res.ok) { setError(data.error ?? "Save failed"); setSavingProg(false); return; }
-    if (id) {
-      setPrograms(ps => ps.map(p => p.id === id ? { ...p, ...data } : p));
-      setEditingProg(null);
-    } else {
-      setPrograms(ps => [...ps, { ...data, classCount: 0 }]);
-      setNewProg({ name: "", type: "gi", description: "" });
-      setShowNewProg(false);
+    try {
+      const body = id ? progForm : newProg;
+      const res = await fetch(id ? `/api/admin/programs/${id}` : "/api/admin/programs", {
+        method: id ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error ?? "Save failed"); return; }
+      if (id) {
+        setPrograms(ps => ps.map(p => p.id === id ? { ...p, ...data } : p));
+        setEditingProg(null);
+      } else {
+        setPrograms(ps => [...ps, { ...data, classCount: 0 }]);
+        setNewProg({ name: "", type: "gi", description: "" });
+        setShowNewProg(false);
+      }
+      router.refresh();
+    } catch {
+      setError("Something went wrong — please try again.");
+    } finally {
+      setSavingProg(false);
     }
-    setSavingProg(false);
-    router.refresh();
   };
 
-  const deleteProgram = async (p: Program) => {
-    if (p.classCount > 0) {
-      if (!confirm(`"${p.name}" has ${p.classCount} class(es). Delete them first.`)) return;
-    } else {
+  const deleteProgram = async (p: Program, unassign = false) => {
+    if (!unassign) {
       if (!confirm(`Delete program "${p.name}"?`)) return;
     }
-    const res = await fetch(`/api/admin/programs/${p.id}`, { method: "DELETE" });
+    const url = unassign ? `/api/admin/programs/${p.id}?unassign=true` : `/api/admin/programs/${p.id}`;
+    const res  = await fetch(url, { method: "DELETE" });
     const data = await res.json();
+    if (res.status === 409 && data.error === "has_classes") {
+      if (confirm(`"${p.name}" is assigned to ${data.count} class(es).\n\nClick OK to remove the program from those classes and delete it, or Cancel to keep it.`)) {
+        await deleteProgram(p, true);
+      }
+      return;
+    }
     if (!res.ok) { setError(data.error ?? "Delete failed"); return; }
     setPrograms(ps => ps.filter(x => x.id !== p.id));
     router.refresh();

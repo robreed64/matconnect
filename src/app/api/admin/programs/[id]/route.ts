@@ -24,7 +24,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
   return NextResponse.json(program);
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: Params }) {
+export async function DELETE(req: NextRequest, { params }: { params: Params }) {
   const { error } = await requireAuth("schedule");
   if (error) return error;
 
@@ -33,11 +33,13 @@ export async function DELETE(_req: NextRequest, { params }: { params: Params }) 
   if (isNaN(programId)) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
   const classCount = await prisma.class.count({ where: { programId } });
+
   if (classCount > 0) {
-    return NextResponse.json(
-      { error: `Cannot delete: ${classCount} class(es) use this program. Reassign or delete them first.` },
-      { status: 409 }
-    );
+    if (req.nextUrl.searchParams.get("unassign") === "true") {
+      await prisma.class.updateMany({ where: { programId }, data: { programId: null } });
+    } else {
+      return NextResponse.json({ error: "has_classes", count: classCount }, { status: 409 });
+    }
   }
 
   await prisma.program.delete({ where: { id: programId } });
