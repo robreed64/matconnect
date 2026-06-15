@@ -5,9 +5,12 @@ import { useRouter } from "next/navigation";
 
 type Item = { id: number; name: string; category: string; priceCents: number; taxRate: number; stock: number | null; barcode: string | null };
 
-export default function PosSetupClient({ categories: initial, items: initial_items }: { categories: string[]; items: Item[] }) {
+export default function PosSetupClient({ categories: initial, items: initial_items, cashDrawerSound: initialDrawerSound }: { categories: string[]; items: Item[]; cashDrawerSound: boolean }) {
   const router = useRouter();
   const [categories, setCategories] = useState(initial);
+  const [cashDrawerSound, setCashDrawerSound] = useState(initialDrawerSound);
+  const [savingDrawer, setSavingDrawer] = useState(false);
+  const [drawerStatus, setDrawerStatus] = useState<"idle" | "ok" | "error">("idle");
   const [items, setItems] = useState(initial_items);
   const [newCat, setNewCat] = useState("");
   const [savingCats, setSavingCats] = useState(false);
@@ -38,6 +41,38 @@ export default function PosSetupClient({ categories: initial, items: initial_ite
     if (!slug || categories.includes(slug)) return;
     setCategories(prev => prev.map(c => c === oldCat ? slug : c));
     setItems(prev => prev.map(i => i.category === oldCat ? { ...i, category: slug } : i));
+  };
+
+  const saveDrawerSound = async (enabled: boolean) => {
+    setSavingDrawer(true);
+    const res = await fetch("/api/admin/settings", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cashDrawerSound: enabled }),
+    });
+    setSavingDrawer(false);
+    setDrawerStatus(res.ok ? "ok" : "error");
+    if (res.ok) { router.refresh(); setTimeout(() => setDrawerStatus("idle"), 2500); }
+  };
+
+  const testDrawerSound = () => {
+    try {
+      const ctx = new AudioContext();
+      // Two-pulse cash register ding
+      [0, 0.12].forEach((delay, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = "sine";
+        osc.frequency.value = i === 0 ? 1318 : 1047;
+        gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+        gain.gain.linearRampToValueAtTime(0.4, ctx.currentTime + delay + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.25);
+        osc.start(ctx.currentTime + delay);
+        osc.stop(ctx.currentTime + delay + 0.3);
+      });
+    } catch { /* AudioContext not available */ }
   };
 
   const saveCategories = async () => {
@@ -144,6 +179,46 @@ export default function PosSetupClient({ categories: initial, items: initial_ite
   return (
     <div className="space-y-6">
       {error && <div className="bg-red-900/30 border border-red-800 text-red-300 text-sm rounded-lg px-4 py-3">{error}</div>}
+
+      {/* Cash Drawer */}
+      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+        <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-1">Cash Drawer</h2>
+        <p className="text-xs text-gray-500 mb-4">
+          Plays a ding sound when a cash sale completes. Works with audio-triggered cash drawers (connected via 3.5mm to RJ11 cable) and as an audible cue for the cashier.
+        </p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              role="switch"
+              aria-checked={cashDrawerSound}
+              onClick={() => {
+                const next = !cashDrawerSound;
+                setCashDrawerSound(next);
+                saveDrawerSound(next);
+              }}
+              disabled={savingDrawer}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none disabled:opacity-50 ${cashDrawerSound ? "bg-green-600" : "bg-gray-700"}`}
+            >
+              <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${cashDrawerSound ? "translate-x-6" : "translate-x-1"}`} />
+            </button>
+            <span className="text-sm text-gray-300">
+              {cashDrawerSound ? "Ding enabled" : "Ding disabled"}
+              {drawerStatus === "ok" && <span className="ml-2 text-green-400 text-xs">Saved ✓</span>}
+              {drawerStatus === "error" && <span className="ml-2 text-red-400 text-xs">Save failed</span>}
+            </span>
+          </div>
+          {cashDrawerSound && (
+            <button
+              type="button"
+              onClick={testDrawerSound}
+              className="px-3 py-1.5 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs transition"
+            >
+              Test ding
+            </button>
+          )}
+        </div>
+      </div>
 
       {/* Categories */}
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">

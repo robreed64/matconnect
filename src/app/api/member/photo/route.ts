@@ -23,9 +23,16 @@ export async function POST(req: NextRequest) {
   }
 
   const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
-  const blob = await put(`member-photos/${memberId}-${Date.now()}.${ext}`, file, {
-    access: "public",
-  });
+
+  let blob: Awaited<ReturnType<typeof put>>;
+  try {
+    blob = await put(`member-photos/${memberId}-${Date.now()}.${ext}`, file, {
+      access: "public",
+    });
+  } catch (err) {
+    console.error("Vercel Blob upload failed:", err);
+    return NextResponse.json({ error: "Photo upload failed — please try again" }, { status: 502 });
+  }
 
   await prisma.member.update({ where: { id: memberId }, data: { photoUrl: blob.url } });
 

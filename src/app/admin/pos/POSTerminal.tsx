@@ -42,18 +42,39 @@ function fmt(cents: number) {
   return `$${(cents / 100).toFixed(2)}`;
 }
 
+function ringCashDrawer() {
+  try {
+    const ctx = new AudioContext();
+    [0, 0.12].forEach((delay, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = "sine";
+      osc.frequency.value = i === 0 ? 1318 : 1047;
+      gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+      gain.gain.linearRampToValueAtTime(0.4, ctx.currentTime + delay + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.25);
+      osc.start(ctx.currentTime + delay);
+      osc.stop(ctx.currentTime + delay + 0.3);
+    });
+  } catch { /* AudioContext not supported */ }
+}
+
 export default function POSTerminal({
   initialItems,
   categories,
   paymentProvider = "stripe",
   terminalEnabled = false,
   squareCardConfig = null,
+  cashDrawerSound = false,
 }: {
   initialItems: Item[];
   categories: string[];
   paymentProvider?: "stripe" | "square";
   terminalEnabled?: boolean;
   squareCardConfig?: { applicationId: string; locationId: string; environment: "sandbox" | "production" } | null;
+  cashDrawerSound?: boolean;
 }) {
   const [items]       = useState<Item[]>(initialItems);
   const [tab, setTab] = useState<string>(categories[0] ?? "drinks");
@@ -61,15 +82,29 @@ export default function POSTerminal({
   const [memberQ, setMemberQ]     = useState("");
   const [memberResults, setMemberResults] = useState<Member[]>([]);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
-  const [payMethod, setPayMethod] = useState<PayMethod>(squareCardConfig ? "square_card" : "cash");
+  const defaultPayMethod: PayMethod = squareCardConfig ? "square_card" : "cash";
+  const [payMethod, setPayMethod] = useState<PayMethod>(defaultPayMethod);
   const [pendingTerminalId, setPendingTerminalId] = useState<number | null>(null);
   const [pendingTerminalTotal, setPendingTerminalTotal] = useState<number | null>(null);
   const [processing, setProcessing] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [walkInName, setWalkInName]   = useState("");
   const [walkInEmail, setWalkInEmail] = useState("");
-  const [receipt, setReceipt]       = useState<{ total: number; id: number; checkedIn?: boolean; waiverPending?: boolean } | null>(null);
+  const [receipt, setReceipt]       = useState<{ total: number; id: number; checkedIn?: boolean; waiverPending?: boolean; payMethod?: PayMethod } | null>(null);
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Auto-switch to card-on-file when the selected member has a stored card
+  useEffect(() => {
+    if (!selectedMember) {
+      setPayMethod(defaultPayMethod);
+      return;
+    }
+    const hasCard = paymentProvider === "square"
+      ? !!selectedMember.squareCardId
+      : !!selectedMember.stripeCustomerId;
+    if (hasCard) setPayMethod("card_on_file");
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedMember]);
 
   const visibleItems = items.filter((i) => i.category === tab);
 
@@ -112,6 +147,7 @@ export default function POSTerminal({
     setMemberQ("");
     setWalkInName("");
     setWalkInEmail("");
+    setPayMethod(defaultPayMethod);
   };
 
   const checkout = async () => {
@@ -148,7 +184,8 @@ export default function POSTerminal({
         });
         if (res.ok) {
           const sale = await res.json();
-          setReceipt({ total: sale.totalCents, id: sale.id, checkedIn: sale.checkedIn, waiverPending: sale.waiverPending });
+          if (cashDrawerSound && payMethod === "cash") ringCashDrawer();
+          setReceipt({ total: sale.totalCents, id: sale.id, checkedIn: sale.checkedIn, waiverPending: sale.waiverPending, payMethod });
           resetCart();
         } else {
           const data = await res.json().catch(() => null);
@@ -169,7 +206,7 @@ export default function POSTerminal({
         onDone={(sale) => {
           setPendingTerminalId(null);
           if (sale) {
-            setReceipt({ total: sale.totalCents, id: sale.id, checkedIn: sale.checkedIn, waiverPending: sale.waiverPending });
+            setReceipt({ total: sale.totalCents, id: sale.id, checkedIn: sale.checkedIn, waiverPending: sale.waiverPending, payMethod: "square_terminal" });
             resetCart();
           }
         }}
@@ -182,11 +219,20 @@ export default function POSTerminal({
   }
 
   if (receipt) {
+    const payLabel: Record<PayMethod, string> = {
+      cash: "Cash",
+      card_on_file: "Card on file",
+      square_card: "Card",
+      square_terminal: "Terminal",
+    };
     return (
       <div className="flex flex-col items-center justify-center h-full gap-6 text-center">
         <div className="text-6xl">✓</div>
         <div>
           <p className="text-2xl font-bold text-green-400">{fmt(receipt.total)} charged</p>
+          {receipt.payMethod && (
+            <p className="text-gray-400 text-sm mt-1">{payLabel[receipt.payMethod]}</p>
+          )}
           <p className="text-gray-500 text-sm mt-1">Sale #{receipt.id}</p>
           {receipt.checkedIn && (
             <p className="text-green-400 text-sm mt-2 font-medium">✓ Checked in</p>
@@ -420,7 +466,7 @@ export default function POSTerminal({
                 });
                 const data = await res.json().catch(() => null);
                 if (!res.ok) return data?.error ?? "Charge failed — try again";
-                setReceipt({ total: data.totalCents, id: data.id, checkedIn: data.checkedIn, waiverPending: data.waiverPending });
+                setReceipt({ total: data.totalCents, id: data.id, checkedIn: data.checkedIn, waiverPending: data.waiverPending, payMethod: "square_card" });
                 resetCart();
                 return null;
               }}

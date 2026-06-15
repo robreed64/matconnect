@@ -37,19 +37,19 @@ export default function PhotoUploader({ currentUrl, uploadUrl, name, onUpload, s
       const fd = new FormData();
       fd.append("file", file);
       const res  = await fetch(uploadUrl, { method: "POST", body: fd });
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
 
-      if (res.ok) {
+      if (res.ok && data?.photoUrl) {
         setPreview(data.photoUrl);
         onUpload?.(data.photoUrl);
         setSaved(true);
         setTimeout(() => setSaved(false), 3000);
       } else {
-        setError(data.error ?? "Upload failed");
+        setError(data?.error ?? "Upload failed — please try again");
         setPreview(currentUrl);
       }
     } catch {
-      setError("Upload failed. Please try again.");
+      setError("Upload failed — please try again");
       setPreview(currentUrl);
     } finally {
       setUploading(false);

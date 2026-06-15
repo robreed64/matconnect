@@ -18,7 +18,7 @@ export default async function SetupPosPage() {
         <Link href="/admin/setup" className="text-sm text-amber-500 hover:text-amber-300 transition">← Configure</Link>
         <h1 className="text-2xl font-bold mt-2">POS Configuration</h1>
       </div>
-      <PosSetupClient categories={categories} items={items.map(i => ({ ...i, priceCents: i.priceCents, taxRate: Number(i.taxRate) }))} />
+      <PosSetupClient categories={categories} cashDrawerSound={!!settings.cashDrawerSound} items={items.map(i => ({ ...i, priceCents: i.priceCents, taxRate: Number(i.taxRate) }))} />
     </div>
   );
 }

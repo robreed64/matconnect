@@ -46,7 +46,7 @@ export default async function POSPage() {
 
       {/* Terminal — fills remaining height */}
       <div className="flex-1 overflow-hidden">
-        <POSTerminal categories={categories} paymentProvider={paymentProvider} terminalEnabled={terminalEnabled} squareCardConfig={squareCardConfig} initialItems={items.map((i) => ({
+        <POSTerminal categories={categories} paymentProvider={paymentProvider} terminalEnabled={terminalEnabled} squareCardConfig={squareCardConfig} cashDrawerSound={!!settings.cashDrawerSound} initialItems={items.map((i) => ({
           id:         i.id,
           name:       i.name,
           priceCents: i.priceCents,
