@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const {
       name, email, phone, dateOfBirth, ageGroup, trainingType,
-      planId, paymentMethodId, promoCode,
+      planId, paymentMethodId, promoCode, password,
     } = body;
     // `customerId` is the provider customer from the payment step;
     // `stripeCustomerId` is the legacy field name from older clients
@@ -203,29 +203,41 @@ export async function POST(req: NextRequest) {
     if (member.email) {
       const existingUser = await prisma.user.findUnique({ where: { email: member.email } });
       if (!existingUser) {
+        const chosenPassword = typeof password === "string" && password.length >= 8 ? password : null;
+        const tempPassword = chosenPassword ?? crypto.randomUUID().replace(/-/g, "").slice(0, 12);
         try {
-          const tempPassword = crypto.randomUUID().replace(/-/g, "").slice(0, 12);
           await prisma.user.create({
             data: {
-              email:        member.email,
-              name:         member.name,
-              passwordHash: await bcrypt.hash(tempPassword, 10),
-              role:         "member",
-              memberId:     member.id,
-              mustChangePassword: true, // emailed temp password is good for one login
+              email:              member.email,
+              name:               member.name,
+              passwordHash:       await bcrypt.hash(tempPassword, 10),
+              role:               "member",
+              memberId:           member.id,
+              mustChangePassword: !chosenPassword,
             },
           });
-          await sendEmail(
-            member.email,
-            "Welcome — your member portal login",
-            `<p>Hi ${member.name},</p>
-<p>Your account has been created. You can log in to the member portal at <strong>/login</strong>.</p>
+          const appUrl = process.env.NEXTAUTH_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "";
+          const loginUrl = `${appUrl}/login`;
+          const emailBody = chosenPassword
+            ? `<div style="font-family:sans-serif;max-width:600px;margin:0 auto">
+<p>Hi ${member.name},</p>
+<p>Your member portal account is ready. Log in with:</p>
+<p><strong>Email:</strong> ${member.email}<br>
+<strong>Password:</strong> the one you created at sign-up</p>
+<p><a href="${loginUrl}" style="display:inline-block;margin-top:8px;padding:10px 20px;background:#3b82f6;color:#fff;border-radius:6px;text-decoration:none;font-weight:bold">Log in to your account</a></p>
+</div>`
+            : `<div style="font-family:sans-serif;max-width:600px;margin:0 auto">
+<p>Hi ${member.name},</p>
+<p>Your member portal account has been created. Log in with:</p>
 <p><strong>Email:</strong> ${member.email}<br>
 <strong>Temporary password:</strong> ${tempPassword}</p>
-<p>Please change your password after logging in.</p>`
-          ).catch(() => {});
-        } catch {
-          // Account creation failure should never block enrollment
+<p><a href="${loginUrl}" style="display:inline-block;margin-top:8px;padding:10px 20px;background:#3b82f6;color:#fff;border-radius:6px;text-decoration:none;font-weight:bold">Log in to your account</a></p>
+<p style="color:#666;font-size:13px">You will be prompted to set a new password on first login.</p>
+</div>`;
+          await sendEmail(member.email, "Welcome — your member portal login", emailBody).catch(() => {});
+        } catch (err) {
+          // Account creation failure must not block enrollment, but surface it in logs
+          console.error("[enroll] user create error:", err);
         }
       }
     }

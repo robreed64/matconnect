@@ -33,7 +33,9 @@ export default function KioskSignup({
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [ageGroup, setAgeGroup] = useState<"adult" | "kids">("adult");
-  const [errors, setErrors] = useState<{ name?: string; email?: string; phone?: string }>({});
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState<{ name?: string; email?: string; phone?: string; password?: string }>({});
 
   // Waiver
   const [signed, setSigned] = useState(false);
@@ -76,6 +78,10 @@ export default function KioskSignup({
     if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
       errs.email = "Valid email is required";
     if (!phone.trim()) errs.phone = "Phone number is required";
+    if (password && password.length < 8)
+      errs.password = "Password must be at least 8 characters";
+    if (password && password !== confirmPassword)
+      errs.password = "Passwords do not match";
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -102,6 +108,7 @@ export default function KioskSignup({
             customerId: opts.customerId,
             paymentMethodId: opts.paymentMethodId,
             promoCode: "",
+            password: password || undefined,
           }),
         });
         if (res.ok) {
@@ -235,6 +242,41 @@ export default function KioskSignup({
               />
               {errors.phone && (
                 <p className="text-red-400 text-sm mt-1">{errors.phone}</p>
+              )}
+            </div>
+            <div>
+              <label className={lbl}>Create a password <span className="text-gray-600 font-normal">(optional)</span></label>
+              <input
+                className={`${inp} ${errors.password ? "border-red-500" : ""}`}
+                type="password"
+                autoComplete="new-password"
+                spellCheck={false}
+                placeholder="At least 8 characters"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setErrors((p) => ({ ...p, password: undefined }));
+                }}
+              />
+              {password.length > 0 && (
+                <input
+                  className={`${inp} mt-3 ${errors.password ? "border-red-500" : ""}`}
+                  type="password"
+                  autoComplete="new-password"
+                  spellCheck={false}
+                  placeholder="Confirm password"
+                  value={confirmPassword}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    setErrors((p) => ({ ...p, password: undefined }));
+                  }}
+                />
+              )}
+              {errors.password && (
+                <p className="text-red-400 text-sm mt-1">{errors.password}</p>
+              )}
+              {!password && (
+                <p className="text-gray-600 text-sm mt-1">Leave blank — we&apos;ll email you a temporary password to set later.</p>
               )}
             </div>
             <div>
@@ -451,7 +493,9 @@ export default function KioskSignup({
                 {name ? `, ${name.split(" ")[0]}` : ""}!
               </h2>
               <p className="text-gray-400 mt-2">
-                Your account is created. Check your email for login info.
+                {password
+                  ? "Log in at the member portal with your email and the password you just created."
+                  : "Check your email for a temporary password to access the member portal."}
               </p>
             </div>
             <button
