@@ -18,7 +18,7 @@ type ScheduleClass = {
   startTime: string;
   endTime: string;
   capacity: number | null;
-  program: { name: string; type: string };
+  program: { name: string; type: string } | null;
   booking: { id: number; status: string } | null;
 };
 
@@ -126,7 +126,7 @@ export default function SchedulePage() {
             <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3">{day}</h2>
             <div className="space-y-2">
               {dayClasses.map((cls) => {
-                const color = CLASS_COLORS[cls.program.type] ?? CLASS_COLORS.private;
+                const color = CLASS_COLORS[cls.program?.type ?? ""] ?? CLASS_COLORS.private;
                 const isBooked = !!cls.booking;
                 const isBusy = busy === cls.id;
                 return (
