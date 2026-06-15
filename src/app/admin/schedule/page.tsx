@@ -45,7 +45,7 @@ export default async function SchedulePage({ searchParams }: { searchParams: Sea
       <div className="px-6 pt-6 pb-2 flex-shrink-0">
         <h1 className="text-2xl font-bold">Schedule</h1>
       </div>
-      <WeekCalendar classes={serialized} weekStartISO={weekStart.toISOString()} canManage={canManage} />
+      <WeekCalendar classes={serialized} weekStartISO={weekStart.toISOString().slice(0, 10) + "T00:00:00"} canManage={canManage} />
     </div>
   );
 }
