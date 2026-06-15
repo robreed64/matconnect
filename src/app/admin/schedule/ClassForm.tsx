@@ -33,7 +33,7 @@ const RECURRENCE_OPTIONS = [
   { value: "",                              label: "One-time (no recurrence)" },
   { value: "FREQ=DAILY",                   label: "Every day" },
   { value: "FREQ=WEEKLY",                  label: "Weekly (same day each week)" },
-  { value: "FREQ=WEEKLY;BYDAY=MO,WE,FR",  label: "Mon / Wed / Fri" },
+  { value: "FREQ=WEEKLY;BYDAY=MO,WE",     label: "Mon / Wed" },
   { value: "FREQ=WEEKLY;BYDAY=TU,TH",     label: "Tue / Thu" },
   { value: "FREQ=WEEKLY;BYDAY=SA,SU",     label: "Weekends" },
   { value: "CUSTOM",                       label: "Custom — pick any days" },
