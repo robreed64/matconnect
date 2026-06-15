@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 type Program = { id: number; name: string; type: string; description: string | null; classCount: number };
+type DeleteState = { id: number; stage: "confirm" } | { id: number; stage: "unassign"; count: number } | null;
 
 const PROGRAM_TYPES = ["gi", "no-gi", "youth", "seminar", "intro", "private"];
 
@@ -15,16 +16,18 @@ export default function ScheduleSetupClient({
   instructorNames: string[];
 }) {
   const router = useRouter();
-  const [programs, setPrograms]     = useState(initial);
+  const [programs, setPrograms]       = useState(initial);
   const [instructors, setInstructors] = useState(initialNames);
-  const [newName, setNewName]       = useState("");
+  const [newName, setNewName]         = useState("");
   const [editingProg, setEditingProg] = useState<number | null>(null);
-  const [progForm, setProgForm]     = useState<Partial<Program>>({});
+  const [progForm, setProgForm]       = useState<Partial<Program>>({});
   const [showNewProg, setShowNewProg] = useState(false);
-  const [newProg, setNewProg]       = useState({ name: "", type: "gi", description: "" });
-  const [savingProg, setSavingProg] = useState(false);
+  const [newProg, setNewProg]         = useState({ name: "", type: "gi", description: "" });
+  const [savingProg, setSavingProg]   = useState(false);
+  const [deletingProg, setDeletingProg] = useState(false);
+  const [deleteState, setDeleteState] = useState<DeleteState>(null);
   const [savingNames, setSavingNames] = useState(false);
-  const [error, setError]           = useState("");
+  const [error, setError]             = useState("");
 
   // Programs
   const saveProgram = async (id?: number) => {
@@ -54,22 +57,31 @@ export default function ScheduleSetupClient({
     }
   };
 
-  const deleteProgram = async (p: Program, unassign = false) => {
-    if (!unassign) {
-      if (!confirm(`Delete program "${p.name}"?`)) return;
-    }
-    const url = unassign ? `/api/admin/programs/${p.id}?unassign=true` : `/api/admin/programs/${p.id}`;
-    const res  = await fetch(url, { method: "DELETE" });
-    const data = await res.json();
-    if (res.status === 409 && data.error === "has_classes") {
-      if (confirm(`"${p.name}" is assigned to ${data.count} class(es).\n\nClick OK to remove the program from those classes and delete it, or Cancel to keep it.`)) {
-        await deleteProgram(p, true);
+  const confirmDelete = (p: Program) => {
+    setDeleteState({ id: p.id, stage: "confirm" });
+    setEditingProg(null);
+  };
+
+  const doDelete = async (id: number, unassign: boolean) => {
+    setDeletingProg(true); setError("");
+    try {
+      const url = unassign ? `/api/admin/programs/${id}?unassign=true` : `/api/admin/programs/${id}`;
+      const res  = await fetch(url, { method: "DELETE" });
+      const data = await res.json();
+      if (res.status === 409 && data.error === "has_classes") {
+        setDeleteState({ id, stage: "unassign", count: data.count });
+        return;
       }
-      return;
+      if (!res.ok) { setError(data.error ?? "Delete failed"); setDeleteState(null); return; }
+      setPrograms(ps => ps.filter(x => x.id !== id));
+      setDeleteState(null);
+      router.refresh();
+    } catch {
+      setError("Something went wrong — please try again.");
+      setDeleteState(null);
+    } finally {
+      setDeletingProg(false);
     }
-    if (!res.ok) { setError(data.error ?? "Delete failed"); return; }
-    setPrograms(ps => ps.filter(x => x.id !== p.id));
-    router.refresh();
   };
 
   // Instructors
@@ -120,6 +132,28 @@ export default function ScheduleSetupClient({
                     <button onClick={() => setEditingProg(null)} className="px-3 py-1.5 rounded-lg bg-gray-700 text-xs text-gray-300 transition">Cancel</button>
                   </div>
                 </div>
+              ) : deleteState?.id === p.id && deleteState.stage === "confirm" ? (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-300">Delete <span className="font-medium text-white">{p.name}</span>?</span>
+                  <div className="flex gap-2">
+                    <button onClick={() => doDelete(p.id, false)} disabled={deletingProg} className="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-medium disabled:opacity-50 transition">
+                      {deletingProg ? "…" : "Yes, delete"}
+                    </button>
+                    <button onClick={() => setDeleteState(null)} className="px-3 py-1.5 rounded-lg bg-gray-700 text-xs text-gray-300 transition">Cancel</button>
+                  </div>
+                </div>
+              ) : deleteState?.id === p.id && deleteState.stage === "unassign" ? (
+                <div className="space-y-2">
+                  <p className="text-sm text-amber-300">
+                    <span className="font-medium">{p.name}</span> is assigned to {(deleteState as { id: number; stage: "unassign"; count: number }).count} class{(deleteState as { id: number; stage: "unassign"; count: number }).count !== 1 ? "es" : ""}. Remove the program tag from those classes and delete?
+                  </p>
+                  <div className="flex gap-2">
+                    <button onClick={() => doDelete(p.id, true)} disabled={deletingProg} className="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-medium disabled:opacity-50 transition">
+                      {deletingProg ? "…" : "Remove & delete"}
+                    </button>
+                    <button onClick={() => setDeleteState(null)} className="px-3 py-1.5 rounded-lg bg-gray-700 text-xs text-gray-300 transition">Cancel</button>
+                  </div>
+                </div>
               ) : (
                 <div className="flex items-center justify-between">
                   <div>
@@ -128,8 +162,8 @@ export default function ScheduleSetupClient({
                     <span className="ml-2 text-xs text-gray-600">{p.classCount} class{p.classCount !== 1 ? "es" : ""}</span>
                   </div>
                   <div className="flex gap-2">
-                    <button onClick={() => { setEditingProg(p.id); setProgForm({ ...p }); }} className="text-xs text-gray-400 hover:text-white transition">Edit</button>
-                    <button onClick={() => deleteProgram(p)} className="text-xs text-red-500 hover:text-red-300 transition">Delete</button>
+                    <button onClick={() => { setEditingProg(p.id); setProgForm({ ...p }); setDeleteState(null); }} className="text-xs text-gray-400 hover:text-white transition">Edit</button>
+                    <button onClick={() => confirmDelete(p)} className="text-xs text-red-500 hover:text-red-300 transition">Delete</button>
                   </div>
                 </div>
               )}
