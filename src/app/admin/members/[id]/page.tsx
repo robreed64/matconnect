@@ -60,6 +60,10 @@ export default async function MemberDetailPage({ params }: { params: Params }) {
 
   if (!member) notFound();
 
+  const hiddenFeatures = ((gymSettings as Record<string, unknown>).hiddenFeatures as string[] | null) ?? [];
+  const showBeltProgression = !hiddenFeatures.includes("belt_progression");
+  const showCheckins        = !hiddenFeatures.includes("checkins");
+
   // Belt progression data
   const nextBelt      = getNextBelt(member.beltRank);
   const requirement   = nextBelt
@@ -118,7 +122,7 @@ export default async function MemberDetailPage({ params }: { params: Params }) {
                 {member.beltRank ? member.beltRank.charAt(0).toUpperCase() + member.beltRank.slice(1) : ""} Belt
               </span>
             )}
-            {maxStripes > 0 && (
+            {showBeltProgression && maxStripes > 0 && (
               <BeltStripesEditor
                 memberId={member.id}
                 currentStripes={member.beltStripes}
@@ -182,21 +186,25 @@ export default async function MemberDetailPage({ params }: { params: Params }) {
         </Section>
 
         {/* Stats */}
-        <Section title="Attendance">
-          <div className="grid grid-cols-2 gap-4">
-            <Stat label="Total check-ins" value={member._count.attendance} />
-          </div>
-        </Section>
+        {showCheckins && (
+          <Section title="Attendance">
+            <div className="grid grid-cols-2 gap-4">
+              <Stat label="Total check-ins" value={member._count.attendance} />
+            </div>
+          </Section>
+        )}
 
         {/* QR check-in */}
-        <Section title="Check-In QR Code">
-          <MemberQRCode
-            memberId={member.id}
-            memberName={member.name}
-            gymName={gymSettings.gymName}
-            beltRank={member.beltRank}
-          />
-        </Section>
+        {showCheckins && (
+          <Section title="Check-In QR Code">
+            <MemberQRCode
+              memberId={member.id}
+              memberName={member.name}
+              gymName={gymSettings.gymName}
+              beltRank={member.beltRank}
+            />
+          </Section>
+        )}
 
         {/* Family */}
         <FamilyManager
@@ -208,30 +216,34 @@ export default async function MemberDetailPage({ params }: { params: Params }) {
       </div>
 
       {/* Belt progression */}
-      <ProgressionSection
-        memberId={member.id}
-        currentBelt={member.beltRank}
-        nextBelt={nextBelt}
-        totalClasses={member._count.attendance}
-        monthsTraining={monthsTraining}
-        requirement={requirement ? { minClasses: requirement.minClasses, minMonths: requirement.minMonths, minTechniques: requirement.minTechniques } : null}
-        initialTechniques={techProgress.map((t) => ({ techniqueName: t.techniqueName, mastered: t.mastered }))}
-        readOnly={!canManage}
-      />
-
-      {/* Recent attendance */}
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 mt-6">
-        <AttendanceManager
+      {showBeltProgression && (
+        <ProgressionSection
           memberId={member.id}
-          initialAttendance={member.attendance.map(a => ({
-            id: a.id,
-            timestamp: a.timestamp.toISOString(),
-            source: a.source,
-            className: a.class?.name ?? null,
-          }))}
+          currentBelt={member.beltRank}
+          nextBelt={nextBelt}
+          totalClasses={member._count.attendance}
+          monthsTraining={monthsTraining}
+          requirement={requirement ? { minClasses: requirement.minClasses, minMonths: requirement.minMonths, minTechniques: requirement.minTechniques } : null}
+          initialTechniques={techProgress.map((t) => ({ techniqueName: t.techniqueName, mastered: t.mastered }))}
           readOnly={!canManage}
         />
-      </div>
+      )}
+
+      {/* Recent attendance */}
+      {showCheckins && (
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 mt-6">
+          <AttendanceManager
+            memberId={member.id}
+            initialAttendance={member.attendance.map(a => ({
+              id: a.id,
+              timestamp: a.timestamp.toISOString(),
+              source: a.source,
+              className: a.class?.name ?? null,
+            }))}
+            readOnly={!canManage}
+          />
+        </div>
+      )}
     </div>
   );
 }
