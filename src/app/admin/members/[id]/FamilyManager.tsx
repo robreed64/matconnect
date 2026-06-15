@@ -10,9 +10,10 @@ type Props = {
   memberId:    number;
   currentParent: MemberSummary | null;
   childMembers:  MemberSummary[];
+  readOnly?: boolean;
 };
 
-export default function FamilyManager({ memberId, currentParent, childMembers }: Props) {
+export default function FamilyManager({ memberId, currentParent, childMembers, readOnly = false }: Props) {
   const router   = useRouter();
   const [parent, setParent]     = useState<MemberSummary | null>(currentParent);
   const [kids,   setKids]       = useState<MemberSummary[]>(childMembers);
@@ -96,10 +97,12 @@ export default function FamilyManager({ memberId, currentParent, childMembers }:
             <Link href={`/admin/members/${parent.id}`} className="text-sm text-blue-400 hover:underline">
               {parent.name}
             </Link>
-            <button onClick={unlinkParent}
-              className="text-xs text-gray-600 hover:text-red-400 transition">
-              Unlink
-            </button>
+            {!readOnly && (
+              <button onClick={unlinkParent}
+                className="text-xs text-gray-600 hover:text-red-400 transition">
+                Unlink
+              </button>
+            )}
           </div>
         ) : (
           <p className="text-sm text-gray-600">None</p>
@@ -118,10 +121,12 @@ export default function FamilyManager({ memberId, currentParent, childMembers }:
                 <Link href={`/admin/members/${child.id}`} className="text-sm text-blue-400 hover:underline">
                   {child.name}
                 </Link>
-                <button onClick={() => unlinkChild(child.id)}
-                  className="text-xs text-gray-600 hover:text-red-400 transition">
-                  Unlink
-                </button>
+                {!readOnly && (
+                  <button onClick={() => unlinkChild(child.id)}
+                    className="text-xs text-gray-600 hover:text-red-400 transition">
+                    Unlink
+                  </button>
+                )}
               </div>
             ))}
           </div>
@@ -129,40 +134,42 @@ export default function FamilyManager({ memberId, currentParent, childMembers }:
       </div>
 
       {/* Search to link */}
-      <div className="relative border-t border-gray-800 pt-4">
-        <p className="text-xs text-gray-600 mb-1.5">Link a family member</p>
-        <input
-          type="text"
-          placeholder="Search members…"
-          value={search}
-          onChange={(e) => onInput(e.target.value)}
-          className="w-full px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 text-xs focus:outline-none focus:border-blue-500 transition"
-        />
-        {loading && (
-          <div className="absolute right-3 top-[2.35rem] w-3 h-3 border-2 border-gray-600 border-t-blue-500 rounded-full animate-spin" />
-        )}
-        {results.length > 0 && (
-          <ul className="absolute z-10 mt-1 w-full bg-gray-800 border border-gray-700 rounded-xl shadow-xl overflow-hidden">
-            {results.map((m) => (
-              <li key={m.id} className="flex items-center justify-between px-3 py-2.5 hover:bg-gray-700 transition">
-                <span className="text-sm text-white">{m.name}</span>
-                <div className="flex gap-2">
-                  {!parent && (
-                    <button onClick={() => linkAsChild(m)}
-                      className="text-xs px-2 py-0.5 rounded bg-gray-600 hover:bg-gray-500 text-gray-200 transition">
-                      Set as my parent
+      {!readOnly && (
+        <div className="relative border-t border-gray-800 pt-4">
+          <p className="text-xs text-gray-600 mb-1.5">Link a family member</p>
+          <input
+            type="text"
+            placeholder="Search members…"
+            value={search}
+            onChange={(e) => onInput(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 text-xs focus:outline-none focus:border-blue-500 transition"
+          />
+          {loading && (
+            <div className="absolute right-3 top-[2.35rem] w-3 h-3 border-2 border-gray-600 border-t-blue-500 rounded-full animate-spin" />
+          )}
+          {results.length > 0 && (
+            <ul className="absolute z-10 mt-1 w-full bg-gray-800 border border-gray-700 rounded-xl shadow-xl overflow-hidden">
+              {results.map((m) => (
+                <li key={m.id} className="flex items-center justify-between px-3 py-2.5 hover:bg-gray-700 transition">
+                  <span className="text-sm text-white">{m.name}</span>
+                  <div className="flex gap-2">
+                    {!parent && (
+                      <button onClick={() => linkAsChild(m)}
+                        className="text-xs px-2 py-0.5 rounded bg-gray-600 hover:bg-gray-500 text-gray-200 transition">
+                        Set as my parent
+                      </button>
+                    )}
+                    <button onClick={() => linkAsParent(m)}
+                      className="text-xs px-2 py-0.5 rounded bg-blue-700 hover:bg-blue-600 text-white transition">
+                      Add as child
                     </button>
-                  )}
-                  <button onClick={() => linkAsParent(m)}
-                    className="text-xs px-2 py-0.5 rounded bg-blue-700 hover:bg-blue-600 text-white transition">
-                    Add as child
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -15,6 +15,7 @@ type Props = {
   monthsTraining: number;
   requirement: Requirement;
   initialTechniques: TechRecord[];
+  readOnly?: boolean;
 };
 
 function pct(value: number, min: number) {
@@ -39,7 +40,7 @@ function ProgressBar({ value, min, label }: { value: number; min: number; label:
 }
 
 export default function ProgressionSection({
-  memberId, nextBelt, totalClasses, monthsTraining, requirement, initialTechniques,
+  memberId, nextBelt, totalClasses, monthsTraining, requirement, initialTechniques, readOnly = false,
 }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -115,36 +116,38 @@ export default function ProgressionSection({
       </div>
 
       {/* Promote button */}
-      <div className="mb-5">
-        {!showConfirm ? (
-          <button
-            onClick={() => setShowConfirm(true)}
-            disabled={isPending}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${
-              ready
-                ? "bg-green-700 hover:bg-green-600 text-white"
-                : "bg-gray-800 hover:bg-gray-700 text-gray-300"
-            }`}
-          >
-            {ready ? "Promote to " : "Promote early to "}
-            <span className="capitalize">{nextBelt}</span>
-          </button>
-        ) : (
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-300">Promote to <span className="font-semibold capitalize">{nextBelt}</span>?</span>
+      {!readOnly && (
+        <div className="mb-5">
+          {!showConfirm ? (
             <button
-              onClick={promote}
-              disabled={promoting}
-              className="px-4 py-1.5 rounded-lg bg-green-700 hover:bg-green-600 text-white text-xs font-semibold transition disabled:opacity-50"
+              onClick={() => setShowConfirm(true)}
+              disabled={isPending}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${
+                ready
+                  ? "bg-green-700 hover:bg-green-600 text-white"
+                  : "bg-gray-800 hover:bg-gray-700 text-gray-300"
+              }`}
             >
-              {promoting ? "…" : "Confirm"}
+              {ready ? "Promote to " : "Promote early to "}
+              <span className="capitalize">{nextBelt}</span>
             </button>
-            <button onClick={() => setShowConfirm(false)} className="text-xs text-gray-500 hover:text-gray-300 transition">
-              Cancel
-            </button>
-          </div>
-        )}
-      </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-gray-300">Promote to <span className="font-semibold capitalize">{nextBelt}</span>?</span>
+              <button
+                onClick={promote}
+                disabled={promoting}
+                className="px-4 py-1.5 rounded-lg bg-green-700 hover:bg-green-600 text-white text-xs font-semibold transition disabled:opacity-50"
+              >
+                {promoting ? "…" : "Confirm"}
+              </button>
+              <button onClick={() => setShowConfirm(false)} className="text-xs text-gray-500 hover:text-gray-300 transition">
+                Cancel
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Technique checklist */}
       {techList.length > 0 && (
@@ -160,13 +163,14 @@ export default function ProgressionSection({
               return (
                 <label
                   key={tech}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-gray-800 cursor-pointer transition group"
+                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition group ${readOnly ? "cursor-default" : "hover:bg-gray-800 cursor-pointer"}`}
                 >
                   <input
                     type="checkbox"
                     checked={checked}
-                    onChange={(e) => toggleTechnique(tech, e.target.checked)}
-                    className="w-4 h-4 rounded border-gray-600 bg-gray-800 text-blue-500 focus:ring-blue-500 focus:ring-offset-0 focus:ring-1 cursor-pointer"
+                    onChange={readOnly ? undefined : (e) => toggleTechnique(tech, e.target.checked)}
+                    readOnly={readOnly}
+                    className={`w-4 h-4 rounded border-gray-600 bg-gray-800 text-blue-500 focus:ring-blue-500 focus:ring-offset-0 focus:ring-1 ${readOnly ? "cursor-default" : "cursor-pointer"}`}
                   />
                   <span className={`text-xs transition ${checked ? "text-green-400 line-through decoration-green-700" : "text-gray-400 group-hover:text-gray-200"}`}>
                     {tech}

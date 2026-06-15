@@ -15,9 +15,11 @@ type ActiveClass = { id: number; name: string };
 export default function AttendanceManager({
   memberId,
   initialAttendance,
+  readOnly = false,
 }: {
   memberId: number;
   initialAttendance: AttendanceRecord[];
+  readOnly?: boolean;
 }) {
   const router = useRouter();
   const [attendance, setAttendance] = useState(initialAttendance);
@@ -75,12 +77,14 @@ export default function AttendanceManager({
     <>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500">Recent check-ins</h2>
-        <button
-          onClick={openModal}
-          className="text-xs px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 transition"
-        >
-          + Add Check-in
-        </button>
+        {!readOnly && (
+          <button
+            onClick={openModal}
+            className="text-xs px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 transition"
+          >
+            + Add Check-in
+          </button>
+        )}
       </div>
 
       {attendance.length === 0 ? (
@@ -102,14 +106,16 @@ export default function AttendanceManager({
                       {d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
                     </span>
                   </span>
-                  <button
-                    onClick={() => deleteCheckIn(a.id)}
-                    disabled={deleting === a.id}
-                    className="text-lg leading-none text-gray-700 hover:text-red-400 transition disabled:opacity-40"
-                    aria-label="Delete check-in"
-                  >
-                    ×
-                  </button>
+                  {!readOnly && (
+                    <button
+                      onClick={() => deleteCheckIn(a.id)}
+                      disabled={deleting === a.id}
+                      className="text-lg leading-none text-gray-700 hover:text-red-400 transition disabled:opacity-40"
+                      aria-label="Delete check-in"
+                    >
+                      ×
+                    </button>
+                  )}
                 </div>
               </div>
             );

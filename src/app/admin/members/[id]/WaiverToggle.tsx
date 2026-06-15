@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function WaiverToggle({ memberId, waiverSignedAt }: { memberId: number; waiverSignedAt: string | null }) {
+export default function WaiverToggle({ memberId, waiverSignedAt, readOnly = false }: { memberId: number; waiverSignedAt: string | null; readOnly?: boolean }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
 
@@ -23,18 +23,22 @@ export default function WaiverToggle({ memberId, waiverSignedAt }: { memberId: n
     <span className="inline-flex items-center gap-2 text-xs text-gray-400">
       <span className="text-green-400">✓ Waiver signed</span>
       {new Date(waiverSignedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-      <button onClick={() => setWaiver(false)} disabled={busy}
-        className="text-gray-600 hover:text-red-400 transition disabled:opacity-50">
-        clear
-      </button>
+      {!readOnly && (
+        <button onClick={() => setWaiver(false)} disabled={busy}
+          className="text-gray-600 hover:text-red-400 transition disabled:opacity-50">
+          clear
+        </button>
+      )}
     </span>
   ) : (
     <span className="inline-flex items-center gap-2 text-xs">
       <span className="text-amber-400">⚠ No waiver on file — kiosk will require signing</span>
-      <button onClick={() => setWaiver(true)} disabled={busy}
-        className="px-2 py-0.5 rounded bg-gray-800 hover:bg-gray-700 text-gray-300 transition disabled:opacity-50">
-        {busy ? "…" : "Mark signed (paper)"}
-      </button>
+      {!readOnly && (
+        <button onClick={() => setWaiver(true)} disabled={busy}
+          className="px-2 py-0.5 rounded bg-gray-800 hover:bg-gray-700 text-gray-300 transition disabled:opacity-50">
+          {busy ? "…" : "Mark signed (paper)"}
+        </button>
+      )}
     </span>
   );
 }

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/auth";
+import { can } from "@/lib/permissions";
 import { getGymSettings } from "@/lib/gym-settings";
 import { trialDaysLeft, trialBadge } from "@/lib/trial";
 import MemberFilters from "./MemberFilters";
@@ -27,7 +29,9 @@ const STATUS_PILL: Record<string, string> = {
 type SearchParams = Promise<{ q?: string; belt?: string; status?: string; type?: string; group?: string; page?: string }>;
 
 export default async function MembersPage({ searchParams }: { searchParams: SearchParams }) {
-  const sp     = await searchParams;
+  const [sp, session] = await Promise.all([searchParams, auth()]);
+  const role      = (session?.user as { role?: string } | undefined)?.role;
+  const canManage = can(role, "manage_members");
   const q      = sp.q?.trim() ?? "";
   const belt   = sp.belt ?? "";
   const status = sp.status ?? "";
@@ -77,12 +81,14 @@ export default async function MembersPage({ searchParams }: { searchParams: Sear
           >
             At-risk
           </Link>
-          <Link
-            href="/admin/members/new"
-            className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-sm font-semibold transition"
-          >
-            + Add Member
-          </Link>
+          {canManage && (
+            <Link
+              href="/admin/members/new"
+              className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-sm font-semibold transition"
+            >
+              + Add Member
+            </Link>
+          )}
         </div>
       </div>
 

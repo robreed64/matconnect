@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/auth";
+import { can } from "@/lib/permissions";
 import DeleteMemberButton from "./DeleteMemberButton";
 import ProgressionSection from "./ProgressionSection";
 import FamilyManager from "./FamilyManager";
@@ -36,6 +38,10 @@ export default async function MemberDetailPage({ params }: { params: Params }) {
   const { id } = await params;
   const memberId = parseInt(id, 10);
   if (isNaN(memberId)) notFound();
+
+  const session   = await auth();
+  const role      = (session?.user as { role?: string } | undefined)?.role;
+  const canManage = can(role, "manage_members");
 
   const [member, gymSettings] = await Promise.all([
     prisma.member.findUnique({
@@ -117,6 +123,7 @@ export default async function MemberDetailPage({ params }: { params: Params }) {
                 memberId={member.id}
                 currentStripes={member.beltStripes}
                 maxStripes={maxStripes}
+                readOnly={!canManage}
               />
             )}
             {member.ageGroup && (
@@ -127,23 +134,25 @@ export default async function MemberDetailPage({ params }: { params: Params }) {
             )}
           </div>
           <div className="mt-2">
-            <WaiverToggle memberId={member.id} waiverSignedAt={member.waiverSignedAt?.toISOString() ?? null} />
+            <WaiverToggle memberId={member.id} waiverSignedAt={member.waiverSignedAt?.toISOString() ?? null} readOnly={!canManage} />
           </div>
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
-          <CreateMemberAccount
-            memberId={member.id}
-            memberName={member.name}
-            existingEmail={["member", "parent"].includes(member.user?.role ?? "") ? member.user!.email : null}
-          />
-          <Link
-            href={`/admin/members/${member.id}/edit`}
-            className="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm font-medium transition"
-          >
-            Edit
-          </Link>
-          <DeleteMemberButton memberId={member.id} memberName={member.name} />
-        </div>
+        {canManage && (
+          <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
+            <CreateMemberAccount
+              memberId={member.id}
+              memberName={member.name}
+              existingEmail={["member", "parent"].includes(member.user?.role ?? "") ? member.user!.email : null}
+            />
+            <Link
+              href={`/admin/members/${member.id}/edit`}
+              className="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm font-medium transition"
+            >
+              Edit
+            </Link>
+            <DeleteMemberButton memberId={member.id} memberName={member.name} />
+          </div>
+        )}
       </div>
 
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -194,6 +203,7 @@ export default async function MemberDetailPage({ params }: { params: Params }) {
           memberId={member.id}
           currentParent={member.parent ? { id: member.parent.id, name: member.parent.name, beltRank: null } : null}
           childMembers={member.children.map((c) => ({ id: c.id, name: c.name, beltRank: c.beltRank }))}
+          readOnly={!canManage}
         />
       </div>
 
@@ -206,6 +216,7 @@ export default async function MemberDetailPage({ params }: { params: Params }) {
         monthsTraining={monthsTraining}
         requirement={requirement ? { minClasses: requirement.minClasses, minMonths: requirement.minMonths, minTechniques: requirement.minTechniques } : null}
         initialTechniques={techProgress.map((t) => ({ techniqueName: t.techniqueName, mastered: t.mastered }))}
+        readOnly={!canManage}
       />
 
       {/* Recent attendance */}
@@ -218,6 +229,7 @@ export default async function MemberDetailPage({ params }: { params: Params }) {
             source: a.source,
             className: a.class?.name ?? null,
           }))}
+          readOnly={!canManage}
         />
       </div>
     </div>
