@@ -35,8 +35,10 @@ export async function POST(req: NextRequest) {
 
 function verifyCustomerToken(customerId: string, token: string): boolean {
   try {
+    const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
+    if (!secret) return false;
     const expected = crypto
-      .createHmac("sha256", process.env.NEXTAUTH_SECRET!)
+      .createHmac("sha256", secret)
       .update(customerId)
       .digest();
     const provided = Buffer.from(token, "hex");

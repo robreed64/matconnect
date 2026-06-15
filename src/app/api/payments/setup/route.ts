@@ -30,8 +30,13 @@ export async function POST(req: NextRequest) {
   // verify the request came from a legitimate setup call (prevents an
   // unauthenticated caller from attaching a card to an arbitrary customer id).
   if (provider.name === "square") {
+    const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
+    if (!secret) {
+      console.error("[payments/setup] Neither AUTH_SECRET nor NEXTAUTH_SECRET is set");
+      return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
+    }
     const customerToken = crypto
-      .createHmac("sha256", process.env.NEXTAUTH_SECRET!)
+      .createHmac("sha256", secret)
       .update(customerId)
       .digest("hex");
     return NextResponse.json({ ...session, customerToken });
