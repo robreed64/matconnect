@@ -6,28 +6,31 @@ import { useRouter } from "next/navigation";
 type Program = { id: number; name: string; type: string; description: string | null; classCount: number };
 type DeleteState = { id: number; stage: "confirm" } | { id: number; stage: "unassign"; count: number } | null;
 
-const PROGRAM_TYPES = ["gi", "no-gi", "youth", "seminar", "intro", "private"];
-
 export default function ScheduleSetupClient({
   programs: initial,
   instructorNames: initialNames,
+  programTypes: initialTypes,
 }: {
   programs: Program[];
   instructorNames: string[];
+  programTypes: string[];
 }) {
   const router = useRouter();
-  const [programs, setPrograms]       = useState(initial);
-  const [instructors, setInstructors] = useState(initialNames);
-  const [newName, setNewName]         = useState("");
-  const [editingProg, setEditingProg] = useState<number | null>(null);
-  const [progForm, setProgForm]       = useState<Partial<Program>>({});
-  const [showNewProg, setShowNewProg] = useState(false);
-  const [newProg, setNewProg]         = useState({ name: "", type: "gi", description: "" });
-  const [savingProg, setSavingProg]   = useState(false);
+  const [programs, setPrograms]         = useState(initial);
+  const [instructors, setInstructors]   = useState(initialNames);
+  const [newName, setNewName]           = useState("");
+  const [progTypes, setProgTypes]       = useState(initialTypes);
+  const [newType, setNewType]           = useState("");
+  const [savingTypes, setSavingTypes]   = useState(false);
+  const [editingProg, setEditingProg]   = useState<number | null>(null);
+  const [progForm, setProgForm]         = useState<Partial<Program>>({});
+  const [showNewProg, setShowNewProg]   = useState(false);
+  const [newProg, setNewProg]           = useState({ name: "", type: initialTypes[0] ?? "gi", description: "" });
+  const [savingProg, setSavingProg]     = useState(false);
   const [deletingProg, setDeletingProg] = useState(false);
-  const [deleteState, setDeleteState] = useState<DeleteState>(null);
-  const [savingNames, setSavingNames] = useState(false);
-  const [error, setError]             = useState("");
+  const [deleteState, setDeleteState]   = useState<DeleteState>(null);
+  const [savingNames, setSavingNames]   = useState(false);
+  const [error, setError]               = useState("");
 
   // Programs
   const saveProgram = async (id?: number) => {
@@ -84,6 +87,27 @@ export default function ScheduleSetupClient({
     }
   };
 
+  // Program types
+  const addProgType = () => {
+    const trimmed = newType.trim().toLowerCase();
+    if (!trimmed || progTypes.includes(trimmed)) return;
+    setProgTypes(prev => [...prev, trimmed]);
+    setNewType("");
+  };
+
+  const removeProgType = (t: string) => setProgTypes(prev => prev.filter(x => x !== t));
+
+  const saveProgTypes = async () => {
+    setSavingTypes(true);
+    await fetch("/api/admin/settings", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ programTypes: progTypes }),
+    });
+    setSavingTypes(false);
+    router.refresh();
+  };
+
   // Instructors
   const addInstructor = () => {
     const trimmed = newName.trim();
@@ -123,7 +147,7 @@ export default function ScheduleSetupClient({
                   <div className="grid grid-cols-2 gap-2">
                     <input className={`${inp} w-full`} value={progForm.name ?? ""} onChange={e => setProgForm(f => ({ ...f, name: e.target.value }))} placeholder="Name" />
                     <select className={`${sel} w-full`} value={progForm.type ?? "gi"} onChange={e => setProgForm(f => ({ ...f, type: e.target.value }))}>
-                      {PROGRAM_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                      {progTypes.map(t => <option key={t} value={t}>{t}</option>)}
                     </select>
                   </div>
                   <input className={`${inp} w-full`} value={progForm.description ?? ""} onChange={e => setProgForm(f => ({ ...f, description: e.target.value }))} placeholder="Description (optional)" />
@@ -177,7 +201,7 @@ export default function ScheduleSetupClient({
             <div className="grid grid-cols-2 gap-2">
               <input className={`${inp} w-full`} value={newProg.name} onChange={e => setNewProg(f => ({ ...f, name: e.target.value }))} placeholder="Program name" />
               <select className={`${sel} w-full`} value={newProg.type} onChange={e => setNewProg(f => ({ ...f, type: e.target.value }))}>
-                {PROGRAM_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                {progTypes.map(t => <option key={t} value={t}>{t}</option>)}
               </select>
             </div>
             <input className={`${inp} w-full`} value={newProg.description} onChange={e => setNewProg(f => ({ ...f, description: e.target.value }))} placeholder="Description (optional)" />
@@ -189,6 +213,34 @@ export default function ScheduleSetupClient({
         ) : (
           <button onClick={() => setShowNewProg(true)} className="text-sm text-blue-400 hover:text-blue-300 transition">+ Add Program</button>
         )}
+      </div>
+
+      {/* Program Types */}
+      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+        <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">Program Types</h2>
+        <p className="text-xs text-gray-600 mb-3">These appear in the type dropdown when creating or editing programs.</p>
+        <div className="flex flex-wrap gap-2 mb-3">
+          {progTypes.map(t => (
+            <span key={t} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gray-800 text-sm text-gray-300 capitalize">
+              {t}
+              <button onClick={() => removeProgType(t)} className="text-gray-600 hover:text-red-400 transition ml-1">×</button>
+            </span>
+          ))}
+          {progTypes.length === 0 && <p className="text-sm text-gray-600">No types saved.</p>}
+        </div>
+        <div className="flex gap-2">
+          <input
+            className={`${inp} flex-1`}
+            placeholder="e.g. wrestling"
+            value={newType}
+            onChange={e => setNewType(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && addProgType()}
+          />
+          <button onClick={addProgType} className="px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm text-gray-300 transition">Add</button>
+        </div>
+        <button onClick={saveProgTypes} disabled={savingTypes} className="mt-3 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium disabled:opacity-50 transition">
+          {savingTypes ? "Saving…" : "Save Types"}
+        </button>
       </div>
 
       {/* Instructor Names */}

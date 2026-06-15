@@ -13,6 +13,7 @@ export default async function SetupSchedulePage() {
   ]);
 
   const instructorNames = (settings.instructorNames as string[]) ?? [];
+  const programTypes    = (settings.programTypes    as string[]) ?? ["gi", "no-gi", "youth", "seminar", "intro", "private"];
 
   return (
     <div className="p-8 max-w-3xl">
@@ -23,6 +24,7 @@ export default async function SetupSchedulePage() {
       <ScheduleSetupClient
         programs={programs.map(p => ({ ...p, classCount: p._count.classes }))}
         instructorNames={instructorNames}
+        programTypes={programTypes}
       />
     </div>
   );

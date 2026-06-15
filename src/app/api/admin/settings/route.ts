@@ -22,7 +22,7 @@ export async function PATCH(req: Request) {
     "gymName", "gymEmail", "gymPhone", "gymAddress", "logoUrl",
     "waiverText", "currency", "currencySymbol", "locale", "timezone",
     "defaultTaxRate", "setupComplete",
-    "beltConfig", "instructorNames", "posCategories",
+    "beltConfig", "instructorNames", "programTypes", "posCategories",
     "paymentProvider",
     "stripePublishableKey", "stripeSecretKey", "stripeWebhookSecret",
     "squareAccessToken", "squareApplicationId", "squareLocationId",
