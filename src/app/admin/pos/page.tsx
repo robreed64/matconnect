@@ -16,6 +16,16 @@ export default async function POSPage() {
     paymentProvider === "square" &&
     !!(settings.squareAccessToken || process.env.SQUARE_ACCESS_TOKEN) &&
     !!settings.squareTerminalDeviceId;
+  const squareCardConfig =
+    paymentProvider === "square" &&
+    settings.squareApplicationId &&
+    settings.squareLocationId
+      ? {
+          applicationId: settings.squareApplicationId,
+          locationId: settings.squareLocationId,
+          environment: (settings.squareEnvironment || "sandbox") as "sandbox" | "production",
+        }
+      : null;
 
   return (
     <div className="flex flex-col h-screen">
@@ -36,7 +46,7 @@ export default async function POSPage() {
 
       {/* Terminal — fills remaining height */}
       <div className="flex-1 overflow-hidden">
-        <POSTerminal categories={categories} paymentProvider={paymentProvider} terminalEnabled={terminalEnabled} initialItems={items.map((i) => ({
+        <POSTerminal categories={categories} paymentProvider={paymentProvider} terminalEnabled={terminalEnabled} squareCardConfig={squareCardConfig} initialItems={items.map((i) => ({
           id:         i.id,
           name:       i.name,
           priceCents: i.priceCents,

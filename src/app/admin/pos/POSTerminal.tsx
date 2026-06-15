@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
+import SquareCardForm from "@/components/payments/SquareCardForm";
 
 type Item = {
   id: number; name: string; priceCents: number;
@@ -13,7 +14,7 @@ type Member    = {
   squareCustomerId?: string | null;
   squareCardId?: string | null;
 };
-type PayMethod = "cash" | "card_on_file" | "square_terminal";
+type PayMethod = "cash" | "card_on_file" | "square_card" | "square_terminal";
 
 // Cycling color palette for dynamic categories
 const PALETTE_TAB = [
@@ -46,11 +47,13 @@ export default function POSTerminal({
   categories,
   paymentProvider = "stripe",
   terminalEnabled = false,
+  squareCardConfig = null,
 }: {
   initialItems: Item[];
   categories: string[];
   paymentProvider?: "stripe" | "square";
   terminalEnabled?: boolean;
+  squareCardConfig?: { applicationId: string; locationId: string; environment: "sandbox" | "production" } | null;
 }) {
   const [items]       = useState<Item[]>(initialItems);
   const [tab, setTab] = useState<string>(categories[0] ?? "drinks");
@@ -363,8 +366,11 @@ export default function POSTerminal({
                     ? !selectedMember?.squareCardId
                     : !selectedMember?.stripeCustomerId,
                 },
+                ...(squareCardConfig
+                  ? [{ method: "square_card" as PayMethod, label: "Card", disabled: false }]
+                  : []),
                 ...(terminalEnabled
-                  ? [{ method: "square_terminal" as PayMethod, label: "Card (Terminal)", disabled: false }]
+                  ? [{ method: "square_terminal" as PayMethod, label: "Terminal", disabled: false }]
                   : []),
               ]
             ).map(({ method, label, disabled }) => (
@@ -389,13 +395,45 @@ export default function POSTerminal({
               {checkoutError}
             </p>
           )}
-          <button
-            onClick={checkout}
-            disabled={cart.length === 0 || processing || walkInMissing}
-            className="w-full py-3 rounded-xl bg-green-600 hover:bg-green-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-base transition"
-          >
-            {processing ? "Processing…" : `Charge ${fmt(total)}`}
-          </button>
+          {payMethod === "square_card" && squareCardConfig ? (
+            <SquareCardForm
+              applicationId={squareCardConfig.applicationId}
+              locationId={squareCardConfig.locationId}
+              environment={squareCardConfig.environment}
+              submitLabel={`Charge ${fmt(total)}`}
+              busyLabel="Charging…"
+              onToken={async (nonce) => {
+                if (cart.length === 0) return "Cart is empty";
+                if (walkInMissing) return "Walk-in name is required for day passes";
+                const payload = {
+                  nonce,
+                  memberId: selectedMember?.id ?? null,
+                  lineItems: cart.map((l) => ({ itemId: l.item.id, quantity: l.quantity })),
+                  ...(needsWalkIn && walkInName.trim() && {
+                    walkIn: { name: walkInName, email: walkInEmail || undefined },
+                  }),
+                };
+                const res = await fetch("/api/admin/pos/card-charge", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(payload),
+                });
+                const data = await res.json().catch(() => null);
+                if (!res.ok) return data?.error ?? "Charge failed — try again";
+                setReceipt({ total: data.totalCents, id: data.id, checkedIn: data.checkedIn, waiverPending: data.waiverPending });
+                resetCart();
+                return null;
+              }}
+            />
+          ) : (
+            <button
+              onClick={checkout}
+              disabled={cart.length === 0 || processing || walkInMissing}
+              className="w-full py-3 rounded-xl bg-green-600 hover:bg-green-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-base transition"
+            >
+              {processing ? "Processing…" : `Charge ${fmt(total)}`}
+            </button>
+          )}
 
           {cart.length > 0 && (
             <button onClick={() => setCart([])} className="w-full text-xs text-gray-600 hover:text-gray-400 transition">
