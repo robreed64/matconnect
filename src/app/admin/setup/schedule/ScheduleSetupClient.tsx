@@ -146,8 +146,11 @@ export default function ScheduleSetupClient({
                 <div className="space-y-2">
                   <div className="grid grid-cols-2 gap-2">
                     <input className={`${inp} w-full`} value={progForm.name ?? ""} onChange={e => setProgForm(f => ({ ...f, name: e.target.value }))} placeholder="Name" />
-                    <select className={`${sel} w-full`} value={progForm.type ?? "gi"} onChange={e => setProgForm(f => ({ ...f, type: e.target.value }))}>
+                    <select className={`${sel} w-full`} value={progForm.type ?? ""} onChange={e => setProgForm(f => ({ ...f, type: e.target.value }))}>
                       {progTypes.map(t => <option key={t} value={t}>{t}</option>)}
+                      {progForm.type && !progTypes.includes(progForm.type) && (
+                        <option value={progForm.type}>{progForm.type}</option>
+                      )}
                     </select>
                   </div>
                   <input className={`${inp} w-full`} value={progForm.description ?? ""} onChange={e => setProgForm(f => ({ ...f, description: e.target.value }))} placeholder="Description (optional)" />
