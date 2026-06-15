@@ -93,7 +93,14 @@ function SquarePaymentStep({ settings, name, email, onSuccess, onSkip }: Props &
     return <NotConfigured providerLabel="Square" onSkip={onSkip} />;
   }
   if (failed) {
-    return <p className="text-red-400 text-sm">Failed to initialize payment. Please try again or skip.</p>;
+    return (
+      <div className="space-y-3">
+        <p className="text-red-400 text-sm">Failed to initialize payment. Please try again or continue without a card.</p>
+        <button onClick={onSkip} className="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white text-sm font-medium transition">
+          Continue without payment →
+        </button>
+      </div>
+    );
   }
   if (!customerId) {
     return (
@@ -169,7 +176,14 @@ function StripePaymentStep({ settings, name, email, onSuccess, onSkip }: Props &
   }
 
   if (!clientSecret || !customerId) {
-    return <p className="text-red-400 text-sm">Failed to initialize payment. Please try again or skip.</p>;
+    return (
+      <div className="space-y-3">
+        <p className="text-red-400 text-sm">Failed to initialize payment. Please try again or continue without a card.</p>
+        <button onClick={onSkip} className="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white text-sm font-medium transition">
+          Continue without payment →
+        </button>
+      </div>
+    );
   }
 
   return (
