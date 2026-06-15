@@ -149,15 +149,26 @@ export async function finalizeTerminalCheckout(
     select: { id: true },
   });
 
-  const result = await recordSale({
-    memberId: row.memberId,
-    walkIn: row.walkIn as WalkIn | null,
-    paymentMethodType: "square_terminal",
-    totalCents: row.totalCents,
-    saleLines,
-    hasDayPass: dayPassItems.length > 0,
-    squarePaymentId,
-  });
+  let result: RecordSaleResult;
+  try {
+    result = await recordSale({
+      memberId: row.memberId,
+      walkIn: row.walkIn as WalkIn | null,
+      paymentMethodType: "square_terminal",
+      totalCents: row.totalCents,
+      saleLines,
+      hasDayPass: dayPassItems.length > 0,
+      squarePaymentId,
+    });
+  } catch (err) {
+    // The claim already flipped status to 'completed'; revert to 'failed' so
+    // the POS client sees a terminal state and isn't left spinning forever.
+    await prisma.terminalCheckout.update({
+      where: { id: row.id },
+      data: { status: "failed" },
+    }).catch(() => {});
+    throw err;
+  }
 
   await prisma.terminalCheckout.update({
     where: { id: row.id },

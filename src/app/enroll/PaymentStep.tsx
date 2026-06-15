@@ -67,6 +67,7 @@ function NotConfigured({ providerLabel, onSkip }: { providerLabel: string; onSki
 
 function SquarePaymentStep({ settings, name, email, onSuccess, onSkip }: Props & { settings: PublicSettings }) {
   const [customerId, setCustomerId] = useState<string | null>(null);
+  const [customerToken, setCustomerToken] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
@@ -77,8 +78,12 @@ function SquarePaymentStep({ settings, name, email, onSuccess, onSkip }: Props &
     })
       .then(r => r.json())
       .then(data => {
-        if (data?.customerId) setCustomerId(data.customerId);
-        else setFailed(true);
+        if (data?.customerId && data?.customerToken) {
+          setCustomerId(data.customerId);
+          setCustomerToken(data.customerToken);
+        } else {
+          setFailed(true);
+        }
       })
       .catch(() => setFailed(true));
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -109,7 +114,7 @@ function SquarePaymentStep({ settings, name, email, onSuccess, onSkip }: Props &
         const res = await fetch("/api/payments/save-card", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ customerId, token }),
+          body: JSON.stringify({ customerId, customerToken, token }),
         });
         const data = await res.json().catch(() => null);
         if (!res.ok || !data?.cardId) return data?.error ?? "Failed to save card";

@@ -264,11 +264,12 @@ export class SquareProvider implements PaymentProvider {
   ): Promise<void> {
     const current = await this.client.subscriptions.get({ subscriptionId: subscriptionRef });
     const version = current.subscription?.version;
-    // Square has no coupons on subscriptions; the discount is a price override
-    // (JSON null clears it back to the plan price)
+    // Square has no coupons; the discount is modeled as a price override.
+    // To remove a discount, set the override to the plan's full price rather
+    // than passing null (null behavior is unspecified by the API).
     const priceOverrideMoney =
       percent === null
-        ? (null as unknown as Square.Money)
+        ? money(plan.priceCents, plan.currency)
         : money(familyDiscountPriceCents(plan.priceCents, percent), plan.currency);
     await this.client.subscriptions.update({
       subscriptionId: subscriptionRef,

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPaymentProvider } from "@/lib/payments/provider";
 import { prisma } from "@/lib/prisma";
+import crypto from "crypto";
 
 // Starts card collection for the enroll flow (public, like /enroll itself).
 // Stripe: creates the customer + a SetupIntent for Elements.
@@ -24,5 +25,17 @@ export async function POST(req: NextRequest) {
   }
 
   const session = await provider.beginCardSetup(customerId);
+
+  // Square: bind the customer to a signed token so /api/payments/save-card can
+  // verify the request came from a legitimate setup call (prevents an
+  // unauthenticated caller from attaching a card to an arbitrary customer id).
+  if (provider.name === "square") {
+    const customerToken = crypto
+      .createHmac("sha256", process.env.NEXTAUTH_SECRET!)
+      .update(customerId)
+      .digest("hex");
+    return NextResponse.json({ ...session, customerToken });
+  }
+
   return NextResponse.json(session);
 }

@@ -68,14 +68,23 @@ export async function POST(req: NextRequest) {
           data: { canceledAt: new Date() },
         });
       }
-      await prisma.subscription.updateMany({
+      const updated = await prisma.subscription.updateMany({
         where: { squareSubscriptionId: sub.id },
         data: { status: newStatus, updatedAt: new Date() },
       });
-      const dbSub = await prisma.subscription.findFirst({ where: { squareSubscriptionId: sub.id } });
-      if (dbSub) {
-        await prisma.member.update({
-          where: { id: dbSub.memberId },
+      if (updated.count > 0) {
+        const dbSub = await prisma.subscription.findFirst({ where: { squareSubscriptionId: sub.id } });
+        if (dbSub) {
+          await prisma.member.update({
+            where: { id: dbSub.memberId },
+            data: { status: newStatus, updatedAt: new Date() },
+          });
+        }
+      } else if (sub.customer_id) {
+        // Subscription row not yet committed (webhook raced enrollment) — update
+        // member directly via customerId so status isn't silently dropped.
+        await prisma.member.updateMany({
+          where: { squareCustomerId: sub.customer_id },
           data: { status: newStatus, updatedAt: new Date() },
         });
       }
@@ -119,7 +128,11 @@ export async function POST(req: NextRequest) {
       const checkout = event.data?.object?.checkout;
       if (!checkout?.id) break;
       if (checkout.status === "COMPLETED") {
-        await finalizeTerminalCheckout(checkout.id, checkout.payment_ids?.[0] ?? null);
+        try {
+          await finalizeTerminalCheckout(checkout.id, checkout.payment_ids?.[0] ?? null);
+        } catch (err) {
+          console.error("Terminal checkout finalization failed in webhook:", err);
+        }
       } else if (checkout.status === "CANCELED") {
         await markTerminalCheckoutEnded(checkout.id, "canceled");
       }

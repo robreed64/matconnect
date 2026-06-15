@@ -4,6 +4,7 @@ import { getPaymentProvider, type PaymentProvider } from "@/lib/payments/provide
 import type { PlanRefs } from "@/lib/payments/types";
 import type { MembershipPlan } from "@prisma/client";
 import { getGymSettings } from "@/lib/gym-settings";
+import { CardDeclinedError } from "@/lib/payments/types";
 import bcrypt from "bcryptjs";
 import { sendEmail } from "@/lib/email";
 
@@ -48,7 +49,10 @@ export async function POST(req: NextRequest) {
 
   let resolvedCustomerId = customerIdInput;
   let subscriptionRef: string | null = null;
-  let memberStatus = planId ? "active" : "trial";
+  // Default to trial; overridden to the provider's status after billing is confirmed.
+  // Keeping this as 'trial' when provider is null prevents an unbilled member
+  // from being marked active just because planId was supplied.
+  let memberStatus = "trial";
 
   const provider = await getPaymentProvider();
   let savedCardId: string | null = null;
@@ -65,8 +69,15 @@ export async function POST(req: NextRequest) {
 
       // Attach/store the card and make it the default
       if (paymentMethodId) {
-        const saved = await provider.saveCard(resolvedCustomerId, paymentMethodId);
-        savedCardId = saved.cardId;
+        try {
+          const saved = await provider.saveCard(resolvedCustomerId, paymentMethodId);
+          savedCardId = saved.cardId;
+        } catch (err) {
+          if (err instanceof CardDeclinedError) {
+            return NextResponse.json({ error: `Card declined: ${err.message}` }, { status: 402 });
+          }
+          throw err;
+        }
       }
 
       const memberRefs = {

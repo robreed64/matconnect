@@ -31,7 +31,11 @@ export async function GET(_req: NextRequest, { params }: { params: Params }) {
   if (!remote) return NextResponse.json({ error: "Square not configured" }, { status: 503 });
 
   if (remote.status === "COMPLETED") {
-    await finalizeTerminalCheckout(row.squareCheckoutId, remote.paymentId);
+    try {
+      await finalizeTerminalCheckout(row.squareCheckoutId, remote.paymentId);
+    } catch (err) {
+      console.error("Terminal checkout finalization failed:", err);
+    }
   } else if (remote.status === "CANCELED") {
     await markTerminalCheckoutEnded(row.squareCheckoutId, "canceled");
   }

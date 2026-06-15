@@ -60,6 +60,7 @@ export default function POSTerminal({
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [payMethod, setPayMethod] = useState<PayMethod>("cash");
   const [pendingTerminalId, setPendingTerminalId] = useState<number | null>(null);
+  const [pendingTerminalTotal, setPendingTerminalTotal] = useState<number | null>(null);
   const [processing, setProcessing] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [walkInName, setWalkInName]   = useState("");
@@ -130,8 +131,12 @@ export default function POSTerminal({
           body: JSON.stringify(payload),
         });
         const data = await res.json().catch(() => null);
-        if (res.ok) setPendingTerminalId(data.id);
-        else setCheckoutError(data?.error ?? "Checkout failed — try again");
+        if (res.ok) {
+          setPendingTerminalId(data.id);
+          setPendingTerminalTotal(data.totalCents ?? null);
+        } else {
+          setCheckoutError(data?.error ?? "Checkout failed — try again");
+        }
       } else {
         const res = await fetch("/api/admin/pos/sales", {
           method: "POST",
@@ -157,7 +162,7 @@ export default function POSTerminal({
     return (
       <TerminalWaitPanel
         pendingId={pendingTerminalId}
-        total={total}
+        total={pendingTerminalTotal ?? total}
         onDone={(sale) => {
           setPendingTerminalId(null);
           if (sale) {
@@ -457,7 +462,18 @@ function TerminalWaitPanel({
   const cancel = async () => {
     setCanceling(true);
     try {
-      await fetch(`/api/admin/pos/terminal-checkout/${pendingId}`, { method: "DELETE" });
+      const res = await fetch(`/api/admin/pos/terminal-checkout/${pendingId}`, { method: "DELETE" });
+      if (res.ok) {
+        const data = await res.json().catch(() => null);
+        // Payment completed at the same instant the cashier canceled — surface it
+        if (data?.status === "completed" && data?.sale) {
+          if (!doneRef.current) {
+            doneRef.current = true;
+            onDone(data.sale);
+          }
+          return;
+        }
+      }
     } catch { /* the next poll will pick up the state */ }
     if (!doneRef.current) {
       doneRef.current = true;
