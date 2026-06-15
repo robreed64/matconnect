@@ -284,12 +284,29 @@ export default function WeekCalendar({
                   View Roster
                 </Link>
                 <div className="flex gap-2">
-                  <Link
-                    href={`/admin/schedule/${selected.id}/edit`}
-                    className="flex-1 text-center py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm font-medium transition"
-                  >
-                    Edit
-                  </Link>
+                  {selected.seriesId ? (
+                    <div className="flex-1 flex gap-1.5">
+                      <Link
+                        href={`/admin/schedule/${selected.id}/edit`}
+                        className="flex-1 text-center py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-xs font-medium transition"
+                      >
+                        This class
+                      </Link>
+                      <Link
+                        href={`/admin/schedule/${selected.id}/edit-series`}
+                        className="flex-1 text-center py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-xs font-medium transition"
+                      >
+                        Entire series
+                      </Link>
+                    </div>
+                  ) : (
+                    <Link
+                      href={`/admin/schedule/${selected.id}/edit`}
+                      className="flex-1 text-center py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm font-medium transition"
+                    >
+                      Edit
+                    </Link>
+                  )}
                   <button
                     onClick={handleDeleteClick}
                     disabled={deleting}
