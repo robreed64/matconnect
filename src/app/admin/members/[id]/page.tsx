@@ -61,8 +61,9 @@ export default async function MemberDetailPage({ params }: { params: Params }) {
   if (!member) notFound();
 
   const hiddenFeatures = ((gymSettings as Record<string, unknown>).hiddenFeatures as string[] | null) ?? [];
-  const showBeltProgression = !hiddenFeatures.includes("belt_progression");
+  const showBeltProgression = !hiddenFeatures.includes("belt_progression") && !hiddenFeatures.includes("belts");
   const showCheckins        = !hiddenFeatures.includes("checkins");
+  const showProgression     = showBeltProgression && !hiddenFeatures.includes("curriculum");
 
   // Belt progression data
   const nextBelt      = getNextBelt(member.beltRank);
@@ -216,7 +217,7 @@ export default async function MemberDetailPage({ params }: { params: Params }) {
       </div>
 
       {/* Belt progression */}
-      {showBeltProgression && (
+      {showProgression && (
         <ProgressionSection
           memberId={member.id}
           currentBelt={member.beltRank}
