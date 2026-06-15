@@ -350,6 +350,7 @@ model GymSettings {
   brevoSmsFrom         String?  @map("brevo_sms_from")
   beltConfig           Json     @default("[]") @map("belt_config")
   instructorNames      Json     @default("[]") @map("instructor_names")
+  programTypes         Json     @default("[\"gi\",\"no-gi\",\"youth\",\"seminar\",\"intro\",\"private\"]") @map("program_types")
   posCategories        Json     @default("[\"drinks\",\"gear\",\"events\"]") @map("pos_categories")
   familyDiscountEnabled  Boolean @default(false) @map("family_discount_enabled")
   familyDiscountPercent  Int     @default(10) @map("family_discount_percent")
