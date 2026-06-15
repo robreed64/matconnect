@@ -5,16 +5,31 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import LogoutButton from "@/components/LogoutButton";
 
-const NAV = [
-  { href: "/member",            label: "Home",       icon: "🏠" },
-  { href: "/member/schedule",   label: "Schedule",   icon: "📅" },
-  { href: "/member/attendance", label: "Attendance", icon: "📋" },
-  { href: "/member/progress",   label: "Progress",   icon: "🥋" },
-  { href: "/member/curriculum", label: "Curriculum", icon: "📖" },
-  { href: "/member/profile",    label: "Profile",    icon: "👤" },
+const ALL_NAV = [
+  { href: "/member",            label: "Home",       icon: "🏠",  feature: null },
+  { href: "/member/schedule",   label: "Schedule",   icon: "📅",  feature: null },
+  { href: "/member/attendance", label: "Attendance", icon: "📋",  feature: null },
+  { href: "/member/progress",   label: "Progress",   icon: "🥋",  feature: "progress" },
+  { href: "/member/curriculum", label: "Curriculum", icon: "📖",  feature: "curriculum" },
+  { href: "/member/profile",    label: "Profile",    icon: "👤",  feature: null },
 ];
 
-export default function MemberNav({ gymName, userName }: { gymName: string; userName?: string | null }) {
+export default function MemberNav({
+  gymName,
+  userName,
+  showProgress  = true,
+  showCurriculum = true,
+}: {
+  gymName: string;
+  userName?: string | null;
+  showProgress?: boolean;
+  showCurriculum?: boolean;
+}) {
+  const NAV = ALL_NAV.filter(item => {
+    if (item.feature === "progress"   && !showProgress)   return false;
+    if (item.feature === "curriculum" && !showCurriculum) return false;
+    return true;
+  });
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
