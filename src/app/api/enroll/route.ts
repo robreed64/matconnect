@@ -174,6 +174,31 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Send waiver confirmation email
+    if (member.email) {
+      const gymSettings = await getGymSettings();
+      const signedDate = new Date().toLocaleDateString("en-US", {
+        weekday: "long", year: "numeric", month: "long", day: "numeric",
+      });
+      await sendEmail(
+        member.email,
+        "Your Signed Participation Agreement",
+        `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#222">
+<h2 style="margin-bottom:4px">Participation Agreement</h2>
+<p style="color:#555;margin-top:0">A copy of the agreement you signed today.</p>
+<table style="width:100%;border-collapse:collapse;margin-bottom:20px">
+  <tr><td style="padding:6px 0;color:#555;width:120px">Name</td><td style="padding:6px 0"><strong>${member.name}</strong></td></tr>
+  <tr><td style="padding:6px 0;color:#555">Email</td><td style="padding:6px 0">${member.email}</td></tr>
+  <tr><td style="padding:6px 0;color:#555">Date signed</td><td style="padding:6px 0">${signedDate}</td></tr>
+</table>
+<hr style="border:none;border-top:1px solid #ddd;margin:20px 0">
+<div style="white-space:pre-wrap;font-size:13px;line-height:1.6;color:#333">${gymSettings.waiverText}</div>
+<hr style="border:none;border-top:1px solid #ddd;margin:20px 0">
+<p style="font-size:12px;color:#888">This email confirms that <strong>${member.name}</strong> agreed to the above terms on ${signedDate}. Please keep it for your records.</p>
+</div>`
+      ).catch(() => {});
+    }
+
     // Auto-create portal account if email provided and no account already exists
     if (member.email) {
       const existingUser = await prisma.user.findUnique({ where: { email: member.email } });
