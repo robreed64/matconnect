@@ -13,6 +13,7 @@ type ClassEvent = {
   instructorName: string | null;
   capacity: number | null;
   program: Program | null;
+  seriesId: string | null;
   _count?: { bookings: number; attendance: number };
 };
 
@@ -61,8 +62,9 @@ export default function WeekCalendar({
 }) {
   const router    = useRouter();
   const weekStart = new Date(weekStartISO);
-  const [selected, setSelected] = useState<ClassEvent | null>(null);
-  const [deleting, setDeleting] = useState(false);
+  const [selected,    setSelected]    = useState<ClassEvent | null>(null);
+  const [deleteMode,  setDeleteMode]  = useState<"confirm" | null>(null);
+  const [deleting,    setDeleting]    = useState(false);
   // Derive today on the client only to avoid SSR/client mismatch
   const [today, setToday] = useState("");
   useEffect(() => { setToday(toLocalISODate(new Date())); }, []);
@@ -79,12 +81,21 @@ export default function WeekCalendar({
     router.push(`/admin/schedule`);
   };
 
-  const deleteClass = async (id: number) => {
+  const deleteClass = async (id: number, series = false) => {
     setDeleting(true);
-    await fetch(`/api/admin/classes/${id}`, { method: "DELETE" });
+    await fetch(`/api/admin/classes/${id}${series ? "?series=true" : ""}`, { method: "DELETE" });
     setSelected(null);
+    setDeleteMode(null);
     setDeleting(false);
     router.refresh();
+  };
+
+  const handleDeleteClick = () => {
+    if (selected?.seriesId) {
+      setDeleteMode("confirm");
+    } else {
+      deleteClass(selected!.id);
+    }
   };
 
   const dayDates = DAYS.map((_, i) => addDays(weekStart, i));
@@ -214,7 +225,7 @@ export default function WeekCalendar({
 
       {/* Class detail popover */}
       {selected && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setSelected(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => { setSelected(null); setDeleteMode(null); }}>
           <div
             className="bg-gray-900 border border-gray-700 rounded-2xl p-6 w-full max-w-sm shadow-2xl"
             onClick={(e) => e.stopPropagation()}
@@ -226,7 +237,7 @@ export default function WeekCalendar({
                   <span className="text-sm text-gray-400 capitalize">{selected.program.type} · {selected.program.name}</span>
                 )}
               </div>
-              <button onClick={() => setSelected(null)} className="text-gray-500 hover:text-white text-xl leading-none">×</button>
+              <button onClick={() => { setSelected(null); setDeleteMode(null); }} className="text-gray-500 hover:text-white text-xl leading-none">×</button>
             </div>
 
             <div className="space-y-2 text-sm mb-5">
@@ -239,29 +250,56 @@ export default function WeekCalendar({
               {selected.capacity       && <Row label="Capacity">{selected.capacity} students</Row>}
             </div>
 
-            <div className="flex gap-2 flex-col">
-              <Link
-                href={`/admin/schedule/${selected.id}/roster`}
-                className="w-full text-center py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-sm font-semibold text-white transition"
-              >
-                View Roster
-              </Link>
-              <div className="flex gap-2">
-                <Link
-                  href={`/admin/schedule/${selected.id}/edit`}
-                  className="flex-1 text-center py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm font-medium transition"
-                >
-                  Edit
-                </Link>
+            {deleteMode === "confirm" ? (
+              <div className="space-y-2">
+                <p className="text-sm text-gray-300 text-center mb-1">This class is part of a recurring series.</p>
                 <button
-                  onClick={() => deleteClass(selected.id)}
+                  onClick={() => deleteClass(selected.id, false)}
                   disabled={deleting}
-                  className="flex-1 py-2 rounded-lg bg-red-900/40 hover:bg-red-800/60 text-red-400 text-sm font-medium disabled:opacity-50 transition"
+                  className="w-full py-2.5 rounded-lg bg-red-900/40 hover:bg-red-800/60 text-red-400 text-sm font-semibold disabled:opacity-50 transition"
                 >
-                  {deleting ? "Deleting…" : "Delete"}
+                  {deleting ? "Deleting…" : "Delete this class only"}
+                </button>
+                <button
+                  onClick={() => deleteClass(selected.id, true)}
+                  disabled={deleting}
+                  className="w-full py-2.5 rounded-lg bg-red-700/60 hover:bg-red-700/80 text-red-200 text-sm font-semibold disabled:opacity-50 transition"
+                >
+                  {deleting ? "Deleting…" : "Delete entire series"}
+                </button>
+                <button
+                  onClick={() => setDeleteMode(null)}
+                  disabled={deleting}
+                  className="w-full py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm text-gray-400 transition"
+                >
+                  Cancel
                 </button>
               </div>
-            </div>
+            ) : (
+              <div className="flex gap-2 flex-col">
+                <Link
+                  href={`/admin/schedule/${selected.id}/roster`}
+                  className="w-full text-center py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-sm font-semibold text-white transition"
+                >
+                  View Roster
+                </Link>
+                <div className="flex gap-2">
+                  <Link
+                    href={`/admin/schedule/${selected.id}/edit`}
+                    className="flex-1 text-center py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm font-medium transition"
+                  >
+                    Edit
+                  </Link>
+                  <button
+                    onClick={handleDeleteClick}
+                    disabled={deleting}
+                    className="flex-1 py-2 rounded-lg bg-red-900/40 hover:bg-red-800/60 text-red-400 text-sm font-medium disabled:opacity-50 transition"
+                  >
+                    {deleting ? "Deleting…" : "Delete"}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

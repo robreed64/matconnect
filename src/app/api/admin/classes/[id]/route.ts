@@ -29,12 +29,28 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
   return NextResponse.json(cls);
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: Params }) {
+export async function DELETE(req: NextRequest, { params }: { params: Params }) {
   const { error } = await requireAuth("schedule");
   if (error) return error;
 
   const { id } = await params;
   const classId = parseInt(id, 10);
+  const deleteSeries = req.nextUrl.searchParams.get("series") === "true";
+
+  if (deleteSeries) {
+    const cls = await prisma.class.findUnique({ where: { id: classId }, select: { seriesId: true } });
+    if (cls?.seriesId) {
+      const siblings = await prisma.class.findMany({
+        where: { seriesId: cls.seriesId },
+        select: { id: true },
+      });
+      const ids = siblings.map((s) => s.id);
+      await prisma.attendance.deleteMany({ where: { classId: { in: ids } } });
+      await prisma.booking.deleteMany({ where: { classId: { in: ids } } });
+      await prisma.class.deleteMany({ where: { id: { in: ids } } });
+      return NextResponse.json({ success: true, deleted: ids.length });
+    }
+  }
 
   await prisma.attendance.deleteMany({ where: { classId } });
   await prisma.booking.deleteMany({ where: { classId } });
