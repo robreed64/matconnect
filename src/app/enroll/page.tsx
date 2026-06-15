@@ -245,7 +245,7 @@ export default function EnrollPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <Field label="Email *">
-                  <input type="text" inputMode="email" autoComplete="email" autoCorrect="off" autoCapitalize="none" placeholder="you@example.com" value={form.email}
+                  <input type="email" autoComplete="email" autoCorrect="off" autoCapitalize="none" placeholder="you@example.com" value={form.email}
                     onChange={(e) => set("email", e.target.value)} className={inputCls(!!errors.email)} />
                   {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
                 </Field>

@@ -9,7 +9,7 @@ export async function GET() {
 
   const member = await prisma.member.findUnique({
     where: { id: memberId },
-    select: { name: true, email: true, phone: true, address: true },
+    select: { name: true, email: true, phone: true, address: true, photoUrl: true },
   });
   return NextResponse.json(member);
 }
