@@ -11,7 +11,8 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   const [session, settings] = await Promise.all([auth(), getGymSettings()]);
   const user = session?.user;
   const role = (user as { role?: string } | undefined)?.role;
-  const nav = navForRole(role);
+  const hiddenFeatures = ((settings as Record<string, unknown>).hiddenFeatures as string[] | null) ?? [];
+  const nav = navForRole(role, hiddenFeatures);
 
   return (
     <div className="flex min-h-screen bg-gray-950 text-white">

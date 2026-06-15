@@ -29,7 +29,7 @@ export async function PATCH(req: Request) {
     "squareWebhookSignatureKey", "squareEnvironment", "squareTerminalDeviceId",
     "brevoApiKey", "brevoSenderEmail", "brevoSenderName", "brevoSmsFrom",
     "familyDiscountEnabled", "familyDiscountPercent",
-    "trialLengthDays",
+    "trialLengthDays", "hiddenFeatures",
   ];
   const data: Record<string, unknown> = {};
   for (const key of allowed) {

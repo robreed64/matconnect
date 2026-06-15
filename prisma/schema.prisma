@@ -355,6 +355,7 @@ model GymSettings {
   trialLengthDays        Int     @default(14) @map("trial_length_days")
   vapidPublicKey         String? @map("vapid_public_key")
   vapidPrivateKey        String? @map("vapid_private_key")
+  hiddenFeatures         Json     @default("[]") @map("hidden_features")
   updatedAt            DateTime @updatedAt @map("updated_at")
 
   @@map("gym_settings")

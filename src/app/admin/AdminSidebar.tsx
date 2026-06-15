@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import LogoutButton from "@/components/LogoutButton";
 
-type NavItem = { href: string; label: string; icon: string };
+type NavItem = { href: string; label: string; icon: string; hiddenFromStaff?: boolean };
 
 type Props = {
   nav: NavItem[];
@@ -39,13 +39,16 @@ export default function AdminSidebar({ nav, gymName, userName, role }: Props) {
             : item.href.slice(1);
           const href = inSetup ? `/admin/setup/${segment}` : item.href;
           const isActive = pathname === href || pathname.startsWith(href + "/");
+          const isHidden = item.hiddenFromStaff;
           return (
             <Link
               key={item.href}
               href={href}
               onClick={() => setMobileOpen(false)}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
-                isActive
+                isHidden
+                  ? "text-gray-600 hover:text-gray-500 hover:bg-gray-900/50"
+                  : isActive
                   ? inSetup
                     ? "bg-amber-900/50 text-amber-200"
                     : "bg-gray-800 text-white"
@@ -54,9 +57,10 @@ export default function AdminSidebar({ nav, gymName, userName, role }: Props) {
                   : "text-gray-300 hover:bg-gray-800 hover:text-white"
               }`}
             >
-              <span>{item.icon}</span>
+              <span className={isHidden ? "opacity-40" : ""}>{item.icon}</span>
               <span className="flex-1">{item.label}</span>
-              {inSetup && <span className="text-amber-500/60 text-xs">⚙</span>}
+              {isHidden && <span className="text-xs text-gray-700 font-normal">hidden</span>}
+              {!isHidden && inSetup && <span className="text-amber-500/60 text-xs">⚙</span>}
             </Link>
           );
         })}

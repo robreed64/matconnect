@@ -357,30 +357,30 @@ export default function POSTerminal({
           <div className="flex gap-2">
             {(
               [
-                { method: "cash" as PayMethod, label: "Cash", disabled: false },
+                { method: "cash" as PayMethod, label: "Cash", disabled: false, activeClass: "bg-green-600 border-green-500 text-white" },
                 {
                   method: "card_on_file" as PayMethod,
                   label: "Card on File",
-                  // Card-on-file needs the provider-appropriate saved card
                   disabled: paymentProvider === "square"
                     ? !selectedMember?.squareCardId
                     : !selectedMember?.stripeCustomerId,
+                  activeClass: "bg-blue-600 border-blue-500 text-white",
                 },
                 ...(squareCardConfig
-                  ? [{ method: "square_card" as PayMethod, label: "Card", disabled: false }]
+                  ? [{ method: "square_card" as PayMethod, label: "Card", disabled: false, activeClass: "bg-blue-600 border-blue-500 text-white" }]
                   : []),
                 ...(terminalEnabled
-                  ? [{ method: "square_terminal" as PayMethod, label: "Terminal", disabled: false }]
+                  ? [{ method: "square_terminal" as PayMethod, label: "Terminal", disabled: false, activeClass: "bg-blue-600 border-blue-500 text-white" }]
                   : []),
               ]
-            ).map(({ method, label, disabled }) => (
+            ).map(({ method, label, disabled, activeClass }) => (
               <button
                 key={method}
                 onClick={() => setPayMethod(method)}
                 disabled={disabled}
                 className={`flex-1 py-2 rounded-lg text-xs font-semibold border transition disabled:opacity-40 disabled:cursor-not-allowed ${
                   payMethod === method
-                    ? "bg-blue-600 border-blue-500 text-white"
+                    ? activeClass
                     : "bg-gray-800 border-gray-700 text-gray-400 hover:text-white hover:border-gray-600"
                 }`}
               >

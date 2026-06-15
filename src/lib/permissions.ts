@@ -16,9 +16,9 @@ export function can(role: string | undefined, feature: Feature): boolean {
   return (ROLE_FEATURES[role] ?? []).includes(feature);
 }
 
-export type NavItem = { href: string; label: string; icon: string };
+export type NavItem = { href: string; label: string; icon: string; hiddenFromStaff?: boolean };
 
-const ALL_NAV: Array<NavItem & { feature: Feature }> = [
+const ALL_NAV: Array<Omit<NavItem, "hiddenFromStaff"> & { feature: Feature }> = [
   { href: "/admin/members",    label: "Members",    icon: "👥", feature: "members" },
   { href: "/admin/leads",      label: "Leads",      icon: "🎯", feature: "leads" },
   { href: "/admin/plans",      label: "Plans",      icon: "💳", feature: "plans" },
@@ -34,6 +34,13 @@ const ALL_NAV: Array<NavItem & { feature: Feature }> = [
   { href: "/kiosk",            label: "Kiosk",      icon: "📲", feature: "kiosk" },
 ];
 
-export function navForRole(role: string | undefined): NavItem[] {
-  return ALL_NAV.filter((item) => can(role, item.feature));
+export function navForRole(role: string | undefined, hiddenFeatures: string[] = []): NavItem[] {
+  const isAdmin = role === "admin";
+  return ALL_NAV
+    .filter((item) => can(role, item.feature))
+    .flatMap((item) => {
+      const isHidden = hiddenFeatures.includes(item.feature);
+      if (isHidden && !isAdmin) return [];
+      return [{ href: item.href, label: item.label, icon: item.icon, hiddenFromStaff: isHidden }];
+    });
 }

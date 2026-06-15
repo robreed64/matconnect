@@ -30,6 +30,7 @@ export default async function SetupHubPage() {
     { href: "/admin/setup/families",   icon: "👨‍👩‍👧", label: "Families",   desc: `${familyCount} family group${familyCount !== 1 ? "s" : ""}` },
     { href: "/admin/setup/pos",        icon: "🛒", label: "POS",        desc: `${cats.length} categories · ${itemCount} items` },
     { href: "/admin/setup/kiosk",      icon: "📲", label: "Kiosk",      desc: "Lock mode & exit PIN" },
+    { href: "/admin/setup/features",   icon: "🔲", label: "Features",   desc: `${(((settings as Record<string, unknown>).hiddenFeatures as string[] | null) ?? []).length} hidden` },
   ];
 
   return (
