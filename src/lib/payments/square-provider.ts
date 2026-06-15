@@ -184,7 +184,7 @@ export class SquareProvider implements PaymentProvider {
           {
             cadence: p.billingInterval === "yearly" ? "ANNUAL" : "MONTHLY",
             ordinal: BigInt(0),
-            recurringPriceMoney: money(p.priceCents, p.currency),
+            pricing: { type: "STATIC", priceMoney: money(p.priceCents, p.currency) },
           },
         ],
       },
