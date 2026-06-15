@@ -13,9 +13,12 @@ export default async function ProfilePage() {
     ? await prisma.member.findUnique({ where: { id: memberId }, select: { beltRank: true, beltStripes: true } })
     : null;
 
+  const showBelts = !hidden.includes("belt_progression") && !hidden.includes("belts");
+
   return (
     <ProfileSections
       showCheckins={showCheckins}
+      showBelts={showBelts}
       beltRank={member?.beltRank ?? null}
       beltStripes={member?.beltStripes ?? 0}
     />

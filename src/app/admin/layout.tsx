@@ -6,6 +6,7 @@ import { getGymSettings } from "@/lib/gym-settings";
 import { navForRole, can } from "@/lib/permissions";
 import AdminSidebar from "./AdminSidebar";
 import ConfigWarnings from "@/components/ConfigWarnings";
+import FullscreenGate from "./FullscreenGate";
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const [session, settings] = await Promise.all([auth(), getGymSettings()]);
@@ -16,6 +17,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   return (
     <div className="flex min-h-screen bg-gray-950 text-white">
+      {role === "front_desk" && <FullscreenGate />}
       <AdminSidebar
         nav={nav}
         gymName={settings.gymName}

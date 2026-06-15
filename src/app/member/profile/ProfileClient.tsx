@@ -616,17 +616,19 @@ function RankBadge({ beltRank, beltStripes }: { beltRank: string | null; beltStr
 
 export default function ProfileSections({
   showCheckins,
+  showBelts,
   beltRank,
   beltStripes,
 }: {
   showCheckins: boolean;
+  showBelts: boolean;
   beltRank: string | null;
   beltStripes: number;
 }) {
   return (
     <div className="space-y-6">
       <h1 className="text-xl font-bold text-white">My Profile</h1>
-      {beltRank && <RankBadge beltRank={beltRank} beltStripes={beltStripes} />}
+      {showBelts && beltRank && <RankBadge beltRank={beltRank} beltStripes={beltStripes} />}
       <PhotoSection />
       <ContactSection />
       <PasswordSection />

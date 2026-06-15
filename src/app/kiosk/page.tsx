@@ -429,8 +429,8 @@ export default function KioskPage() {
             </div>
           )}
 
-          <Link href="/enroll" className="mt-8 inline-block px-5 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-sm font-medium text-gray-300 hover:text-white transition">
-            New member? Enroll here →
+          <Link href="/kiosk/new" className="mt-8 inline-block px-6 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-base font-semibold text-white transition">
+            I&apos;m new here — Sign up
           </Link>
         </>
       )}
