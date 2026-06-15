@@ -182,7 +182,7 @@ export async function POST(req: NextRequest) {
       });
       await sendEmail(
         member.email,
-        "Your Signed Participation Agreement",
+        "Your Signed Participation Agreement — keep for your records",
         `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#222">
 <h2 style="margin-bottom:4px">Participation Agreement</h2>
 <p style="color:#555;margin-top:0">A copy of the agreement you signed today.</p>
@@ -196,7 +196,7 @@ export async function POST(req: NextRequest) {
 <hr style="border:none;border-top:1px solid #ddd;margin:20px 0">
 <p style="font-size:12px;color:#888">This email confirms that <strong>${member.name}</strong> agreed to the above terms on ${signedDate}. Please keep it for your records.</p>
 </div>`
-      ).catch(() => {});
+      ).catch((err) => { console.error("[enroll] waiver email failed:", err); });
     }
 
     // Auto-create portal account if email provided and no account already exists
@@ -234,7 +234,9 @@ export async function POST(req: NextRequest) {
 <p><a href="${loginUrl}" style="display:inline-block;margin-top:8px;padding:10px 20px;background:#3b82f6;color:#fff;border-radius:6px;text-decoration:none;font-weight:bold">Log in to your account</a></p>
 <p style="color:#666;font-size:13px">You will be prompted to set a new password on first login.</p>
 </div>`;
-          await sendEmail(member.email, "Welcome — your member portal login", emailBody).catch(() => {});
+          await sendEmail(member.email, "Welcome — your member portal login", emailBody).catch((err) => {
+            console.error("[enroll] welcome email failed:", err);
+          });
         } catch (err) {
           // Account creation failure must not block enrollment, but surface it in logs
           console.error("[enroll] user create error:", err);
