@@ -15,6 +15,7 @@ type FormState = {
   instructorName: string;
   capacity: string;
   recurrenceRule: string;
+  seriesEndDate: string;
 };
 
 type Props = {
@@ -46,6 +47,7 @@ export default function ClassForm({ initialValues, classId }: Props) {
     instructorName: initialValues?.instructorName ?? "",
     capacity:       initialValues?.capacity       ?? "",
     recurrenceRule: initialValues?.recurrenceRule ?? "",
+    seriesEndDate:  initialValues?.seriesEndDate  ?? "",
   });
 
   useEffect(() => {
@@ -66,6 +68,14 @@ export default function ClassForm({ initialValues, classId }: Props) {
       setError("Name, date, start time and end time are required.");
       return;
     }
+    if (form.recurrenceRule && !form.seriesEndDate) {
+      setError("Please set a series end date for recurring classes.");
+      return;
+    }
+    if (form.seriesEndDate && form.seriesEndDate < form.date) {
+      setError("Series end date must be on or after the start date.");
+      return;
+    }
 
     const startTime = new Date(`${form.date}T${form.startTime}:00`);
     const endTime   = new Date(`${form.date}T${form.endTime}:00`);
@@ -77,11 +87,13 @@ export default function ClassForm({ initialValues, classId }: Props) {
     const body = {
       name:           form.name,
       programId:      form.programId || null,
+      date:           form.date,
       startTime:      startTime.toISOString(),
       endTime:        endTime.toISOString(),
       instructorName: form.instructorName || null,
       capacity:       form.capacity || null,
       recurrenceRule: form.recurrenceRule || null,
+      seriesEndDate:  form.seriesEndDate  || null,
     };
 
     const res = classId
@@ -137,7 +149,7 @@ export default function ClassForm({ initialValues, classId }: Props) {
       </div>
 
       <div className="grid grid-cols-3 gap-4">
-        <Field label="Date *">
+        <Field label={form.recurrenceRule ? "Series Start Date *" : "Date *"}>
           <input type="date" value={form.date}
             onChange={(e) => set("date", e.target.value)} className={inp} />
         </Field>
@@ -146,8 +158,18 @@ export default function ClassForm({ initialValues, classId }: Props) {
             onChange={(e) => set("startTime", e.target.value)} className={inp} />
         </Field>
         <Field label="End Time *">
-          <input type="time" value={form.endTime}
-            onChange={(e) => set("endTime", e.target.value)} className={inp} />
+          <div className="space-y-1">
+            <input type="time" value={form.endTime}
+              onChange={(e) => set("endTime", e.target.value)} className={inp} />
+            {form.startTime && form.endTime && (() => {
+              const [sh, sm] = form.startTime.split(":").map(Number);
+              const [eh, em] = form.endTime.split(":").map(Number);
+              const mins = (eh * 60 + em) - (sh * 60 + sm);
+              if (mins <= 0) return null;
+              const h = Math.floor(mins / 60), m = mins % 60;
+              return <p className="text-xs text-gray-500">{h > 0 ? `${h}h ` : ""}{m > 0 ? `${m}m` : ""} duration</p>;
+            })()}
+          </div>
         </Field>
       </div>
 
@@ -164,6 +186,14 @@ export default function ClassForm({ initialValues, classId }: Props) {
           </select>
         </Field>
       </div>
+
+      {form.recurrenceRule && (
+        <Field label="Series End Date *">
+          <input type="date" value={form.seriesEndDate} min={form.date}
+            onChange={(e) => set("seriesEndDate", e.target.value)} className={inp} />
+          <p className="text-xs text-gray-500 mt-1">Classes will be created for every matching day up to and including this date.</p>
+        </Field>
+      )}
 
       {error && <p className="text-red-400 text-sm">{error}</p>}
 
