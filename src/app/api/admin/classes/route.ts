@@ -80,17 +80,16 @@ export async function POST(req: NextRequest) {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await prisma.class.createMany({
-      data: occurrences.map((o) => ({
-        name,
-        startTime:      o.startTime,
-        endTime:        o.endTime,
-        instructorName: instructorName || null,
-        capacity:       capInt,
-        recurrenceRule,
-        ...(pidInt ? { programId: pidInt } : {}),
-      })) as any,
-    });
+    const rows: any[] = occurrences.map((o) => ({
+      name,
+      startTime:      o.startTime,
+      endTime:        o.endTime,
+      instructorName: instructorName || null,
+      capacity:       capInt,
+      recurrenceRule,
+      ...(pidInt ? { programId: pidInt } : {}),
+    }));
+    await prisma.class.createMany({ data: rows });
 
     // Return the first occurrence so the client can navigate to its week
     const first = await prisma.class.findFirst({
