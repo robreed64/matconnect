@@ -12,9 +12,9 @@ export default async function EditClassPage({ params }: { params: Params }) {
   const initialValues = {
     name:           cls.name,
     programId:      cls.programId ? String(cls.programId) : "",
-    date:           cls.startTime.toLocaleDateString("en-CA"),
-    startTime:      cls.startTime.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }),
-    endTime:        cls.endTime.toLocaleTimeString("en-GB",   { hour: "2-digit", minute: "2-digit" }),
+    // Pass raw UTC ISO strings — ClassForm converts them to local time on the client
+    startTimeISO:   cls.startTime.toISOString(),
+    endTimeISO:     cls.endTime.toISOString(),
     instructorName: cls.instructorName ?? "",
     capacity:       cls.capacity ? String(cls.capacity) : "",
     recurrenceRule: cls.recurrenceRule ?? "",

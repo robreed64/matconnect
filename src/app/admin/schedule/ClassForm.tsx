@@ -19,7 +19,7 @@ type FormState = {
 };
 
 type Props = {
-  initialValues?: Partial<FormState>;
+  initialValues?: Partial<FormState> & { startTimeISO?: string; endTimeISO?: string };
   classId?: number;
 };
 
@@ -55,8 +55,19 @@ export default function ClassForm({ initialValues, classId }: Props) {
     fetch("/api/admin/settings").then(r => r.json()).then((d: GymSettings) => {
       if (Array.isArray(d.instructorNames)) setInstructorNames(d.instructorNames);
     }).catch(() => {});
-    // Set today's date client-side only to avoid server/client timezone mismatch
-    if (!initialValues?.date) {
+
+    if (initialValues?.startTimeISO && initialValues?.endTimeISO) {
+      // Edit mode: convert UTC ISO → local date/time so the displayed times match the user's timezone
+      const s = new Date(initialValues.startTimeISO);
+      const e = new Date(initialValues.endTimeISO);
+      setForm((f) => ({
+        ...f,
+        date:      s.toLocaleDateString("en-CA"),
+        startTime: s.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }),
+        endTime:   e.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }),
+      }));
+    } else if (!initialValues?.date) {
+      // New class: default to today in the user's local timezone
       setForm((f) => ({ ...f, date: new Date().toLocaleDateString("en-CA") }));
     }
   }, []);

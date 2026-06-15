@@ -176,7 +176,7 @@ export default async function MemberHomePage() {
         ) : (
           <div className="space-y-2">
             {classes.map((cls) => {
-              const color = CLASS_COLORS[cls.program.type] ?? CLASS_COLORS.private;
+              const color = CLASS_COLORS[cls.program?.type ?? ""] ?? CLASS_COLORS.private;
               return (
                 <div key={cls.id} className={`flex items-center justify-between px-4 py-3 rounded-xl border ${color}`}>
                   <div>

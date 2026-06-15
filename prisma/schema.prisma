@@ -128,8 +128,8 @@ model Program {
 
 model Class {
   id             Int      @id @default(autoincrement())
-  programId      Int      @map("program_id")
-  program        Program  @relation(fields: [programId], references: [id])
+  programId      Int?     @map("program_id")
+  program        Program? @relation(fields: [programId], references: [id])
   name           String
   startTime      DateTime @map("start_time")
   endTime        DateTime @map("end_time")
