@@ -45,6 +45,32 @@ function minutesSinceMidnight(iso: string) {
   return d.getHours() * 60 + d.getMinutes();
 }
 
+function layoutClasses(classes: ScheduleClass[]) {
+  if (classes.length === 0) return [];
+  const sorted = [...classes].sort(
+    (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+  );
+  const colEnds: number[] = [];
+  const assignments = sorted.map(cls => {
+    const start = new Date(cls.startTime).getTime();
+    const end   = new Date(cls.endTime).getTime();
+    let col = colEnds.findIndex(t => t <= start);
+    if (col === -1) { col = colEnds.length; colEnds.push(end); }
+    else colEnds[col] = end;
+    return { cls, col };
+  });
+  return assignments.map(({ cls, col }) => {
+    const start = new Date(cls.startTime).getTime();
+    const end   = new Date(cls.endTime).getTime();
+    const span  = Math.max(
+      ...assignments
+        .filter(({ cls: o }) => new Date(o.startTime).getTime() < end && new Date(o.endTime).getTime() > start)
+        .map(({ col: c }) => c)
+    ) + 1;
+    return { cls, col, span };
+  });
+}
+
 function ScheduleInner() {
   const router       = useRouter();
   const searchParams = useSearchParams();
@@ -244,18 +270,20 @@ function ScheduleInner() {
                     <div key={h} className="absolute left-0 right-0 border-t border-gray-800/60"
                       style={{ top: (h - HOUR_START) * 60 * PX_PER_MIN }} />
                   ))}
-                  {dayCls.map(cls => {
+                  {layoutClasses(dayCls).map(({ cls, col, span }) => {
                     const color  = typeColors[cls.program?.type ?? ""] ?? PRESET_COLORS.private;
                     const top    = Math.max(0, (minutesSinceMidnight(cls.startTime) - HOUR_START * 60) * PX_PER_MIN);
                     const height = Math.max(24, (new Date(cls.endTime).getTime() - new Date(cls.startTime).getTime()) / 60000 * PX_PER_MIN);
                     const booked = !!cls.booking && cls.booking.status !== "waitlisted";
                     const waitlisted = cls.booking?.status === "waitlisted";
+                    const leftPct  = (col / span) * 100;
+                    const widthPct = (1 / span) * 100;
                     return (
                       <button
                         key={cls.id}
                         onClick={() => setSelected(cls)}
-                        className={`absolute left-0.5 right-0.5 rounded border-l-2 px-1 py-0.5 text-left overflow-hidden transition hover:brightness-110 ${color} ${booked ? "ring-2 ring-white ring-offset-1 ring-offset-gray-950 brightness-125" : waitlisted ? "ring-2 ring-amber-400/70" : ""}`}
-                        style={{ top, height }}
+                        className={`absolute rounded border-l-2 px-1 py-0.5 text-left overflow-hidden transition hover:brightness-110 ${color} ${booked ? "ring-2 ring-white ring-offset-1 ring-offset-gray-950 brightness-125" : waitlisted ? "ring-2 ring-amber-400/70" : ""}`}
+                        style={{ top, height, left: `calc(${leftPct}% + 2px)`, width: `calc(${widthPct}% - 4px)` }}
                       >
                         <div className="text-xs font-semibold leading-tight truncate">{cls.name}</div>
                         {height > 30 && (
