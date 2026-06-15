@@ -119,6 +119,31 @@ export default async function MemberHomePage() {
         </div>
       </div>
 
+      {/* Notifications */}
+      {member.messages.length > 0 && (
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-4">Notifications</h2>
+          <div className="divide-y divide-gray-800">
+            {member.messages.map((n) => (
+              <div key={n.id} className="flex items-start gap-3 py-3">
+                <span className="text-base flex-shrink-0 mt-0.5">
+                  {CHANNEL_ICON[n.channel] ?? "📬"}
+                </span>
+                <div className="flex-1 min-w-0">
+                  {n.subject && <p className="text-sm font-medium text-gray-200 truncate">{n.subject}</p>}
+                  <p className="text-sm text-gray-500 truncate">{n.body}</p>
+                </div>
+                <span className="text-xs text-gray-600 flex-shrink-0 mt-0.5">
+                  {n.sentAt
+                    ? n.sentAt.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                    : ""}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Belt progress snapshot */}
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
@@ -229,30 +254,6 @@ export default async function MemberHomePage() {
         )}
       </div>
 
-      {/* Notifications */}
-      {member.messages.length > 0 && (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-4">Notifications</h2>
-          <div className="divide-y divide-gray-800">
-            {member.messages.map((n) => (
-              <div key={n.id} className="flex items-start gap-3 py-3">
-                <span className="text-base flex-shrink-0 mt-0.5">
-                  {CHANNEL_ICON[n.channel] ?? "📬"}
-                </span>
-                <div className="flex-1 min-w-0">
-                  {n.subject && <p className="text-sm font-medium text-gray-200 truncate">{n.subject}</p>}
-                  <p className="text-sm text-gray-500 truncate">{n.body}</p>
-                </div>
-                <span className="text-xs text-gray-600 flex-shrink-0 mt-0.5">
-                  {n.sentAt
-                    ? n.sentAt.toLocaleDateString("en-US", { month: "short", day: "numeric" })
-                    : ""}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
