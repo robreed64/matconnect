@@ -14,40 +14,72 @@ type FormState = {
   endTime: string;
   instructorName: string;
   capacity: string;
-  recurrenceRule: string;
+  recurrencePattern: string; // select value; "CUSTOM" means custom weekday picker
+  customDays: string[];       // ["MO","WE","SA"] — used when pattern === "CUSTOM"
   seriesEndDate: string;
+  excludeDates: string[];     // YYYY-MM-DD dates to skip
 };
 
 type Props = {
-  initialValues?: Partial<FormState> & { startTimeISO?: string; endTimeISO?: string };
+  initialValues?: Partial<Omit<FormState, "customDays" | "excludeDates">> & {
+    startTimeISO?: string;
+    endTimeISO?: string;
+    recurrenceRule?: string;
+  };
   classId?: number;
 };
 
 const RECURRENCE_OPTIONS = [
-  { value: "",                    label: "One-time (no recurrence)" },
-  { value: "FREQ=WEEKLY",        label: "Weekly (same day each week)" },
-  { value: "FREQ=WEEKLY;BYDAY=MO,WE,FR", label: "Mon / Wed / Fri" },
-  { value: "FREQ=WEEKLY;BYDAY=TU,TH",    label: "Tue / Thu" },
-  { value: "FREQ=WEEKLY;BYDAY=SA,SU",    label: "Weekends" },
+  { value: "",                              label: "One-time (no recurrence)" },
+  { value: "FREQ=DAILY",                   label: "Every day" },
+  { value: "FREQ=WEEKLY",                  label: "Weekly (same day each week)" },
+  { value: "FREQ=WEEKLY;BYDAY=MO,WE,FR",  label: "Mon / Wed / Fri" },
+  { value: "FREQ=WEEKLY;BYDAY=TU,TH",     label: "Tue / Thu" },
+  { value: "FREQ=WEEKLY;BYDAY=SA,SU",     label: "Weekends" },
+  { value: "CUSTOM",                       label: "Custom — pick any days" },
 ];
+
+const WEEKDAYS = [
+  { code: "MO", label: "Mon" },
+  { code: "TU", label: "Tue" },
+  { code: "WE", label: "Wed" },
+  { code: "TH", label: "Thu" },
+  { code: "FR", label: "Fri" },
+  { code: "SA", label: "Sat" },
+  { code: "SU", label: "Sun" },
+];
+
+const PRESET_VALUES = new Set(RECURRENCE_OPTIONS.filter(o => o.value && o.value !== "CUSTOM").map(o => o.value));
+
+function initPattern(rule: string | undefined): { pattern: string; customDays: string[] } {
+  if (!rule) return { pattern: "", customDays: [] };
+  if (PRESET_VALUES.has(rule)) return { pattern: rule, customDays: [] };
+  // Custom BYDAY not matching a preset
+  const byDay = rule.match(/BYDAY=([A-Z,]+)/);
+  return { pattern: "CUSTOM", customDays: byDay ? byDay[1].split(",") : [] };
+}
 
 export default function ClassForm({ initialValues, classId }: Props) {
   const router  = useRouter();
-  const [programs, setPrograms]             = useState<Program[]>([]);
+  const [programs, setPrograms]               = useState<Program[]>([]);
   const [instructorNames, setInstructorNames] = useState<string[]>([]);
-  const [saving, setSaving]                 = useState(false);
-  const [error, setError]                   = useState<string | null>(null);
+  const [saving, setSaving]                   = useState(false);
+  const [error, setError]                     = useState<string | null>(null);
+
+  const { pattern: initPatternVal, customDays: initCustomDays } = initPattern(initialValues?.recurrenceRule);
 
   const [form, setForm] = useState<FormState>({
-    name:           initialValues?.name           ?? "",
-    programId:      initialValues?.programId      ?? "",
-    date:           initialValues?.date           ?? "",
-    startTime:      initialValues?.startTime      ?? "18:00",
-    endTime:        initialValues?.endTime        ?? "19:30",
-    instructorName: initialValues?.instructorName ?? "",
-    capacity:       initialValues?.capacity       ?? "",
-    recurrenceRule: initialValues?.recurrenceRule ?? "",
-    seriesEndDate:  initialValues?.seriesEndDate  ?? "",
+    name:               initialValues?.name           ?? "",
+    programId:          initialValues?.programId      ?? "",
+    date:               initialValues?.date           ?? "",
+    startTime:          initialValues?.startTime      ?? "18:00",
+    endTime:            initialValues?.endTime        ?? "19:30",
+    instructorName:     initialValues?.instructorName ?? "",
+    capacity:           initialValues?.capacity       ?? "",
+    recurrencePattern:  initPatternVal,
+    customDays:         initCustomDays,
+    seriesEndDate:      initialValues?.seriesEndDate  ?? "",
+    excludeDates:       [],
   });
 
   useEffect(() => {
@@ -57,7 +89,6 @@ export default function ClassForm({ initialValues, classId }: Props) {
     }).catch(() => {});
 
     if (initialValues?.startTimeISO && initialValues?.endTimeISO) {
-      // Edit mode: convert UTC ISO → local date/time so the displayed times match the user's timezone
       const s = new Date(initialValues.startTimeISO);
       const e = new Date(initialValues.endTimeISO);
       setForm((f) => ({
@@ -67,19 +98,21 @@ export default function ClassForm({ initialValues, classId }: Props) {
         endTime:   e.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }),
       }));
     } else if (!initialValues?.date) {
-      // New class: default to today in the user's local timezone
       setForm((f) => ({ ...f, date: new Date().toLocaleDateString("en-CA") }));
     }
   }, []);
 
-  const set = (k: keyof FormState, v: string) => setForm((f) => ({ ...f, [k]: v }));
+  const set = (k: keyof Pick<FormState, "name"|"programId"|"date"|"startTime"|"endTime"|"instructorName"|"capacity"|"seriesEndDate">, v: string) =>
+    setForm((f) => ({ ...f, [k]: v }));
+
+  const isRecurring = form.recurrencePattern !== "";
 
   const submit = async () => {
     if (!form.name || !form.date || !form.startTime || !form.endTime) {
       setError("Name, date, start time and end time are required.");
       return;
     }
-    if (form.recurrenceRule && !form.seriesEndDate) {
+    if (isRecurring && !form.seriesEndDate) {
       setError("Please set a series end date for recurring classes.");
       return;
     }
@@ -87,10 +120,19 @@ export default function ClassForm({ initialValues, classId }: Props) {
       setError("Series end date must be on or after the start date.");
       return;
     }
+    if (form.recurrencePattern === "CUSTOM" && form.customDays.length === 0) {
+      setError("Select at least one day for custom recurrence.");
+      return;
+    }
 
     const startTime = new Date(`${form.date}T${form.startTime}:00`);
     const endTime   = new Date(`${form.date}T${form.endTime}:00`);
     if (endTime <= startTime) { setError("End time must be after start time."); return; }
+
+    const recurrenceRule =
+      form.recurrencePattern === ""       ? null :
+      form.recurrencePattern === "CUSTOM" ? `FREQ=WEEKLY;BYDAY=${form.customDays.join(",")}` :
+      form.recurrencePattern;
 
     setSaving(true);
     setError(null);
@@ -103,8 +145,9 @@ export default function ClassForm({ initialValues, classId }: Props) {
       endTime:        endTime.toISOString(),
       instructorName: form.instructorName || null,
       capacity:       form.capacity || null,
-      recurrenceRule: form.recurrenceRule || null,
-      seriesEndDate:  form.seriesEndDate  || null,
+      recurrenceRule,
+      seriesEndDate:  form.seriesEndDate || null,
+      excludeDates:   form.excludeDates.filter(Boolean),
     };
 
     const res = classId
@@ -115,7 +158,6 @@ export default function ClassForm({ initialValues, classId }: Props) {
     if (res.ok) {
       const d = await res.json();
       const weekStart = new Date(d.startTime);
-      // Navigate to the week containing this class
       const day  = weekStart.getDay();
       const diff = day === 0 ? -6 : 1 - day;
       weekStart.setDate(weekStart.getDate() + diff);
@@ -160,7 +202,7 @@ export default function ClassForm({ initialValues, classId }: Props) {
       </div>
 
       <div className="grid grid-cols-3 gap-4">
-        <Field label={form.recurrenceRule ? "Series Start Date *" : "Date *"}>
+        <Field label={isRecurring ? "Series Start Date *" : "Date *"}>
           <input type="date" value={form.date}
             onChange={(e) => set("date", e.target.value)} className={inp} />
         </Field>
@@ -190,7 +232,11 @@ export default function ClassForm({ initialValues, classId }: Props) {
             onChange={(e) => set("capacity", e.target.value)} className={inp} />
         </Field>
         <Field label="Recurrence">
-          <select value={form.recurrenceRule} onChange={(e) => set("recurrenceRule", e.target.value)} className={inp}>
+          <select
+            value={form.recurrencePattern}
+            onChange={(e) => setForm(f => ({ ...f, recurrencePattern: e.target.value, customDays: [] }))}
+            className={inp}
+          >
             {RECURRENCE_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
             ))}
@@ -198,11 +244,78 @@ export default function ClassForm({ initialValues, classId }: Props) {
         </Field>
       </div>
 
-      {form.recurrenceRule && (
+      {/* Custom day picker */}
+      {form.recurrencePattern === "CUSTOM" && (
+        <Field label="Select Days *">
+          <div className="flex gap-2 flex-wrap">
+            {WEEKDAYS.map(({ code, label }) => (
+              <button
+                key={code}
+                type="button"
+                onClick={() => setForm(f => ({
+                  ...f,
+                  customDays: f.customDays.includes(code)
+                    ? f.customDays.filter(d => d !== code)
+                    : [...f.customDays, code],
+                }))}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+                  form.customDays.includes(code)
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-800 text-gray-400 hover:text-white border border-gray-700"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </Field>
+      )}
+
+      {/* Series end date */}
+      {isRecurring && (
         <Field label="Series End Date *">
           <input type="date" value={form.seriesEndDate} min={form.date}
             onChange={(e) => set("seriesEndDate", e.target.value)} className={inp} />
           <p className="text-xs text-gray-500 mt-1">Classes will be created for every matching day up to and including this date.</p>
+        </Field>
+      )}
+
+      {/* Exclusion dates */}
+      {isRecurring && (
+        <Field label="Days Off / Closures">
+          <div className="space-y-2">
+            {form.excludeDates.map((d, i) => (
+              <div key={i} className="flex gap-2 items-center">
+                <input
+                  type="date"
+                  value={d}
+                  min={form.date || undefined}
+                  max={form.seriesEndDate || undefined}
+                  onChange={(e) => setForm(f => {
+                    const dates = [...f.excludeDates];
+                    dates[i] = e.target.value;
+                    return { ...f, excludeDates: dates };
+                  })}
+                  className={`${inp} flex-1`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setForm(f => ({ ...f, excludeDates: f.excludeDates.filter((_, j) => j !== i) }))}
+                  className="text-gray-500 hover:text-red-400 transition text-xl leading-none px-1"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => setForm(f => ({ ...f, excludeDates: [...f.excludeDates, ""] }))}
+              className="text-sm text-blue-400 hover:text-blue-300 transition"
+            >
+              + Add date
+            </button>
+          </div>
+          <p className="text-xs text-gray-500 mt-1">These dates will be skipped — useful for holidays and closures.</p>
         </Field>
       )}
 

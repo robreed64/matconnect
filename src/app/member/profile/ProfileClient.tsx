@@ -422,11 +422,16 @@ function PushSection() {
       });
 
       const json = sub.toJSON();
-      await fetch("/api/push/subscribe", {
+      const saveRes = await fetch("/api/push/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ endpoint: sub.endpoint, keys: json.keys }),
       });
+
+      if (!saveRes.ok) {
+        const d = await saveRes.json().catch(() => ({}));
+        throw new Error(d.error ?? "Failed to save subscription");
+      }
 
       setStatus("subscribed");
       setSubState("granted");
@@ -565,12 +570,63 @@ function QRSection() {
   );
 }
 
+// ── Belt Rank Display ─────────────────────────────────────────────────────────
+
+const BELT_COLORS: Record<string, { bg: string; text: string; stripe: string }> = {
+  white:  { bg: "bg-white",      text: "text-gray-900", stripe: "bg-gray-400" },
+  blue:   { bg: "bg-blue-600",   text: "text-white",    stripe: "bg-white" },
+  purple: { bg: "bg-purple-700", text: "text-white",    stripe: "bg-white" },
+  brown:  { bg: "bg-amber-800",  text: "text-white",    stripe: "bg-white" },
+  black:  { bg: "bg-gray-900 border border-gray-600", text: "text-white", stripe: "bg-white" },
+};
+
+function RankBadge({ beltRank, beltStripes }: { beltRank: string | null; beltStripes: number }) {
+  if (!beltRank) return null;
+  const colors = BELT_COLORS[beltRank.toLowerCase()] ?? BELT_COLORS.white;
+  const label  = beltRank.charAt(0).toUpperCase() + beltRank.slice(1);
+  return (
+    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+      <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-4">Current Rank</h2>
+      <div className="flex items-center gap-4">
+        {/* Belt pill */}
+        <span className={`px-4 py-1.5 rounded-full text-sm font-bold ${colors.bg} ${colors.text}`}>
+          {label} Belt
+        </span>
+        {/* Stripe dots */}
+        {beltStripes > 0 && (
+          <div className="flex items-center gap-1.5">
+            {Array.from({ length: beltStripes }).map((_, i) => (
+              <span
+                key={i}
+                className={`w-3 h-3 rounded-full ${colors.bg} border-2 ${beltRank.toLowerCase() === "white" ? "border-gray-400" : "border-gray-600"}`}
+                style={{ boxShadow: "inset 0 0 0 1.5px rgba(255,255,255,0.4)" }}
+              />
+            ))}
+            <span className="text-sm text-gray-400 ml-1">
+              {beltStripes} {beltStripes === 1 ? "stripe" : "stripes"}
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Page ─────────────────────────────────────────────────────────────────────
 
-export default function ProfileSections({ showCheckins }: { showCheckins: boolean }) {
+export default function ProfileSections({
+  showCheckins,
+  beltRank,
+  beltStripes,
+}: {
+  showCheckins: boolean;
+  beltRank: string | null;
+  beltStripes: number;
+}) {
   return (
     <div className="space-y-6">
       <h1 className="text-xl font-bold text-white">My Profile</h1>
+      {beltRank && <RankBadge beltRank={beltRank} beltStripes={beltStripes} />}
       <PhotoSection />
       <ContactSection />
       <PasswordSection />

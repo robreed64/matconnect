@@ -5,7 +5,10 @@ import { prisma } from "@/lib/prisma";
 export async function POST(req: Request) {
   const { session, error } = await requireAuth();
   if (error) return error;
-  const userId = parseInt((session.user as { id: string }).id, 10);
+  const userId = parseInt((session.user as { id?: string }).id ?? "", 10);
+  if (isNaN(userId)) {
+    return NextResponse.json({ error: "User ID not found in session" }, { status: 400 });
+  }
 
   const { endpoint, keys } = await req.json();
   if (!endpoint || !keys?.p256dh || !keys?.auth) {

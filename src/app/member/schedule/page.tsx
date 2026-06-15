@@ -58,7 +58,8 @@ function ScheduleInner() {
   const searchParams = useSearchParams();
   const weekParam    = searchParams.get("week");
 
-  const [exportOpen, setExportOpen] = useState(false);
+  const [exportOpen,  setExportOpen]  = useState(false);
+  const [cancelMode,  setCancelMode]  = useState<"confirm" | null>(null);
   const [weekStart, setWeekStart] = useState<Date>(() => {
     if (weekParam) return getMondayOf(new Date(weekParam + "T12:00:00"));
     return getMondayOf(new Date());
@@ -123,14 +124,23 @@ function ScheduleInner() {
     setBusy(false);
   }
 
-  async function cancel(cls: ScheduleClass) {
+  async function cancel(cls: ScheduleClass, series = false) {
     if (!cls.booking) return;
     setBusy(true);
-    await fetch(`/api/member/bookings/${cls.booking.id}`, { method: "DELETE" });
-    setClasses(prev => prev.map(c => c.id === cls.id ? { ...c, booking: null } : c));
-    setSelected(prev => prev?.id === cls.id ? { ...prev, booking: null } : prev);
-    showToast("Booking canceled");
+    await fetch(`/api/member/bookings/${cls.booking.id}${series ? "?series=true" : ""}`, { method: "DELETE" });
+    setCancelMode(null);
+    setSelected(null);
+    loadWeek(weekStart);
+    showToast(series ? "Series bookings canceled" : "Booking canceled");
     setBusy(false);
+  }
+
+  function handleCancelClick(cls: ScheduleClass) {
+    if (cls.seriesId) {
+      setCancelMode("confirm");
+    } else {
+      cancel(cls);
+    }
   }
 
   const gridHeight = (HOUR_END - HOUR_START) * 60 * PX_PER_MIN;
@@ -271,7 +281,7 @@ function ScheduleInner() {
 
       {/* Class detail popover */}
       {selected && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setSelected(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => { setSelected(null); setCancelMode(null); }}>
           <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 w-full max-w-sm shadow-2xl"
             onClick={e => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-4">
@@ -281,7 +291,7 @@ function ScheduleInner() {
                   <span className="text-sm text-gray-400 capitalize">{selected.program.type} · {selected.program.name}</span>
                 )}
               </div>
-              <button onClick={() => setSelected(null)} className="text-gray-500 hover:text-white text-xl leading-none">×</button>
+              <button onClick={() => { setSelected(null); setCancelMode(null); }} className="text-gray-500 hover:text-white text-xl leading-none">×</button>
             </div>
 
             <div className="space-y-2 text-sm mb-5">
@@ -308,15 +318,42 @@ function ScheduleInner() {
             </div>
 
             {selected.booking ? (
-              <div className="space-y-2">
-                <div className={`text-center text-sm font-medium py-2 rounded-lg ${selected.booking.status === "waitlisted" ? "bg-amber-900/30 text-amber-300" : "bg-green-900/30 text-green-400"}`}>
-                  {selected.booking.status === "waitlisted" ? "You're on the waitlist" : "✓ You're booked"}
+              cancelMode === "confirm" ? (
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-300 text-center mb-1">This class is part of a recurring series.</p>
+                  <button
+                    onClick={() => cancel(selected, false)}
+                    disabled={busy}
+                    className="w-full py-2.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm font-semibold text-gray-300 disabled:opacity-50 transition"
+                  >
+                    {busy ? "Canceling…" : "Cancel this class only"}
+                  </button>
+                  <button
+                    onClick={() => cancel(selected, true)}
+                    disabled={busy}
+                    className="w-full py-2.5 rounded-lg bg-red-900/40 hover:bg-red-800/60 text-red-400 text-sm font-semibold disabled:opacity-50 transition"
+                  >
+                    {busy ? "Canceling…" : "Cancel entire series"}
+                  </button>
+                  <button
+                    onClick={() => setCancelMode(null)}
+                    disabled={busy}
+                    className="w-full py-2 rounded-lg bg-gray-900 hover:bg-gray-800 text-sm text-gray-500 transition"
+                  >
+                    Keep booking
+                  </button>
                 </div>
-                <button onClick={() => cancel(selected)} disabled={busy}
-                  className="w-full py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm text-gray-300 disabled:opacity-50 transition">
-                  {busy ? "Canceling…" : "Cancel booking"}
-                </button>
-              </div>
+              ) : (
+                <div className="space-y-2">
+                  <div className={`text-center text-sm font-medium py-2 rounded-lg ${selected.booking.status === "waitlisted" ? "bg-amber-900/30 text-amber-300" : "bg-green-900/30 text-green-400"}`}>
+                    {selected.booking.status === "waitlisted" ? "You're on the waitlist" : "✓ You're booked"}
+                  </div>
+                  <button onClick={() => handleCancelClick(selected)} disabled={busy}
+                    className="w-full py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm text-gray-300 disabled:opacity-50 transition">
+                    {busy ? "Canceling…" : "Cancel booking"}
+                  </button>
+                </div>
+              )
             ) : (
               <button onClick={() => book(selected)} disabled={busy}
                 className="w-full py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-sm font-semibold text-white disabled:opacity-50 transition">

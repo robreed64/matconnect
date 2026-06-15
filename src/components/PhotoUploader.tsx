@@ -13,6 +13,7 @@ type Props = {
 export default function PhotoUploader({ currentUrl, uploadUrl, name, onUpload, size = "lg" }: Props) {
   const [preview, setPreview]     = useState<string | null>(currentUrl);
   const [uploading, setUploading] = useState(false);
+  const [saved, setSaved]         = useState(false);
   const [error, setError]         = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -29,21 +30,30 @@ export default function PhotoUploader({ currentUrl, uploadUrl, name, onUpload, s
     }
     setPreview(URL.createObjectURL(file));
     setError(null);
+    setSaved(false);
     setUploading(true);
 
-    const fd = new FormData();
-    fd.append("file", file);
-    const res  = await fetch(uploadUrl, { method: "POST", body: fd });
-    const data = await res.json();
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res  = await fetch(uploadUrl, { method: "POST", body: fd });
+      const data = await res.json();
 
-    if (res.ok) {
-      setPreview(data.photoUrl);
-      onUpload?.(data.photoUrl);
-    } else {
-      setError(data.error ?? "Upload failed");
+      if (res.ok) {
+        setPreview(data.photoUrl);
+        onUpload?.(data.photoUrl);
+        setSaved(true);
+        setTimeout(() => setSaved(false), 3000);
+      } else {
+        setError(data.error ?? "Upload failed");
+        setPreview(currentUrl);
+      }
+    } catch {
+      setError("Upload failed. Please try again.");
       setPreview(currentUrl);
+    } finally {
+      setUploading(false);
     }
-    setUploading(false);
   }
 
   return (
@@ -78,10 +88,12 @@ export default function PhotoUploader({ currentUrl, uploadUrl, name, onUpload, s
         }}
       />
 
-      {!error && (
-        <p className="text-xs text-gray-500">{uploading ? "Uploading…" : "Click to add photo"}</p>
-      )}
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error
+        ? <p className="text-xs text-red-400">{error}</p>
+        : saved
+        ? <p className="text-xs text-green-400">Photo saved!</p>
+        : <p className="text-xs text-gray-500">{uploading ? "Uploading…" : "Click to change photo"}</p>
+      }
     </div>
   );
 }

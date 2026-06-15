@@ -75,6 +75,7 @@ export const authConfig = {
     },
     session({ session, token }) {
       if (session.user) {
+        (session.user as { id?: unknown }).id         = token.sub;
         (session.user as { role?: unknown }).role     = token.role;
         (session.user as { memberId?: unknown }).memberId = token.memberId;
         (session.user as { mustChangePassword?: unknown }).mustChangePassword = token.mustChangePassword;
