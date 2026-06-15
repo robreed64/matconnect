@@ -5,8 +5,19 @@ import type { PlanRefs } from "@/lib/payments/types";
 import type { MembershipPlan } from "@prisma/client";
 import { getGymSettings } from "@/lib/gym-settings";
 import { CardDeclinedError } from "@/lib/payments/types";
+import { SquareError } from "square";
 import bcrypt from "bcryptjs";
 import { sendEmail } from "@/lib/email";
+
+function readableError(err: unknown): string {
+  if (err instanceof CardDeclinedError) return `Card declined: ${err.message}`;
+  if (err instanceof SquareError) {
+    const first = err.errors?.[0];
+    return first?.detail || first?.code || err.message;
+  }
+  if (err instanceof Error) return err.message;
+  return "Unexpected error";
+}
 
 // Plans created while the other provider was active have no refs on this one —
 // create them lazily so enrollment doesn't dead-end after a provider switch.
@@ -46,6 +57,9 @@ export async function POST(req: NextRequest) {
 
     if (!name?.trim() || !email?.trim() || !phone?.trim()) {
       return NextResponse.json({ error: "Name, email, and phone are required" }, { status: 400 });
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      return NextResponse.json({ error: "A valid email address is required" }, { status: 400 });
     }
 
     let resolvedCustomerId = customerIdInput;
@@ -169,7 +183,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, memberId: member.id });
   } catch (err) {
     console.error("[enroll] POST error:", err);
-    const message = err instanceof Error ? err.message : "Unexpected error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: readableError(err) }, { status: 500 });
   }
 }
