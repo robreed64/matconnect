@@ -19,6 +19,13 @@ function readableError(err: unknown): string {
   return "Unexpected error";
 }
 
+function isApiVersionIncompatible(err: unknown): boolean {
+  return (
+    err instanceof SquareError &&
+    (err.errors ?? []).some(e => e.code === "API_VERSION_INCOMPATIBLE")
+  );
+}
+
 // Plans created while the other provider was active have no refs on this one —
 // create them lazily so enrollment doesn't dead-end after a provider switch.
 async function ensurePlanRefs(provider: PaymentProvider, plan: MembershipPlan): Promise<PlanRefs | null> {
@@ -74,7 +81,7 @@ export async function POST(req: NextRequest) {
 
     if (planId && provider) {
       const plan = await prisma.membershipPlan.findUnique({ where: { id: parseInt(planId, 10) } });
-      const planRefs = plan ? await ensurePlanRefs(provider, plan) : null;
+      let planRefs = plan ? await ensurePlanRefs(provider, plan) : null;
 
       if (planRefs) {
         // Create customer if we somehow don't have one yet
@@ -101,11 +108,29 @@ export async function POST(req: NextRequest) {
           squareCardId: provider.name === "square" ? savedCardId : null,
         };
 
-        const sub = await provider.createSubscription({
-          member: memberRefs,
-          planRefs,
-          promoCode,
-        });
+        let sub;
+        try {
+          sub = await provider.createSubscription({ member: memberRefs, planRefs, promoCode });
+        } catch (err) {
+          // Square API v2026-05-20 rejects subscriptions against plan variations
+          // built with the old recurringPriceMoney field. Recreate the variation
+          // using the new pricing format, save the new IDs, and retry once.
+          if (isApiVersionIncompatible(err) && plan) {
+            const settings = await getGymSettings();
+            const freshRefs = await provider.createPlan({
+              name: plan.name,
+              description: plan.description,
+              priceCents: plan.priceCents,
+              billingInterval: plan.billingInterval,
+              currency: settings.currency,
+            });
+            await prisma.membershipPlan.update({ where: { id: plan.id }, data: freshRefs });
+            planRefs = freshRefs;
+            sub = await provider.createSubscription({ member: memberRefs, planRefs: freshRefs, promoCode });
+          } else {
+            throw err;
+          }
+        }
         subscriptionRef = sub.subscriptionRef;
         memberStatus = sub.status;
       }
