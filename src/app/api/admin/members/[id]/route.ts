@@ -53,7 +53,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
       ...(body.photoUrl    !== undefined && { photoUrl: body.photoUrl || null }),
       ...(body.beltStripes !== undefined && { beltStripes: Number(body.beltStripes) }),
       // Front desk recording a paper waiver (or clearing a mistaken one)
-      ...(body.waiverSigned !== undefined && { waiverSignedAt: body.waiverSigned ? new Date() : null }),
+      ...(body.waiverSigned !== undefined && {
+        waiverSignedAt: body.waiverSigned ? new Date() : null,
+        ...(body.waiverSigned === false && { waiverDocumentUrl: null }),
+      }),
     },
   });
   return NextResponse.json(member);

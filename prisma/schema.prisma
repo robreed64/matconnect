@@ -28,8 +28,9 @@ model Member {
   squareCardId     String?   @map("square_card_id")
   checkinToken     String?   @unique @map("checkin_token")
   beltStripes      Int       @default(0) @map("belt_stripes")
-  waiverSignedAt   DateTime? @map("waiver_signed_at")
-  trialStartedAt   DateTime? @map("trial_started_at")
+  waiverSignedAt    DateTime? @map("waiver_signed_at")
+  waiverDocumentUrl String?   @map("waiver_document_url")
+  trialStartedAt    DateTime? @map("trial_started_at")
   createdAt        DateTime  @default(now()) @map("created_at")
   updatedAt        DateTime  @updatedAt @map("updated_at")
 

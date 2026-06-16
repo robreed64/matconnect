@@ -139,7 +139,7 @@ export default async function MemberDetailPage({ params }: { params: Params }) {
             )}
           </div>
           <div className="mt-2">
-            <WaiverToggle memberId={member.id} waiverSignedAt={member.waiverSignedAt?.toISOString() ?? null} readOnly={!canManage} />
+            <WaiverToggle memberId={member.id} waiverSignedAt={member.waiverSignedAt?.toISOString() ?? null} waiverDocumentUrl={member.waiverDocumentUrl ?? null} readOnly={!canManage} />
           </div>
         </div>
         {canManage && (
