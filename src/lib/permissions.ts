@@ -41,6 +41,6 @@ export function navForRole(role: string | undefined, hiddenFeatures: string[] = 
     .flatMap((item) => {
       const isHidden = hiddenFeatures.includes(item.feature);
       if (isHidden && !isAdmin) return [];
-      return [{ href: item.href, label: item.label, icon: item.icon, hiddenFromStaff: isHidden }];
+      return [{ href: item.href, label: item.label, icon: item.icon, hiddenFromStaff: isHidden && !isAdmin }];
     });
 }
