@@ -42,7 +42,7 @@ export default function FeatureVisibilityClient({ initialHidden }: { initialHidd
         alert(`Error: ${error.error || "Failed to save settings"}`);
         setHidden(hidden);
       }
-    } catch (e) {
+    } catch {
       alert("Failed to save settings");
       setHidden(hidden);
     } finally {
