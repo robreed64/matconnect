@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import MemberImportModal from "@/components/MemberImportModal";
 
 type Props = {
@@ -12,7 +12,7 @@ export default function StepMembers({ onNext, onBack }: Props) {
   const [showImport, setShowImport] = useState(false);
   const [imported, setImported] = useState(false);
 
-  const handleImportComplete = (result: { created: number; updated: number; skipped: number }) => {
+  const handleImportComplete = () => {
     setImported(true);
   };
 

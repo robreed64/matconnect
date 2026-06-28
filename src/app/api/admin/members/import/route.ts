@@ -88,7 +88,7 @@ function parseRow(row: string[], headerMapping: Record<number, string>): ImportR
   return result;
 }
 
-function validateRow(row: ImportRow, index: number): { valid: boolean; error?: string } {
+function validateRow(row: ImportRow): { valid: boolean; error?: string } {
   if (!row.name || row.name.trim().length === 0) {
     return { valid: false, error: "Name is required" };
   }
@@ -142,7 +142,7 @@ export async function POST(req: NextRequest) {
     // Validate rows and check for duplicates
     const previewed: RowWithMetadata[] = await Promise.all(
       parsedRows.map(async (row) => {
-        const validation = validateRow(row, row._index);
+        const validation = validateRow(row);
         if (!validation.valid) {
           return { ...row, _error: validation.error } as RowWithMetadata;
         }
@@ -166,7 +166,7 @@ export async function POST(req: NextRequest) {
     const errors = previewed.filter((r) => r._error).map((r) => `Row ${r._index}: ${r._error}`);
 
     const preview: ImportPreview = {
-      rows: previewed as any,
+      rows: previewed as ImportPreview["rows"],
       headers: Object.values(headerMapping),
       errors,
       duplicates,
@@ -202,7 +202,7 @@ export async function PATCH(req: NextRequest) {
     const skipped = [];
 
     for (const row of rows) {
-      const merge = mergeMap[row._existingId as any];
+      const merge = mergeMap[row._existingId as number];
       if (row._duplicate && merge?.skip) {
         skipped.push(row._index);
         continue;
