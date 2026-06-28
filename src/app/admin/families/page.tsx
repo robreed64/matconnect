@@ -53,7 +53,7 @@ export default async function FamiliesPage() {
 
       {/* Create portal account */}
       <div className="mb-8 bg-gray-900 border border-gray-800 rounded-xl p-5">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-4">
+        <h2 className="text-xs font-semibold tracking-wide text-gray-400 mb-4">
           Create Parent Portal Account
         </h2>
         <p className="text-sm text-gray-400 mb-4">

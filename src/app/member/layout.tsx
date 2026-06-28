@@ -13,7 +13,7 @@ export default async function MemberLayout({ children }: { children: ReactNode }
   const hidden = ((settings as Record<string, unknown>).hiddenFeatures as string[] | null) ?? [];
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col">
+    <div className="min-h-dvh bg-gray-950 text-white flex flex-col">
       <MemberNav
         gymName={settings.gymName}
         userName={user.name}

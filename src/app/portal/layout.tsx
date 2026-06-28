@@ -8,7 +8,7 @@ export default async function PortalLayout({ children }: { children: ReactNode }
   const user = session?.user;
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-dvh bg-gray-950 text-white">
       <header className="bg-gray-900 border-b border-gray-800 px-6 py-4 flex items-center justify-between">
         <span className="text-lg font-black tracking-tight">{settings.gymName} Family Portal</span>
         {user && (

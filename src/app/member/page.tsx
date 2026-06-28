@@ -90,7 +90,7 @@ export default async function MemberHomePage() {
     <div className="space-y-6">
       {/* Profile card */}
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex items-start gap-5">
-        <div className="w-16 h-16 rounded-full bg-gray-700 border-2 border-gray-600 flex items-center justify-center text-xl font-bold text-gray-300 flex-shrink-0">
+        <div className="w-16 h-16 rounded-2xl bg-gray-700 border-2 border-gray-600 flex items-center justify-center text-xl font-bold text-gray-300 flex-shrink-0">
           {initials}
         </div>
         <div className="flex-1 min-w-0">
@@ -122,7 +122,7 @@ export default async function MemberHomePage() {
       {/* Notifications */}
       {member.messages.length > 0 && (
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-4">Notifications</h2>
+          <h2 className="text-xs font-semibold tracking-wide text-gray-400 mb-4">Notifications</h2>
           <div className="divide-y divide-gray-800">
             {member.messages.map((n) => (
               <div key={n.id} className="flex items-start gap-3 py-3">
@@ -148,7 +148,7 @@ export default async function MemberHomePage() {
         {/* Belt progress snapshot */}
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500">Belt Progress</h2>
+            <h2 className="text-xs font-semibold tracking-wide text-gray-400">Belt Progress</h2>
             <Link href="/member/progress" className="text-xs text-blue-400 hover:text-blue-300 transition">View all →</Link>
           </div>
           {nextBelt ? (
@@ -185,7 +185,7 @@ export default async function MemberHomePage() {
 
         {/* Subscription */}
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-4">Membership</h2>
+          <h2 className="text-xs font-semibold tracking-wide text-gray-400 mb-4">Membership</h2>
           {sub ? (
             <div className="space-y-2 text-sm">
               <Row label="Plan"    value={sub.plan.name} />
@@ -203,7 +203,7 @@ export default async function MemberHomePage() {
 
       {/* Upcoming classes */}
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-4">Upcoming Classes</h2>
+        <h2 className="text-xs font-semibold tracking-wide text-gray-400 mb-4">Upcoming Classes</h2>
         {classes.length === 0 ? (
           <p className="text-sm text-gray-600">No classes scheduled this week.</p>
         ) : (
@@ -235,7 +235,7 @@ export default async function MemberHomePage() {
       {/* Recent check-ins */}
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500">Recent Check-ins</h2>
+          <h2 className="text-xs font-semibold tracking-wide text-gray-400">Recent Check-ins</h2>
           <Link href="/member/attendance" className="text-xs text-blue-400 hover:text-blue-300 transition">View all →</Link>
         </div>
         {member.attendance.length === 0 ? (

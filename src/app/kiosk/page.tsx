@@ -250,7 +250,7 @@ export default function KioskPage() {
   const belt = selected?.beltRank ? BELT_STYLES[selected.beltRank.toLowerCase()] : null;
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gray-950 px-4 pt-12 pb-8 relative">
+    <div className="min-h-dvh flex flex-col items-center bg-gray-950 px-4 pt-12 pb-8 relative">
       {/* Hidden admin exit button */}
       <div className="absolute top-3 right-3 group">
         <button

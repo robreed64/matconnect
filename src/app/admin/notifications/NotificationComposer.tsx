@@ -48,7 +48,7 @@ export default function NotificationComposer({ members }: { members: Member[] })
 
   return (
     <div className="space-y-5">
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500">Compose</h2>
+      <h2 className="text-xs font-semibold tracking-wide text-gray-400">Compose</h2>
 
       {/* Recipient */}
       <div>

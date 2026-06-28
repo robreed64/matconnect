@@ -76,7 +76,7 @@ export default function AttendanceManager({
   return (
     <>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500">Recent check-ins</h2>
+        <h2 className="text-xs font-semibold tracking-wide text-gray-400">Recent check-ins</h2>
         {!readOnly && (
           <button
             onClick={openModal}

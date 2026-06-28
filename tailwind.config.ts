@@ -8,7 +8,11 @@ const config: Config = {
     "./src/lib/**/*.{js,ts,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ["var(--font-outfit)", "ui-sans-serif", "system-ui", "sans-serif"],
+      },
+    },
   },
   plugins: [],
 };

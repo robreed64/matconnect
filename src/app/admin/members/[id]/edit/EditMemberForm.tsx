@@ -199,7 +199,7 @@ export default function EditMemberForm({ id }: { id: string }) {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-4">{title}</h2>
+      <h2 className="text-xs font-semibold tracking-wide text-gray-400 mb-4">{title}</h2>
       {children}
     </div>
   );

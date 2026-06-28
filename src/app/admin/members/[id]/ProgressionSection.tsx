@@ -51,7 +51,7 @@ export default function ProgressionSection({
   if (!nextBelt) {
     return (
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3">Belt Progression</h2>
+        <h2 className="text-xs font-semibold tracking-wide text-gray-400 mb-3">Belt Progression</h2>
         <p className="text-sm text-yellow-400 font-medium">Black belt — highest rank achieved.</p>
       </div>
     );
@@ -97,7 +97,7 @@ export default function ProgressionSection({
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500">Belt Progression</h2>
+        <h2 className="text-xs font-semibold tracking-wide text-gray-400">Belt Progression</h2>
         <div className="flex items-center gap-2">
           <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize ${nextStyle.bg} ${nextStyle.text}`}>
             → {nextBelt}

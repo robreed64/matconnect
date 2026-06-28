@@ -79,7 +79,7 @@ export default async function BeltsPage() {
 
       {/* Belt order + technique counts */}
       <div className="mt-6 bg-gray-900 border border-gray-800 rounded-xl p-5">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-4">Belt Progression Path</h2>
+        <h2 className="text-xs font-semibold tracking-wide text-gray-400 mb-4">Belt Progression Path</h2>
         <div className="flex items-center gap-3 flex-wrap mb-4">
           {BELT_ORDER.map((belt, i) => {
             const s = BELT_STYLES[belt];

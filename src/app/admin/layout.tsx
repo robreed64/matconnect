@@ -16,7 +16,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   const nav = navForRole(role, hiddenFeatures);
 
   return (
-    <div className="flex min-h-screen bg-gray-950 text-white">
+    <div className="flex min-h-dvh bg-gray-950 text-white">
       {role === "front_desk" && <FullscreenGate />}
       <AdminSidebar
         nav={nav}

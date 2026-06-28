@@ -47,7 +47,7 @@ function ContactSection() {
 
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4">
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500">Contact Info</h2>
+      <h2 className="text-xs font-semibold tracking-wide text-gray-400">Contact Info</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="Name"    value={form.name}    onChange={v => setForm(p => ({ ...p, name: v }))} />
         <Field label="Email"   value={form.email}   onChange={v => setForm(p => ({ ...p, email: v }))} type="text" inputMode="email" autoComplete="email" autoCorrect="off" autoCapitalize="none" />
@@ -103,7 +103,7 @@ function PasswordSection() {
 
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4">
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500">Change Password</h2>
+      <h2 className="text-xs font-semibold tracking-wide text-gray-400">Change Password</h2>
       <div className="space-y-3 max-w-sm">
         <div>
           <label className="block text-xs text-gray-500 mb-1">Current password</label>
@@ -210,7 +210,7 @@ function CardSection() {
 
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4">
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500">Payment Method</h2>
+      <h2 className="text-xs font-semibold tracking-wide text-gray-400">Payment Method</h2>
       {card ? (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -362,7 +362,7 @@ function PhotoSection() {
 
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-2">
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500">Profile Photo</h2>
+      <h2 className="text-xs font-semibold tracking-wide text-gray-400">Profile Photo</h2>
       <div className="flex items-center gap-5 pt-1">
         <PhotoUploader
           currentUrl={photoUrl}
@@ -469,7 +469,7 @@ function PushSection() {
 
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-3">
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500">Push Notifications</h2>
+      <h2 className="text-xs font-semibold tracking-wide text-gray-400">Push Notifications</h2>
       <p className="text-sm text-gray-400">
         Get notified about class changes, announcements, and updates from the gym.
       </p>
@@ -545,7 +545,7 @@ function QRSection() {
 
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4">
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500">Check-in QR Code</h2>
+      <h2 className="text-xs font-semibold tracking-wide text-gray-400">Check-in QR Code</h2>
       {loading ? (
         <div className="text-sm text-gray-500">Generating…</div>
       ) : token ? (
@@ -586,7 +586,7 @@ function RankBadge({ beltRank, beltStripes }: { beltRank: string | null; beltStr
   const label  = beltRank.charAt(0).toUpperCase() + beltRank.slice(1);
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-4">Current Rank</h2>
+      <h2 className="text-xs font-semibold tracking-wide text-gray-400 mb-4">Current Rank</h2>
       <div className="flex items-center gap-4">
         {/* Belt pill */}
         <span className={`px-4 py-1.5 rounded-full text-sm font-bold ${colors.bg} ${colors.text}`}>

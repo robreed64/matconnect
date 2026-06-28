@@ -6,12 +6,12 @@ import { usePathname } from "next/navigation";
 import LogoutButton from "@/components/LogoutButton";
 
 const ALL_NAV = [
-  { href: "/member",            label: "Home",       icon: "🏠",  feature: null },
-  { href: "/member/schedule",   label: "Schedule",   icon: "📅",  feature: null },
-  { href: "/member/attendance", label: "Attendance", icon: "📋",  feature: null },
-  { href: "/member/progress",   label: "Progress",   icon: "🥋",  feature: "progress" },
-  { href: "/member/curriculum", label: "Curriculum", icon: "📖",  feature: "curriculum" },
-  { href: "/member/profile",    label: "Profile",    icon: "👤",  feature: null },
+  { href: "/member",            label: "Home",       feature: null },
+  { href: "/member/schedule",   label: "Schedule",   feature: null },
+  { href: "/member/attendance", label: "Attendance", feature: null },
+  { href: "/member/progress",   label: "Progress",   feature: "progress" },
+  { href: "/member/curriculum", label: "Curriculum", feature: "curriculum" },
+  { href: "/member/profile",    label: "Profile",    feature: null },
 ];
 
 export default function MemberNav({
@@ -60,10 +60,9 @@ export default function MemberNav({
                 key={item.href}
                 href={item.href}
                 className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition ${
-                  active(item.href) ? "bg-gray-800 text-white" : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                  active(item.href) ? "bg-blue-500/10 text-blue-300" : "text-gray-400 hover:bg-gray-800 hover:text-white"
                 }`}
               >
-                <span>{item.icon}</span>
                 {item.label}
               </Link>
             ))}
@@ -103,10 +102,9 @@ export default function MemberNav({
                   href={item.href}
                   onClick={() => setOpen(false)}
                   className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition ${
-                    active(item.href) ? "bg-gray-800 text-white" : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                    active(item.href) ? "bg-blue-500/10 text-blue-300" : "text-gray-300 hover:bg-gray-800 hover:text-white"
                   }`}
                 >
-                  <span className="text-lg">{item.icon}</span>
                   {item.label}
                 </Link>
               ))}

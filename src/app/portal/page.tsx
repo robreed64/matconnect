@@ -90,7 +90,7 @@ export default async function PortalPage() {
     <div className="space-y-8">
       {/* Children overview */}
       <section>
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-4">
+        <h2 className="text-xs font-semibold tracking-wide text-gray-400 mb-4">
           {children.length === 0 ? "Your Account" : "Your Family"}
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -108,7 +108,7 @@ export default async function PortalPage() {
 
       {/* Upcoming schedule */}
       <section>
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-4">Upcoming Classes (Next 7 Days)</h2>
+        <h2 className="text-xs font-semibold tracking-wide text-gray-400 mb-4">Upcoming Classes (Next 7 Days)</h2>
         {classes.length === 0 ? (
           <p className="text-gray-600 text-sm">No classes scheduled this week.</p>
         ) : (
@@ -134,7 +134,7 @@ export default async function PortalPage() {
 
       {/* Recent activity */}
       <section>
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-4">Recent Activity</h2>
+        <h2 className="text-xs font-semibold tracking-wide text-gray-400 mb-4">Recent Activity</h2>
         {recentAttendance.length === 0 ? (
           <p className="text-gray-600 text-sm">No check-ins yet.</p>
         ) : (
@@ -175,7 +175,7 @@ function MemberCard({
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
       <div className="flex items-start gap-4">
-        <div className="w-12 h-12 rounded-full bg-gray-700 border border-gray-600 flex items-center justify-center text-sm font-bold text-gray-300 flex-shrink-0">
+        <div className="w-12 h-12 rounded-xl bg-gray-700 border border-gray-600 flex items-center justify-center text-sm font-bold text-gray-300 flex-shrink-0">
           {initials.toUpperCase()}
         </div>
         <div className="flex-1 min-w-0">

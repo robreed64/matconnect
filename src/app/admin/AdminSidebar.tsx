@@ -51,7 +51,7 @@ export default function AdminSidebar({ nav, gymName, userName, role }: Props) {
                   : isActive
                   ? inSetup
                     ? "bg-amber-900/50 text-amber-200"
-                    : "bg-gray-800 text-white"
+                    : "bg-blue-500/10 text-blue-100"
                   : inSetup
                   ? "text-amber-200/70 hover:bg-amber-900/30 hover:text-amber-100"
                   : "text-gray-300 hover:bg-gray-800 hover:text-white"

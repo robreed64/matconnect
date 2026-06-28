@@ -123,7 +123,7 @@ export default function KioskSignup({
         setSubmitting(false);
       }
     },
-    [name, email, phone, ageGroup]
+    [name, email, phone, ageGroup, password]
   );
 
   const inp =
@@ -131,7 +131,7 @@ export default function KioskSignup({
   const lbl = "block text-sm font-medium text-gray-400 mb-2";
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col">
+    <div className="min-h-dvh bg-gray-950 text-white flex flex-col">
       {/* Progress dots for steps 1-4 */}
       {step > 0 && step < 5 && (
         <div className="flex justify-center gap-2 pt-8 pb-2">
@@ -162,7 +162,7 @@ export default function KioskSignup({
             </div>
             <button
               onClick={() => setStep(1)}
-              className="w-full py-5 rounded-2xl bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold text-2xl transition"
+              className="w-full py-5 rounded-2xl bg-blue-600 hover:bg-blue-500 active:bg-blue-700 active:scale-[0.98] text-white font-bold text-2xl transition"
             >
               Sign Up Now
             </button>
@@ -301,7 +301,7 @@ export default function KioskSignup({
               onClick={() => {
                 if (validateInfo()) setStep(2);
               }}
-              className="w-full py-5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xl transition"
+              className="w-full py-5 rounded-2xl bg-blue-600 hover:bg-blue-500 active:scale-[0.98] text-white font-bold text-xl transition"
             >
               Next →
             </button>
@@ -500,7 +500,7 @@ export default function KioskSignup({
             </div>
             <button
               onClick={() => router.push("/kiosk")}
-              className="w-full py-5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xl transition"
+              className="w-full py-5 rounded-2xl bg-blue-600 hover:bg-blue-500 active:scale-[0.98] text-white font-bold text-xl transition"
             >
               Check In Now →
             </button>
