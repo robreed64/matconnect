@@ -86,7 +86,6 @@ function SquarePaymentStep({ settings, name, email, onSuccess, onSkip }: Props &
         }
       })
       .catch(() => setFailed(true));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, email]);
 
   if (!settings.squareApplicationId || !settings.squareLocationId) {

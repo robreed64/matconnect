@@ -87,7 +87,9 @@ export default function ClassForm({ initialValues, classId }: Props) {
     fetch("/api/admin/settings").then(r => r.json()).then((d: GymSettings) => {
       if (Array.isArray(d.instructorNames)) setInstructorNames(d.instructorNames);
     }).catch(() => {});
+  }, []);
 
+  useEffect(() => {
     if (initialValues?.startTimeISO && initialValues?.endTimeISO) {
       const s = new Date(initialValues.startTimeISO);
       const e = new Date(initialValues.endTimeISO);
@@ -100,7 +102,7 @@ export default function ClassForm({ initialValues, classId }: Props) {
     } else if (!initialValues?.date) {
       setForm((f) => ({ ...f, date: new Date().toLocaleDateString("en-CA") }));
     }
-  }, []);
+  }, [initialValues?.date, initialValues?.startTimeISO, initialValues?.endTimeISO]);
 
   const set = (k: keyof Pick<FormState, "name"|"programId"|"date"|"startTime"|"endTime"|"instructorName"|"capacity"|"seriesEndDate">, v: string) =>
     setForm((f) => ({ ...f, [k]: v }));

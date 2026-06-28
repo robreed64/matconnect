@@ -385,21 +385,22 @@ function PushSection() {
   const [subState,  setSubState]  = useState<"unknown" | "granted" | "denied" | "default">("unknown");
   const [msg,       setMsg]       = useState<string | null>(null);
 
-  async function checkState() {
-    if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
-      setSubState("denied");
-      return;
+  useEffect(() => {
+    async function checkState() {
+      if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+        setSubState("denied");
+        return;
+      }
+      const perm = Notification.permission;
+      setSubState(perm as "unknown" | "granted" | "denied" | "default");
+      if (perm === "granted") {
+        const reg = await navigator.serviceWorker.ready;
+        const existing = await reg.pushManager.getSubscription();
+        if (existing) setStatus("subscribed");
+      }
     }
-    const perm = Notification.permission;
-    setSubState(perm as typeof subState);
-    if (perm === "granted") {
-      const reg = await navigator.serviceWorker.ready;
-      const existing = await reg.pushManager.getSubscription();
-      if (existing) setStatus("subscribed");
-    }
-  }
-
-  useEffect(() => { checkState(); }, []);
+    checkState();
+  }, []);
 
   async function subscribe() {
     if (!("serviceWorker" in navigator)) { setMsg("Not supported in this browser"); return; }

@@ -4,6 +4,16 @@ A running record of bugs, mistakes, and lessons learned during development.
 
 ---
 
+## React
+
+### Stale closure — `useCallback` missing a state dep
+**Error:** Password typed at kiosk signup was silently dropped; member always received a temp password instead of the one they chose.
+**Cause:** `submitEnroll` in `KioskSignup.tsx` used `password` inside the callback body but the deps array was `[name, email, phone, ageGroup]`. The callback was last memoized before the user typed their password (name/email/phone are filled first), so it captured `password = ""` and never updated.
+**Fix:** Added `password` to the `useCallback` deps array.
+**Rule:** Every state or prop variable read inside a `useCallback` or `useMemo` must appear in the deps array. ESLint rule `react-hooks/exhaustive-deps` catches this automatically — worth enabling if not already on.
+
+---
+
 ## Auth / NextAuth
 
 ### Prisma imported in Edge Runtime (middleware)

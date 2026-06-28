@@ -40,7 +40,7 @@ export default function EditSeriesForm({ classId, initialValues, programs }: Pro
     // Store the original time-of-day in ms since midnight (local)
     setOrigStartMs((s.getHours() * 60 + s.getMinutes()) * 60000);
     setOrigEndMs((e.getHours() * 60 + e.getMinutes()) * 60000);
-  }, []);
+  }, [initialValues.startTimeISO, initialValues.endTimeISO]);
 
   const submit = async () => {
     if (!name || !startTime || !endTime) {
