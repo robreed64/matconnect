@@ -479,6 +479,7 @@ function EnrollPhotoCapture({ memberId }: { memberId: number; memberName: string
   if (done) {
     return (
       <div className="flex items-center justify-center gap-2 text-green-400 text-sm">
+        {/* eslint-disable-next-line @next/next/no-img-element -- blob URL from createObjectURL, not optimizable */}
         {preview && <img src={preview} alt="photo" className="w-10 h-10 rounded-full object-cover" />}
         <span>Photo saved ✓</span>
       </div>
@@ -501,6 +502,7 @@ function EnrollPhotoCapture({ memberId }: { memberId: number; memberName: string
       />
       {preview ? (
         <div className="flex items-center gap-3">
+          {/* eslint-disable-next-line @next/next/no-img-element -- blob URL from createObjectURL, not optimizable */}
           <img src={preview} alt="preview" className="w-14 h-14 rounded-full object-cover border-2 border-gray-600" />
           <span className="text-sm text-gray-400">{uploading ? "Uploading…" : "Ready"}</span>
         </div>

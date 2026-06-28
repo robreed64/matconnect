@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -98,9 +99,9 @@ export default async function MemberDetailPage({ params }: { params: Params }) {
 
       {/* Profile header */}
       <div className="mt-4 flex items-start gap-6">
-        <div className="w-20 h-20 rounded-full bg-gray-700 flex items-center justify-center text-2xl font-bold text-gray-300 flex-shrink-0 overflow-hidden border-2 border-gray-600">
+        <div className="relative w-20 h-20 rounded-full bg-gray-700 flex items-center justify-center text-2xl font-bold text-gray-300 flex-shrink-0 overflow-hidden border-2 border-gray-600">
           {member.photoUrl
-            ? <img src={member.photoUrl} alt={member.name} className="w-full h-full object-cover" />
+            ? <Image src={member.photoUrl} alt={member.name} fill sizes="80px" className="object-cover" />
             : initials(member.name).toUpperCase()
           }
         </div>

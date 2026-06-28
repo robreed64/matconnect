@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { prisma } from "@/lib/prisma";
@@ -130,9 +131,9 @@ export default async function MembersPage({ searchParams }: { searchParams: Sear
                 <tr key={m.id} className="hover:bg-gray-900/40 transition">
                   <td className="px-4 py-3">
                     <Link href={`/admin/members/${m.id}`} className="hover:text-blue-400 transition flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gray-700 border border-gray-600 flex-shrink-0 overflow-hidden flex items-center justify-center text-xs font-bold text-gray-400">
+                      <div className="relative w-8 h-8 rounded-full bg-gray-700 border border-gray-600 flex-shrink-0 overflow-hidden flex items-center justify-center text-xs font-bold text-gray-400">
                         {m.photoUrl
-                          ? <img src={m.photoUrl} alt={m.name} className="w-full h-full object-cover" />
+                          ? <Image src={m.photoUrl} alt={m.name} fill sizes="32px" className="object-cover" />
                           : m.name.trim().split(/\s+/).map(p => p[0]).slice(0, 2).join("").toUpperCase()
                         }
                       </div>

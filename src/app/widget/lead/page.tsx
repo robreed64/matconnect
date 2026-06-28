@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, FormEvent } from "react";
+import Image from "next/image";
 
 type GymInfo = { gymName: string; logoUrl?: string | null };
 
@@ -71,7 +72,7 @@ export default function LeadWidgetPage() {
         {/* Gym branding */}
         <div className="text-center mb-6">
           {gym?.logoUrl ? (
-            <img src={gym.logoUrl} alt={gym.gymName} className="h-12 mx-auto mb-3 object-contain" />
+            <Image src={gym.logoUrl} alt={gym.gymName} width={200} height={48} className="h-12 w-auto mx-auto mb-3 object-contain" />
           ) : (
             <div className="text-2xl mb-1">🥋</div>
           )}

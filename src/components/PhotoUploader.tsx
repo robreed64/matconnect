@@ -65,6 +65,7 @@ export default function PhotoUploader({ currentUrl, uploadUrl, name, onUpload, s
         className={`${dim} rounded-full bg-gray-700 border-2 border-gray-600 flex items-center justify-center overflow-hidden relative hover:border-blue-500 transition group disabled:opacity-60`}
       >
         {preview ? (
+          // eslint-disable-next-line @next/next/no-img-element -- blob URL from createObjectURL, not suitable for next/image
           <img src={preview} alt={name ?? "photo"} className="w-full h-full object-cover" />
         ) : (
           <span className="text-gray-300 font-bold">{initials}</span>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -41,9 +42,9 @@ function Avatar({ member }: { member: Member }) {
   const dot = member.beltRank ? BELT_DOT[member.beltRank.toLowerCase()] : null;
   return (
     <div className="flex items-center gap-3">
-      <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0 overflow-hidden border border-gray-600">
+      <div className="relative w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0 overflow-hidden border border-gray-600">
         {member.photoUrl
-          ? <img src={member.photoUrl} alt={member.name} className="w-full h-full object-cover" />
+          ? <Image src={member.photoUrl} alt={member.name} fill sizes="32px" className="object-cover" />
           : <Initials name={member.name} />}
       </div>
       <div>
