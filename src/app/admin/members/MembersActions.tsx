@@ -10,6 +10,29 @@ type Props = {
 
 export default function MembersActions({ canManage }: Props) {
   const [showImport, setShowImport] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      const response = await fetch("/api/admin/members/export");
+      if (!response.ok) throw new Error("Export failed");
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = response.headers.get("content-disposition")?.split("filename=")[1]?.replace(/"/g, "") || "members.csv";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      alert("Failed to export members");
+      console.error(error);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   return (
     <>
@@ -28,6 +51,15 @@ export default function MembersActions({ canManage }: Props) {
             className="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm font-semibold text-gray-300 hover:text-white transition"
           >
             Import
+          </button>
+        )}
+        {canManage && (
+          <button
+            onClick={handleExport}
+            disabled={isExporting}
+            className="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm font-semibold text-gray-300 hover:text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isExporting ? "Exporting..." : "Export"}
           </button>
         )}
         {canManage && (
