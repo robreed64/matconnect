@@ -64,6 +64,12 @@ export async function PATCH(req: Request) {
     data.trialLengthDays = days;
   }
 
+  if (data.hiddenFeatures !== undefined) {
+    if (!Array.isArray(data.hiddenFeatures)) {
+      return NextResponse.json({ error: "hiddenFeatures must be an array" }, { status: 400 });
+    }
+  }
+
   const settings = await prisma.gymSettings.upsert({
     where: { id: 1 },
     update: data,

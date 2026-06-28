@@ -31,12 +31,23 @@ export default function FeatureVisibilityClient({ initialHidden }: { initialHidd
     const next = hidden.includes(key) ? hidden.filter((k) => k !== key) : [...hidden, key];
     setSaving(key);
     setHidden(next);
-    await fetch("/api/admin/settings", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ hiddenFeatures: next }),
-    });
-    setSaving(null);
+    try {
+      const response = await fetch("/api/admin/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ hiddenFeatures: next }),
+      });
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        alert(`Error: ${error.error || "Failed to save settings"}`);
+        setHidden(hidden);
+      }
+    } catch (e) {
+      alert("Failed to save settings");
+      setHidden(hidden);
+    } finally {
+      setSaving(null);
+    }
   };
 
   return (
