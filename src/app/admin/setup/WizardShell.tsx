@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import StepGymInfo   from "./StepGymInfo";
+import StepMembers   from "./StepMembers";
 import StepRegion    from "./StepRegion";
 import StepWaiver    from "./StepWaiver";
 import StepTaxAndPOS from "./StepTaxAndPOS";
@@ -21,7 +22,7 @@ export type WizardValues = {
   defaultTaxRate: number;
 };
 
-const STEPS = ["Gym Info", "Region", "Waiver", "Tax & POS", "Done"];
+const STEPS = ["Gym Info", "Members", "Region", "Waiver", "Tax & POS", "Done"];
 
 type Props = { initialValues: WizardValues };
 
@@ -70,10 +71,11 @@ export default function WizardShell({ initialValues }: Props) {
         {/* Step content */}
         <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl p-6">
           {step === 0 && <StepGymInfo   values={values} onChange={onChange} onNext={() => saveStep()} />}
-          {step === 1 && <StepRegion    values={values} onChange={onChange} onNext={() => saveStep()} onBack={back} />}
-          {step === 2 && <StepWaiver    values={values} onChange={onChange} onNext={() => saveStep()} onBack={back} />}
-          {step === 3 && <StepTaxAndPOS values={values} onChange={onChange} onNext={() => saveStep()} onBack={back} />}
-          {step === 4 && <StepDone      values={values} onBack={back} />}
+          {step === 1 && <StepMembers   onNext={next} onBack={back} />}
+          {step === 2 && <StepRegion    values={values} onChange={onChange} onNext={() => saveStep()} onBack={back} />}
+          {step === 3 && <StepWaiver    values={values} onChange={onChange} onNext={() => saveStep()} onBack={back} />}
+          {step === 4 && <StepTaxAndPOS values={values} onChange={onChange} onNext={() => saveStep()} onBack={back} />}
+          {step === 5 && <StepDone      values={values} onBack={back} />}
         </div>
       </div>
     </div>

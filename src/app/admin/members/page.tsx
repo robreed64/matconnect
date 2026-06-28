@@ -7,6 +7,7 @@ import { can } from "@/lib/permissions";
 import { getGymSettings } from "@/lib/gym-settings";
 import { trialDaysLeft, trialBadge } from "@/lib/trial";
 import MemberFilters from "./MemberFilters";
+import MembersActions from "./MembersActions";
 
 const PAGE_SIZE = 20;
 
@@ -75,24 +76,7 @@ export default async function MembersPage({ searchParams }: { searchParams: Sear
           <h1 className="text-2xl font-bold">Members</h1>
           <p className="text-gray-400 text-sm mt-0.5">{total} total</p>
         </div>
-        <div className="flex items-center gap-2">
-          {canManage && (
-            <Link
-              href="/admin/members/at-risk"
-              className="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm font-semibold text-gray-300 hover:text-white transition"
-            >
-              At-risk
-            </Link>
-          )}
-          {canManage && (
-            <Link
-              href="/admin/members/new"
-              className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-sm font-semibold transition"
-            >
-              + Add Member
-            </Link>
-          )}
-        </div>
+        <MembersActions canManage={canManage} />
       </div>
 
       {/* Filters */}
