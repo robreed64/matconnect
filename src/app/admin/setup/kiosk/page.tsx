@@ -8,7 +8,7 @@ export default function SetupKioskPage() {
         <h1 className="text-2xl font-bold mt-2">Kiosk</h1>
       </div>
 
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-4">
+      <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl p-6 space-y-4">
         <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Lock Mode</h2>
         <p className="text-sm text-gray-400">
           When you enter kiosk mode, the screen goes fullscreen and the browser navigation is locked.

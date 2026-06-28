@@ -68,7 +68,7 @@ export default function WizardShell({ initialValues }: Props) {
         </div>
 
         {/* Step content */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+        <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl p-6">
           {step === 0 && <StepGymInfo   values={values} onChange={onChange} onNext={() => saveStep()} />}
           {step === 1 && <StepRegion    values={values} onChange={onChange} onNext={() => saveStep()} onBack={back} />}
           {step === 2 && <StepWaiver    values={values} onChange={onChange} onNext={() => saveStep()} onBack={back} />}

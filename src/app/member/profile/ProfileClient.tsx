@@ -46,7 +46,7 @@ function ContactSection() {
   if (loading) return <div className="text-sm text-gray-500">Loading…</div>;
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4">
+    <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-5 space-y-4">
       <h2 className="text-xs font-semibold tracking-wide text-gray-400">Contact Info</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="Name"    value={form.name}    onChange={v => setForm(p => ({ ...p, name: v }))} />
@@ -102,7 +102,7 @@ function PasswordSection() {
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4">
+    <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-5 space-y-4">
       <h2 className="text-xs font-semibold tracking-wide text-gray-400">Change Password</h2>
       <div className="space-y-3 max-w-sm">
         <div>
@@ -203,13 +203,13 @@ function CardSection() {
   }
 
   if (loading) return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+    <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-5">
       <div className="text-sm text-gray-500">Loading payment info…</div>
     </div>
   );
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4">
+    <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-5 space-y-4">
       <h2 className="text-xs font-semibold tracking-wide text-gray-400">Payment Method</h2>
       {card ? (
         <div className="flex items-center justify-between">
@@ -361,7 +361,7 @@ function PhotoSection() {
   if (loading) return null;
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-2">
+    <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-5 space-y-2">
       <h2 className="text-xs font-semibold tracking-wide text-gray-400">Profile Photo</h2>
       <div className="flex items-center gap-5 pt-1">
         <PhotoUploader
@@ -469,7 +469,7 @@ function PushSection() {
   if (subState === "denied") return null;
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-3">
+    <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-5 space-y-3">
       <h2 className="text-xs font-semibold tracking-wide text-gray-400">Push Notifications</h2>
       <p className="text-sm text-gray-400">
         Get notified about class changes, announcements, and updates from the gym.
@@ -545,7 +545,7 @@ function QRSection() {
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4">
+    <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-5 space-y-4">
       <h2 className="text-xs font-semibold tracking-wide text-gray-400">Check-in QR Code</h2>
       {loading ? (
         <div className="text-sm text-gray-500">Generating…</div>
@@ -586,7 +586,7 @@ function RankBadge({ beltRank, beltStripes }: { beltRank: string | null; beltStr
   const colors = BELT_COLORS[beltRank.toLowerCase()] ?? BELT_COLORS.white;
   const label  = beltRank.charAt(0).toUpperCase() + beltRank.slice(1);
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+    <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-5">
       <h2 className="text-xs font-semibold tracking-wide text-gray-400 mb-4">Current Rank</h2>
       <div className="flex items-center gap-4">
         {/* Belt pill */}

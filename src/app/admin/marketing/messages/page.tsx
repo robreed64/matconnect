@@ -36,11 +36,11 @@ export default async function MessagesPage() {
       </div>
 
       {messages.length === 0 ? (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-10 text-center text-gray-600 text-sm">
+        <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-10 text-center text-gray-600 text-sm">
           No messages sent yet. Run a workflow or compose a manual message.
         </div>
       ) : (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+        <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-800 text-xs text-gray-500 uppercase tracking-wide">

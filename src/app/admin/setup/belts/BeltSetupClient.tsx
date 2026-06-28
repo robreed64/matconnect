@@ -35,7 +35,7 @@ export default function BeltSetupClient({ belts: initial }: { belts: Belt[] }) {
 
   return (
     <div className="space-y-3">
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-3">
+      <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl p-6 space-y-3">
         <div className="grid grid-cols-[auto_1fr_auto_auto_auto] gap-3 items-center text-xs text-gray-500 mb-1 px-1">
           <span>Color</span><span>Name</span><span>Max Stripes</span><span></span>
         </div>

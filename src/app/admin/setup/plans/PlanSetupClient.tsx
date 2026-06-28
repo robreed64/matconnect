@@ -79,7 +79,7 @@ export default function PlanSetupClient({ plans: initial, stripeConfigured }: { 
       {error && <div className="bg-red-900/30 border border-red-800 text-red-300 text-sm rounded-lg px-4 py-3">{error}</div>}
 
       {plans.map(plan => (
-        <div key={plan.id} className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+        <div key={plan.id} className="bg-[#0f1117] border border-gray-700/50 rounded-2xl p-5">
           {editing === plan.id ? (
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">

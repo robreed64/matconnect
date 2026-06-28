@@ -415,7 +415,7 @@ export default async function ReportsPage() {
 function KPI({ label, value, sub, accent }: { label: string; value: string; sub: string; accent?: "green" | "blue" }) {
   const color = accent === "green" ? "text-green-400" : accent === "blue" ? "text-blue-400" : "text-white";
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+    <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-5">
       <p className="text-xs text-gray-500 mb-1">{label}</p>
       <p className={`text-3xl font-bold ${color}`}>{value}</p>
       <p className="text-xs text-gray-600 mt-1">{sub}</p>
@@ -425,7 +425,7 @@ function KPI({ label, value, sub, accent }: { label: string; value: string; sub:
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+    <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-5">
       <h2 className="text-sm font-semibold text-gray-400 mb-4 uppercase tracking-wider">{title}</h2>
       {children}
     </div>

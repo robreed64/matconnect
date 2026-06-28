@@ -23,14 +23,14 @@ export default async function SetupCurriculumPage() {
           { label: "Active", value: active },
           { label: "Inactive", value: inactive },
         ].map(s => (
-          <div key={s.label} className="bg-gray-900 border border-gray-800 rounded-xl px-5 py-3 text-center">
+          <div key={s.label} className="bg-[#0f1117] border border-gray-700/50 rounded-xl px-5 py-3 text-center">
             <p className="text-2xl font-bold text-white">{s.value}</p>
             <p className="text-xs text-gray-500 mt-1">{s.label}</p>
           </div>
         ))}
       </div>
 
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden mb-4">
+      <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl overflow-hidden mb-4">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-800 bg-gray-900/60 text-gray-400 text-left">

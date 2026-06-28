@@ -27,7 +27,7 @@ export default async function MemberCurriculumPage() {
       </div>
 
       {curricula.length === 0 ? (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-10 text-center text-gray-600 text-sm">
+        <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-10 text-center text-gray-600 text-sm">
           No curriculum published yet. Check back soon.
         </div>
       ) : (
@@ -37,7 +37,7 @@ export default async function MemberCurriculumPage() {
             const weeks = Array.from(new Set(c.lessons.map((l) => l.weekNumber))).sort((a, b) => a - b);
 
             return (
-              <div key={c.id} className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+              <div key={c.id} className="bg-[#0f1117] border border-gray-700/50 rounded-2xl overflow-hidden">
                 {/* Header */}
                 <div className="px-6 py-5 border-b border-gray-800 flex items-start justify-between gap-4">
                   <div>

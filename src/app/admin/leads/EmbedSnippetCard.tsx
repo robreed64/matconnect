@@ -14,7 +14,7 @@ export default function EmbedSnippetCard() {
     : "Loading…";
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-3">
+    <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl p-6 space-y-3">
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-bold text-white">Embed on your website</h2>
         {origin && (

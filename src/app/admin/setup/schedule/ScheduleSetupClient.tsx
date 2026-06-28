@@ -143,7 +143,7 @@ export default function ScheduleSetupClient({
       {error && <div className="bg-red-900/30 border border-red-800 text-red-300 text-sm rounded-lg px-4 py-3">{error}</div>}
 
       {/* Programs */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+      <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl p-6">
         <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">Programs</h2>
         <div className="space-y-2 mb-4">
           {programs.map(p => (
@@ -225,7 +225,7 @@ export default function ScheduleSetupClient({
       </div>
 
       {/* Program Types */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+      <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl p-6">
         <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">Program Types</h2>
         <p className="text-xs text-gray-600 mb-3">These appear in the type dropdown when creating or editing programs.</p>
         <div className="flex flex-wrap gap-2 mb-3">
@@ -252,7 +252,7 @@ export default function ScheduleSetupClient({
       </div>
 
       {/* Instructor Names */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+      <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl p-6">
         <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">Instructor Names</h2>
         <p className="text-xs text-gray-600 mb-3">These appear as suggestions when creating or editing classes.</p>
         <div className="flex flex-wrap gap-2 mb-3">

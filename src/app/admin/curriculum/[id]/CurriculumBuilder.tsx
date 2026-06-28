@@ -191,7 +191,7 @@ export default function CurriculumBuilder({
       {/* Lesson form panel */}
       {form && (
         <div className="fixed inset-0 bg-black/70 flex items-start justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-2xl p-6 my-8">
+          <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl w-full max-w-2xl p-6 my-8">
             <h2 className="text-base font-bold text-white mb-5">
               {editing ? "Edit Lesson" : `New Lesson — Week ${adding}`}
             </h2>
@@ -274,7 +274,7 @@ function LessonCard({ lesson, onEdit, onDelete }: { lesson: Lesson; onEdit: () =
   const techs = lesson.techniques ?? [];
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+    <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl overflow-hidden">
       <button onClick={() => setExpanded((v) => !v)}
         className="w-full text-left px-5 py-4 flex items-center justify-between gap-4 hover:bg-gray-800/50 transition">
         <div className="flex-1 min-w-0">

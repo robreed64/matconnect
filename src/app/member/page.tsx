@@ -89,7 +89,7 @@ export default async function MemberHomePage() {
   return (
     <div className="space-y-6">
       {/* Profile card */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex items-start gap-5">
+      <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl p-6 flex items-start gap-5">
         <div className="w-16 h-16 rounded-2xl bg-gray-700 border-2 border-gray-600 flex items-center justify-center text-xl font-bold text-gray-300 flex-shrink-0">
           {initials}
         </div>
@@ -121,7 +121,7 @@ export default async function MemberHomePage() {
 
       {/* Notifications */}
       {member.messages.length > 0 && (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+        <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-5">
           <h2 className="text-xs font-semibold tracking-wide text-gray-400 mb-4">Notifications</h2>
           <div className="divide-y divide-gray-800">
             {member.messages.map((n) => (
@@ -146,7 +146,7 @@ export default async function MemberHomePage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Belt progress snapshot */}
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+        <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xs font-semibold tracking-wide text-gray-400">Belt Progress</h2>
             <Link href="/member/progress" className="text-xs text-blue-400 hover:text-blue-300 transition">View all →</Link>
@@ -184,7 +184,7 @@ export default async function MemberHomePage() {
         </div>
 
         {/* Subscription */}
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+        <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-5">
           <h2 className="text-xs font-semibold tracking-wide text-gray-400 mb-4">Membership</h2>
           {sub ? (
             <div className="space-y-2 text-sm">
@@ -202,7 +202,7 @@ export default async function MemberHomePage() {
       </div>
 
       {/* Upcoming classes */}
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+      <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-5">
         <h2 className="text-xs font-semibold tracking-wide text-gray-400 mb-4">Upcoming Classes</h2>
         {classes.length === 0 ? (
           <p className="text-sm text-gray-600">No classes scheduled this week.</p>
@@ -233,7 +233,7 @@ export default async function MemberHomePage() {
       </div>
 
       {/* Recent check-ins */}
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+      <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xs font-semibold tracking-wide text-gray-400">Recent Check-ins</h2>
           <Link href="/member/attendance" className="text-xs text-blue-400 hover:text-blue-300 transition">View all →</Link>

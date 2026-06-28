@@ -86,7 +86,7 @@ export default function FamilyManager({ memberId, currentParent, childMembers, r
   };
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+    <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-5">
       <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-4">Family</h2>
 
       {/* Parent */}

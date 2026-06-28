@@ -250,9 +250,14 @@ export default function KioskPage() {
   const belt = selected?.beltRank ? BELT_STYLES[selected.beltRank.toLowerCase()] : null;
 
   return (
-    <div className="min-h-dvh flex flex-col items-center bg-gray-950 px-4 pt-12 pb-8 relative">
+    <div className="min-h-dvh flex flex-col items-center bg-gray-950 px-4 pt-12 pb-8 relative overflow-hidden">
+      {/* Ambient glow */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-blue-600/8 blur-[140px]" />
+      </div>
+
       {/* Hidden admin exit button */}
-      <div className="absolute top-3 right-3 group">
+      <div className="absolute top-3 right-3 group z-10">
         <button
           onClick={() => setShowExit(true)}
           className="w-9 h-9 rounded-full flex items-center justify-center text-transparent group-hover:text-gray-600 transition-colors duration-500"
@@ -268,20 +273,21 @@ export default function KioskPage() {
       {showExit && <KioskExitModal onClose={() => setShowExit(false)} />}
 
       {/* Header */}
-      <div className="mb-8 text-center">
-        <h1 className="text-4xl font-black tracking-tight text-white">{gymName}</h1>
+      <div className="relative mb-10 text-center">
+        <h1 className="text-5xl font-black tracking-tight text-white">{gymName}</h1>
+        <p className="mt-2 text-gray-500 text-base">Welcome — tap below to check in</p>
 
         {/* Mode toggle */}
-        <div className="mt-5 inline-flex rounded-xl bg-gray-800 p-1 gap-1">
+        <div className="mt-6 inline-flex rounded-2xl bg-[#0f1117] border border-gray-700/50 p-1 gap-1">
           <button
             onClick={() => { setMode("search"); setScanResult(null); }}
-            className={`px-5 py-2 rounded-lg text-sm font-semibold transition ${mode === "search" ? "bg-blue-600 text-white" : "text-gray-400 hover:text-white"}`}
+            className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition ${mode === "search" ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-gray-400 hover:text-white"}`}
           >
             Search by name
           </button>
           <button
             onClick={() => { setMode("scan"); setSelected(null); setQuery(""); setResults([]); }}
-            className={`px-5 py-2 rounded-lg text-sm font-semibold transition ${mode === "scan" ? "bg-blue-600 text-white" : "text-gray-400 hover:text-white"}`}
+            className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition ${mode === "scan" ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-gray-400 hover:text-white"}`}
           >
             Scan QR code
           </button>

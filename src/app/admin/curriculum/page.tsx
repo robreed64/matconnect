@@ -20,7 +20,7 @@ export default async function CurriculumPage() {
       </div>
 
       {curricula.length === 0 ? (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-12 text-center">
+        <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-12 text-center">
           <p className="text-gray-500 text-sm">No curricula yet.</p>
           <p className="text-gray-600 text-xs mt-1">Create one to start building structured lesson plans.</p>
         </div>
@@ -30,7 +30,7 @@ export default async function CurriculumPage() {
             const belt  = c.beltLevel ? BELT_STYLES[c.beltLevel] : null;
             return (
               <Link key={c.id} href={`/admin/curriculum/${c.id}`}
-                className="bg-gray-900 border border-gray-800 rounded-xl p-5 hover:border-gray-700 transition group">
+                className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-5 hover:border-gray-700 transition group">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">

@@ -78,7 +78,7 @@ export default async function BeltsPage() {
       <BeltRequirementsEditor initial={requirements} />
 
       {/* Belt order + technique counts */}
-      <div className="mt-6 bg-gray-900 border border-gray-800 rounded-xl p-5">
+      <div className="mt-6 bg-[#0f1117] border border-gray-700/50 rounded-xl p-5">
         <h2 className="text-xs font-semibold tracking-wide text-gray-400 mb-4">Belt Progression Path</h2>
         <div className="flex items-center gap-3 flex-wrap mb-4">
           {BELT_ORDER.map((belt, i) => {
@@ -113,11 +113,11 @@ export default async function BeltsPage() {
         </h2>
 
         {candidates.length === 0 ? (
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-8 text-center text-gray-600 text-sm">
+          <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-8 text-center text-gray-600 text-sm">
             No members currently at 50%+ on all promotion criteria.
           </div>
         ) : (
-          <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+          <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl overflow-hidden">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-800 text-gray-500 text-xs">

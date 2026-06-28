@@ -86,7 +86,7 @@ export default async function MemberAttendancePage() {
 
       {/* Grouped list */}
       {groups.length === 0 ? (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-10 text-center text-gray-600 text-sm">
+        <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-10 text-center text-gray-600 text-sm">
           No check-ins recorded yet.
         </div>
       ) : (
@@ -97,7 +97,7 @@ export default async function MemberAttendancePage() {
                 <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500">{g.label}</h2>
                 <span className="text-xs text-gray-700">{g.items.length} classes</span>
               </div>
-              <div className="bg-gray-900 border border-gray-800 rounded-xl divide-y divide-gray-800">
+              <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl divide-y divide-gray-800">
                 {g.items.map((a) => {
                   const type  = a.class?.program?.type;
                   const color = type ? (CLASS_COLOR[type] ?? CLASS_COLOR.private) : "text-gray-400";
@@ -131,7 +131,7 @@ export default async function MemberAttendancePage() {
 function StatCard({ label, value, sub, accent }: { label: string; value: number; sub?: string; accent?: "blue" | "green" }) {
   const color = accent === "blue" ? "text-blue-400" : accent === "green" ? "text-green-400" : "text-white";
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 text-center">
+    <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-5 text-center">
       <p className="text-xs text-gray-500 mb-1">{label}</p>
       <p className={`text-3xl font-bold ${color}`}>{value}</p>
       {sub && <p className="text-xs text-gray-600 mt-1">{sub}</p>}

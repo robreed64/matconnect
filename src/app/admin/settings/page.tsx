@@ -69,7 +69,7 @@ const select = "w-full px-4 py-2.5 rounded-lg bg-gray-800 border border-gray-700
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-4">
+    <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl p-6 space-y-4">
       <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">{title}</h2>
       {children}
     </div>

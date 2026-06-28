@@ -46,48 +46,55 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-dvh bg-gray-950 flex items-center justify-center px-4">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-black tracking-tight text-white">{gymName}</h1>
-          <p className="text-gray-500 mt-2 text-sm">Sign in to your account</p>
+    <div className="min-h-dvh bg-gray-950 flex items-center justify-center px-4 relative overflow-hidden">
+      {/* Ambient radial glow */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute left-1/2 top-0 h-[500px] w-[700px] -translate-x-1/2 rounded-full bg-blue-600/10 blur-[120px]" />
+      </div>
+
+      <div className="relative w-full max-w-sm">
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-black tracking-tight text-white">{gymName}</h1>
+          <p className="text-gray-500 mt-2 text-sm">Sign in to continue</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="bg-red-900/30 border border-red-800 text-red-300 text-sm rounded-lg px-4 py-3">
+            <div className="rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm px-4 py-3">
               {error}
             </div>
           )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1.5">Email</label>
-            <input
-              type="text" inputMode="email" autoComplete="email" autoCorrect="off" autoCapitalize="none"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm transition"
-              placeholder="you@example.com"
-            />
-          </div>
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs font-semibold tracking-wide text-gray-400 mb-1.5">Email</label>
+              <input
+                type="text" inputMode="email" autoComplete="email" autoCorrect="off" autoCapitalize="none"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl bg-[#0f1117] border border-gray-700/50 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 text-sm transition"
+                placeholder="you@example.com"
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1.5">Password</label>
-            <PasswordInput
-              required
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm transition"
-              placeholder="••••••••"
-            />
+            <div>
+              <label className="block text-xs font-semibold tracking-wide text-gray-400 mb-1.5">Password</label>
+              <PasswordInput
+                required
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl bg-[#0f1117] border border-gray-700/50 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 text-sm transition"
+                placeholder="••••••••"
+              />
+            </div>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-semibold text-sm transition"
+            className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-[0.98] disabled:opacity-50 text-white font-semibold text-sm transition"
           >
             {loading ? "Signing in…" : "Sign in"}
           </button>

@@ -181,7 +181,7 @@ export default function PosSetupClient({ categories: initial, items: initial_ite
       {error && <div className="bg-red-900/30 border border-red-800 text-red-300 text-sm rounded-lg px-4 py-3">{error}</div>}
 
       {/* Cash Drawer */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+      <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl p-6">
         <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-1">Cash Drawer</h2>
         <p className="text-xs text-gray-500 mb-4">
           Plays a ding sound when a cash sale completes. Works with audio-triggered cash drawers (connected via 3.5mm to RJ11 cable) and as an audible cue for the cashier.
@@ -221,7 +221,7 @@ export default function PosSetupClient({ categories: initial, items: initial_ite
       </div>
 
       {/* Categories */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+      <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl p-6">
         <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">Categories</h2>
         <div className="space-y-2 mb-4">
           {categories.map(cat => (
@@ -264,7 +264,7 @@ export default function PosSetupClient({ categories: initial, items: initial_ite
       </div>
 
       {/* Items */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+      <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-800 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Items</h2>
           <div className="flex items-center gap-3">

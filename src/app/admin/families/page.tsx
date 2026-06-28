@@ -52,7 +52,7 @@ export default async function FamiliesPage() {
       </div>
 
       {/* Create portal account */}
-      <div className="mb-8 bg-gray-900 border border-gray-800 rounded-xl p-5">
+      <div className="mb-8 bg-[#0f1117] border border-gray-700/50 rounded-xl p-5">
         <h2 className="text-xs font-semibold tracking-wide text-gray-400 mb-4">
           Create Parent Portal Account
         </h2>
@@ -64,13 +64,13 @@ export default async function FamiliesPage() {
 
       {/* Families list */}
       {families.length === 0 ? (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-10 text-center text-gray-600 text-sm">
+        <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-10 text-center text-gray-600 text-sm">
           No family groups yet. Link children to parents from the member detail page.
         </div>
       ) : (
         <div className="space-y-4">
           {families.map((family) => (
-            <div key={family.id} className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+            <div key={family.id} className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-5">
               {/* Parent row */}
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">

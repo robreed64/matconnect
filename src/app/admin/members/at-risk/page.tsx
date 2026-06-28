@@ -70,7 +70,7 @@ export default async function AtRiskPage({ searchParams }: { searchParams: Searc
       </div>
 
       {rows.length === 0 ? (
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-12 text-center">
+        <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl p-12 text-center">
           <p className="text-gray-500 text-sm">No at-risk members — everyone has trained in the last {days} days. 🎉</p>
         </div>
       ) : (

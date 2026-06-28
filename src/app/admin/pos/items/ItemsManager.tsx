@@ -106,7 +106,7 @@ export default function ItemsManager({ initialItems, categories: CATEGORIES }: {
       </div>
 
       {/* Item list */}
-      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+      <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl overflow-hidden">
         {visible.length === 0 ? (
           <p className="px-5 py-10 text-center text-gray-600 text-sm">No items yet.</p>
         ) : (
@@ -162,7 +162,7 @@ export default function ItemsManager({ initialItems, categories: CATEGORIES }: {
       {/* Form modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-md p-6">
+          <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl w-full max-w-md p-6">
             <h2 className="text-lg font-bold text-white mb-5">{editing ? "Edit Item" : "Add Item"}</h2>
             <div className="space-y-4">
               <Field label="Name" required>

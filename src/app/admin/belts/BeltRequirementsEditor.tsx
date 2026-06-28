@@ -44,7 +44,7 @@ export default function BeltRequirementsEditor({ initial }: { initial: Requireme
   };
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+    <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl overflow-hidden">
       <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800">
         <h2 className="text-xs font-semibold tracking-wide text-gray-400">Promotion Requirements</h2>
         <button

@@ -148,7 +148,7 @@ export default function WorkflowManager({ initialWorkflows }: { initialWorkflows
       </div>
 
       {workflows.length === 0 ? (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-10 text-center text-gray-600 text-sm">
+        <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-10 text-center text-gray-600 text-sm">
           No workflows yet. Create one to start automating outreach.
         </div>
       ) : (
@@ -208,7 +208,7 @@ export default function WorkflowManager({ initialWorkflows }: { initialWorkflows
       {/* Form modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/70 flex items-start justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-lg p-6 my-8">
+          <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl w-full max-w-lg p-6 my-8">
             <h2 className="text-lg font-bold text-white mb-5">{editing ? "Edit Workflow" : "New Workflow"}</h2>
             <div className="space-y-4">
 

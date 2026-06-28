@@ -61,7 +61,7 @@ export default async function MemberProgressPage() {
       </div>
 
       {/* Belt journey visual */}
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+      <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-6">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-5">Your Journey</h2>
         <div className="flex items-center gap-2">
           {BELT_ORDER.map((belt, i) => {
@@ -89,7 +89,7 @@ export default async function MemberProgressPage() {
 
       {/* Requirements for next belt */}
       {nextBelt && (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+        <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-5">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-4">
             Requirements for <span className="text-white capitalize">{nextBelt} Belt</span>
           </h2>
@@ -120,7 +120,7 @@ export default async function MemberProgressPage() {
       )}
 
       {!nextBelt && currentBelt === "black" && (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-center">
+        <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-6 text-center">
           <p className="text-2xl">🥋</p>
           <p className="text-white font-semibold mt-2">Black Belt</p>
           <p className="text-gray-500 text-sm mt-1">Peak of the mountain. Keep rolling.</p>

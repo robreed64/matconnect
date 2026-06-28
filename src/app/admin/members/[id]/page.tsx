@@ -233,7 +233,7 @@ export default async function MemberDetailPage({ params }: { params: Params }) {
 
       {/* Recent attendance */}
       {showCheckins && (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 mt-6">
+        <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-5 mt-6">
           <AttendanceManager
             memberId={member.id}
             initialAttendance={member.attendance.map(a => ({
@@ -252,7 +252,7 @@ export default async function MemberDetailPage({ params }: { params: Params }) {
 
 function Section({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) {
   return (
-    <div className={`bg-gray-900 border border-gray-800 rounded-xl p-5 ${className}`}>
+    <div className={`bg-[#0f1117] border border-gray-700/50 rounded-xl p-5 ${className}`}>
       <h2 className="text-xs font-semibold tracking-wide text-gray-400 mb-4">{title}</h2>
       {children}
     </div>

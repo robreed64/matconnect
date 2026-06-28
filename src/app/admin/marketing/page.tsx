@@ -35,7 +35,7 @@ export default async function MarketingPage() {
       </div>
 
       {channels.length > 0 && (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 mb-8 flex gap-6">
+        <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-4 mb-8 flex gap-6">
           {channels.map((c) => (
             <div key={c.channel} className="text-sm">
               <span className="text-gray-400 capitalize">{c.channel}:</span>{" "}
@@ -54,7 +54,7 @@ export default async function MarketingPage() {
 
 function StatCard({ label, value, accent }: { label: string; value: number; accent?: boolean }) {
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+    <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-5">
       <p className="text-xs text-gray-500 mb-1">{label}</p>
       <p className={`text-3xl font-bold ${accent ? "text-blue-400" : "text-white"}`}>{value}</p>
     </div>

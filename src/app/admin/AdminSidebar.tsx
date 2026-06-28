@@ -22,8 +22,8 @@ export default function AdminSidebar({ nav, gymName, userName, role }: Props) {
   const sidebarContent = (
     <>
       {/* Header */}
-      <div className={`px-5 py-6 border-b ${inSetup ? "border-amber-800/40" : "border-gray-800"}`}>
-        <span className="text-lg font-black tracking-tight block">{gymName}</span>
+      <div className={`px-5 py-6 border-b ${inSetup ? "border-amber-800/40" : "border-gray-800/60"}`}>
+        <span className="text-xl font-black tracking-tight block text-white">{gymName}</span>
         {inSetup && (
           <span className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-amber-400 bg-amber-900/40 px-2 py-0.5 rounded-full">
             ⚙ CONFIGURE
@@ -67,7 +67,7 @@ export default function AdminSidebar({ nav, gymName, userName, role }: Props) {
       </nav>
 
       {/* Footer */}
-      <div className={`px-4 py-4 border-t ${inSetup ? "border-amber-800/40" : "border-gray-800"}`}>
+      <div className={`px-4 py-4 border-t ${inSetup ? "border-amber-800/40" : "border-gray-800/60"}`}>
         {userName && (
           <>
             <p className="text-xs font-medium text-gray-300 truncate">{userName}</p>
@@ -103,7 +103,7 @@ export default function AdminSidebar({ nav, gymName, userName, role }: Props) {
   return (
     <>
       {/* Mobile top bar */}
-      <div className={`md:hidden fixed top-0 inset-x-0 z-40 h-14 flex items-center gap-3 px-4 border-b ${inSetup ? "bg-amber-950/90 border-amber-800/40" : "bg-gray-900 border-gray-800"}`}>
+      <div className={`md:hidden fixed top-0 inset-x-0 z-40 h-14 flex items-center gap-3 px-4 border-b ${inSetup ? "bg-amber-950/90 border-amber-800/40" : "bg-[#0c0e14] border-gray-800/60"}`}>
         <button
           onClick={() => setMobileOpen(true)}
           className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition"
@@ -127,7 +127,7 @@ export default function AdminSidebar({ nav, gymName, userName, role }: Props) {
       {/* Sidebar — drawer on mobile, fixed column on desktop */}
       <aside className={[
         "flex-col flex-shrink-0 transition-colors",
-        inSetup ? "bg-amber-950/40 border-r border-amber-800/40" : "bg-gray-900 border-r border-gray-800",
+        inSetup ? "bg-amber-950/40 border-r border-amber-800/40" : "bg-[#0c0e14] border-r border-gray-800/60",
         mobileOpen
           ? "flex fixed inset-y-0 left-0 z-50 w-72"
           : "hidden",

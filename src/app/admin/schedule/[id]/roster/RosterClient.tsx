@@ -309,7 +309,7 @@ export default function RosterClient({ classId, bookings: initialBookings, atten
 
 function Stat({ label, value, color = "text-white" }: { label: string; value: number; color?: string }) {
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-center min-w-[80px]">
+    <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl px-4 py-3 text-center min-w-[80px]">
       <div className={`text-2xl font-bold ${color}`}>{value}</div>
       <div className="text-xs text-gray-500 mt-0.5">{label}</div>
     </div>

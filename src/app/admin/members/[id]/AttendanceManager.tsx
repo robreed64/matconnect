@@ -125,7 +125,7 @@ export default function AttendanceManager({
 
       {showModal && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-sm p-6 space-y-4">
+          <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl w-full max-w-sm p-6 space-y-4">
             <h3 className="text-base font-bold text-white">Add Manual Check-in</h3>
             <div className="space-y-3">
               <div>

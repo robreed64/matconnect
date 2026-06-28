@@ -42,7 +42,7 @@ export default function NewCurriculumButton() {
 
       {open && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-md p-6">
+          <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl w-full max-w-md p-6">
             <h2 className="text-base font-bold text-white mb-5">New Curriculum</h2>
             <div className="space-y-4">
               <Field label="Name *">

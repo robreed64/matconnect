@@ -60,7 +60,7 @@ export default function FamiliesSetupClient({ families: initial }: { families: F
 
   if (families.length === 0) {
     return (
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center">
+      <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl p-8 text-center">
         <p className="text-gray-500 text-sm">No family groups yet.</p>
         <p className="text-gray-600 text-xs mt-2">Link children to a parent from the member&apos;s detail page.</p>
         <Link href="/admin/members" className="inline-block mt-4 text-sm text-blue-400 hover:underline">Browse Members →</Link>
@@ -71,7 +71,7 @@ export default function FamiliesSetupClient({ families: initial }: { families: F
   return (
     <div className="space-y-4">
       {families.map(f => (
-        <div key={f.id} className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+        <div key={f.id} className="bg-[#0f1117] border border-gray-700/50 rounded-2xl p-5">
           <div className="flex items-start justify-between gap-4">
             <div>
               <Link href={`/admin/members/${f.id}`} className="font-semibold text-white hover:text-blue-400 transition">{f.name}</Link>

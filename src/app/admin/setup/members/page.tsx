@@ -28,7 +28,7 @@ export default async function SetupMembersPage() {
           { label: "New This Month", value: thisMonth },
           { label: "Past Due", value: pastDue, warn: pastDue > 0 },
         ].map((s) => (
-          <div key={s.label} className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
+          <div key={s.label} className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-4 text-center">
             <p className={`text-2xl font-bold ${s.warn ? "text-red-400" : "text-white"}`}>{s.value}</p>
             <p className="text-xs text-gray-500 mt-1">{s.label}</p>
           </div>
@@ -41,7 +41,7 @@ export default async function SetupMembersPage() {
         </div>
       )}
 
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-3 mb-6">
+      <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl p-6 space-y-3 mb-6">
         <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">Actions</h2>
         <Link href="/admin/members" className="flex items-center justify-between px-4 py-3 rounded-lg bg-gray-800 hover:bg-gray-700 transition text-sm">
           <span>Browse & manage members</span><span className="text-gray-500">→</span>
@@ -55,7 +55,7 @@ export default async function SetupMembersPage() {
       </div>
 
       {byBelt.length > 0 && (
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+        <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl p-6">
           <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">Members by Belt</h2>
           <div className="space-y-2">
             {byBelt.map((b) => (

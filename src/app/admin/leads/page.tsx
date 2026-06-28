@@ -42,7 +42,7 @@ export default async function LeadsPage() {
 
       {leads.length === 0 ? (
         <div className="space-y-6">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-12 text-center">
+          <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl p-12 text-center">
             <p className="text-gray-600 text-sm">
               No leads yet. Add the lead capture form to your website to start collecting prospects.
             </p>
@@ -50,7 +50,7 @@ export default async function LeadsPage() {
           <EmbedSnippetCard />
         </div>
       ) : (
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+        <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-800 text-xs uppercase tracking-wider text-gray-500">

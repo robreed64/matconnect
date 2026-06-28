@@ -396,7 +396,7 @@ export default function EnrollPage() {
           {step === 4 && (
             <div className="space-y-5">
               <h2 className="text-2xl font-bold">Confirm Enrollment</h2>
-              <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-3 text-sm">
+              <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-5 space-y-3 text-sm">
                 <Row label="Name"     value={form.name} />
                 <Row label="Email"    value={form.email || "—"} />
                 <Row label="Phone"    value={form.phone || "—"} />
@@ -487,7 +487,7 @@ function EnrollPhotoCapture({ memberId }: { memberId: number; memberName: string
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4">
+    <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl p-4">
       <p className="text-sm text-gray-400 mb-3">Add a photo so staff can recognize you at the front desk.</p>
       <input
         ref={inputRef}

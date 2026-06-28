@@ -45,7 +45,7 @@ export default function ComposeMessage({ members }: { members: Member[] }) {
 
       {open && (
         <div className="fixed inset-0 bg-black/70 flex items-start justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-lg p-6 my-8">
+          <div className="bg-[#0f1117] border border-gray-700/50 rounded-2xl w-full max-w-lg p-6 my-8">
             <h2 className="text-lg font-bold text-white mb-5">Send Message</h2>
 
             <div className="space-y-4">

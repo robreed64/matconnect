@@ -95,7 +95,7 @@ export default async function NotificationsPage({ searchParams }: { searchParams
             { label: "SMS",         value: byChannel.sms    ?? 0,  color: "text-cyan-300" },
             { label: "Push",        value: byChannel.push   ?? 0,  color: "text-blue-300" },
           ].map(({ label, value, color }) => (
-            <div key={label} className="bg-gray-900 border border-gray-800 rounded-xl px-5 py-4">
+            <div key={label} className="bg-[#0f1117] border border-gray-700/50 rounded-xl px-5 py-4">
               <p className="text-xs text-gray-500 uppercase tracking-wide">{label}</p>
               <p className={`text-3xl font-black mt-1 ${color}`}>{value}</p>
             </div>
@@ -104,11 +104,11 @@ export default async function NotificationsPage({ searchParams }: { searchParams
 
         {/* Messages table */}
         {messages.length === 0 ? (
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-10 text-center text-sm text-gray-600">
+          <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-10 text-center text-sm text-gray-600">
             No notifications sent in {monthLabel}.
           </div>
         ) : (
-          <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+          <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl overflow-hidden">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-800 text-xs text-gray-500 uppercase tracking-wide">
@@ -161,7 +161,7 @@ export default async function NotificationsPage({ searchParams }: { searchParams
             {subscriberCount} active subscriber{subscriberCount !== 1 ? "s" : ""}
           </p>
         </div>
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+        <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-6">
           <NotificationComposer
             members={pushMembers.map(m => ({ memberId: m.id, name: m.name, userId: m.user!.id }))}
           />

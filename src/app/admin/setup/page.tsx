@@ -45,7 +45,7 @@ export default async function SetupHubPage() {
           <Link
             key={c.href}
             href={c.href}
-            className="flex flex-col gap-2 p-5 rounded-2xl bg-gray-900 border border-gray-800 hover:border-amber-700/60 hover:bg-amber-950/20 transition group"
+            className="flex flex-col gap-2 p-5 rounded-2xl bg-[#0f1117] border border-gray-700/50 hover:border-amber-700/60 hover:bg-amber-950/20 transition group"
           >
             <span className="text-3xl">{c.icon}</span>
             <div>

@@ -131,7 +131,14 @@ export default function KioskSignup({
   const lbl = "block text-sm font-medium text-gray-400 mb-2";
 
   return (
-    <div className="min-h-dvh bg-gray-950 text-white flex flex-col">
+    <div className="min-h-dvh bg-gray-950 text-white flex flex-col relative overflow-hidden">
+      {/* Ambient glow — only on welcome screen */}
+      {step === 0 && (
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-blue-600/10 blur-[140px]" />
+        </div>
+      )}
+
       {/* Progress dots for steps 1-4 */}
       {step > 0 && step < 5 && (
         <div className="flex justify-center gap-2 pt-8 pb-2">
@@ -153,18 +160,18 @@ export default function KioskSignup({
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-8 w-full max-w-lg mx-auto">
         {/* Step 0 — Welcome */}
         {step === 0 && (
-          <div className="text-center space-y-8 w-full">
-            <div>
-              <h1 className="text-5xl font-black">{gymName}</h1>
-              <p className="text-2xl text-gray-400 mt-3">
-                Let&apos;s get you set up.
+          <div className="relative text-center space-y-10 w-full">
+            <div className="space-y-3">
+              <h1 className="text-6xl font-black tracking-tight">{gymName}</h1>
+              <p className="text-xl text-gray-400">
+                Join us today — first class is on us.
               </p>
             </div>
             <button
               onClick={() => setStep(1)}
-              className="w-full py-5 rounded-2xl bg-blue-600 hover:bg-blue-500 active:bg-blue-700 active:scale-[0.98] text-white font-bold text-2xl transition"
+              className="w-full py-5 rounded-2xl bg-blue-600 hover:bg-blue-500 active:bg-blue-700 active:scale-[0.98] text-white font-bold text-2xl shadow-lg shadow-blue-600/25 transition"
             >
-              Sign Up Now
+              Get Started
             </button>
             <Link
               href="/kiosk"

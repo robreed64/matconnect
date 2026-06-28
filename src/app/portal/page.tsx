@@ -138,7 +138,7 @@ export default async function PortalPage() {
         {recentAttendance.length === 0 ? (
           <p className="text-gray-600 text-sm">No check-ins yet.</p>
         ) : (
-          <div className="bg-gray-900 border border-gray-800 rounded-xl divide-y divide-gray-800">
+          <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl divide-y divide-gray-800">
             {recentAttendance.map((a) => (
               <div key={a.id} className="flex items-center justify-between px-4 py-3 text-sm">
                 <div>
@@ -173,7 +173,7 @@ function MemberCard({
   })();
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+    <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-5">
       <div className="flex items-start gap-4">
         <div className="w-12 h-12 rounded-xl bg-gray-700 border border-gray-600 flex items-center justify-center text-sm font-bold text-gray-300 flex-shrink-0">
           {initials.toUpperCase()}
