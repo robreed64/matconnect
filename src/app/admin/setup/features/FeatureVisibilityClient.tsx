@@ -28,21 +28,30 @@ export default function FeatureVisibilityClient({ initialHidden }: { initialHidd
   const [saving, setSaving] = useState<string | null>(null);
 
   const toggle = async (key: string) => {
-    const next = hidden.includes(key) ? hidden.filter((k) => k !== key) : [...hidden, key];
+    const isCurrentlyHidden = hidden.includes(key);
+    const next = isCurrentlyHidden ? hidden.filter((k) => k !== key) : [...hidden, key];
     setSaving(key);
     setHidden(next);
+
     try {
       const response = await fetch("/api/admin/settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ hiddenFeatures: next }),
       });
+
+      const data = await response.json();
+
       if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        alert(`Error: ${error.error || "Failed to save settings"}`);
+        console.error("Settings update failed:", data);
+        alert(`Error: ${data.error || "Failed to save settings"}`);
         setHidden(hidden);
+        return;
       }
-    } catch {
+
+      console.log("Settings updated successfully", data);
+    } catch (err) {
+      console.error("Request failed:", err);
       alert("Failed to save settings");
       setHidden(hidden);
     } finally {
