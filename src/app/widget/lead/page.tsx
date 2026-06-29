@@ -3,11 +3,7 @@
 import { Suspense, useEffect, useState, FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
-
-const HEX_RE = /^#[0-9a-fA-F]{3,8}$/;
-function safeColor(raw: string | null): string {
-  return raw && HEX_RE.test(raw) ? raw : "#2563eb";
-}
+import { safeColor } from "@/lib/widget-color";
 
 type GymInfo = { gymName: string; logoUrl?: string | null };
 
@@ -148,7 +144,7 @@ function LeadWidgetContent() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 px-4 disabled:opacity-50 text-white font-semibold text-sm rounded-lg transition mt-1"
+            className="w-full py-2.5 px-4 disabled:opacity-50 text-white font-semibold text-sm rounded-lg transition hover:opacity-90 mt-1"
             style={{ backgroundColor: color }}
           >
             {loading ? "Sending…" : "Request a free class →"}

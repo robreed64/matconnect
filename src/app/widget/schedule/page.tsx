@@ -1,14 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { getGymSettings } from "@/lib/gym-settings";
+import { safeColor } from "@/lib/widget-color";
 
 export const dynamic = "force-dynamic";
 
 const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-
-const HEX_RE = /^#[0-9a-fA-F]{3,8}$/;
-function safeColor(raw: string | undefined): string {
-  return raw && HEX_RE.test(raw) ? raw : "#2563eb";
-}
 
 type SearchParams = Promise<{ color?: string }>;
 
@@ -27,12 +23,18 @@ export default async function ScheduleWidgetPage({ searchParams }: { searchParam
     select: { id: true, name: true, startTime: true, instructorName: true },
   });
 
-  const byDay = new Map<string, { name: string; time: string; instructor: string | null }[]>();
+  const byDay = new Map<string, Array<{ id: number; name: string; time: string; instructor: string | null }>>();
   for (const c of classes) {
     const day = c.startTime.toLocaleDateString("en-US", { weekday: "long", timeZone: tz });
     const time = c.startTime.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: tz });
     if (!byDay.has(day)) byDay.set(day, []);
-    byDay.get(day)!.push({ name: c.name, time, instructor: c.instructorName });
+    const item: { id: number; name: string; time: string; instructor: string | null } = {
+      id: c.id,
+      name: c.name,
+      time,
+      instructor: c.instructorName,
+    };
+    byDay.get(day)!.push(item);
   }
   const scheduleDays = WEEKDAYS.filter((d) => byDay.has(d));
 
@@ -46,9 +48,9 @@ export default async function ScheduleWidgetPage({ searchParams }: { searchParam
             <div key={day}>
               <h2 className="font-bold text-base mb-2" style={{ color }}>{day}</h2>
               <ul className="space-y-2">
-                {byDay.get(day)!.map((c, i) => (
+                {byDay.get(day)!.map((c) => (
                   <li
-                    key={i}
+                    key={c.id}
                     className="border-l-4 pl-3 py-1"
                     style={{ borderColor: color }}
                   >

@@ -1,12 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { getGymSettings, formatCurrency } from "@/lib/gym-settings";
+import { safeColor } from "@/lib/widget-color";
 
 export const dynamic = "force-dynamic";
-
-const HEX_RE = /^#[0-9a-fA-F]{3,8}$/;
-function safeColor(raw: string | undefined): string {
-  return raw && HEX_RE.test(raw) ? raw : "#2563eb";
-}
 
 type SearchParams = Promise<{ color?: string }>;
 
