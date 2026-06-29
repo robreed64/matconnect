@@ -50,6 +50,7 @@ export default function FeatureVisibilityClient({ initialHidden }: { initialHidd
       }
 
       console.log("Settings updated successfully", data);
+      window.location.reload();
     } catch (err) {
       console.error("Request failed:", err);
       alert("Failed to save settings");
