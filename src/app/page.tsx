@@ -67,6 +67,35 @@ function IconArrowRight() {
     </svg>
   );
 }
+function IconChart() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+    </svg>
+  );
+}
+function IconPhone() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="5" y="2" width="14" height="20" rx="2.5" ry="2.5"/><line x1="12" y1="18" x2="12.01" y2="18"/>
+    </svg>
+  );
+}
+function IconUserPlus() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+      <line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>
+    </svg>
+  );
+}
+function IconChevron() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="6 9 12 15 18 9"/>
+    </svg>
+  );
+}
 
 // ── Nav ───────────────────────────────────────────────────────────────────────
 function Nav() {
@@ -80,6 +109,7 @@ function Nav() {
           <a href="#features" className="hover:text-white transition">Features</a>
           <a href="#how-it-works" className="hover:text-white transition">How it works</a>
           <a href="#pricing" className="hover:text-white transition">Pricing</a>
+          <a href="#faq" className="hover:text-white transition">FAQ</a>
         </nav>
         <div className="flex items-center gap-3">
           <Link href="/login" className="hidden sm:block text-sm text-gray-400 hover:text-white transition px-3 py-2">
@@ -239,17 +269,17 @@ function Hero() {
 // ── Stats ─────────────────────────────────────────────────────────────────────
 function Stats() {
   const stats = [
-    { value: "500+", label: "Gyms powered" },
-    { value: "40k+", label: "Members tracked" },
-    { value: "1.2M+", label: "Check-ins logged" },
-    { value: "99.9%", label: "Uptime SLA" },
+    { value: "All-in-one", label: "Check-in to billing in one app" },
+    { value: "Stripe & Square", label: "Bring your own processor" },
+    { value: "Set up in a day", label: "No onboarding calls or IT" },
+    { value: "No contracts", label: "Month to month, cancel anytime" },
   ];
   return (
     <section className="border-y border-gray-800/60 bg-[#0a0b10]">
       <div className="mx-auto max-w-6xl px-6 py-12 grid grid-cols-2 md:grid-cols-4 gap-8">
         {stats.map(({ value, label }) => (
           <div key={label} className="text-center">
-            <div className="text-3xl font-black text-white tracking-tight">{value}</div>
+            <div className="text-2xl font-black text-white tracking-tight">{value}</div>
             <div className="text-sm text-gray-500 mt-1">{label}</div>
           </div>
         ))}
@@ -272,23 +302,38 @@ const FEATURES = [
   },
   {
     icon: <IconTrophy />,
-    title: "Belt progression",
-    desc: "Set class and technique requirements per rank. Members track their own progress toward the next belt.",
+    title: "Belt progression & curriculum",
+    desc: "Set class, time, and technique requirements per rank, build week-by-week lesson plans, and let members track their own progress toward the next belt.",
   },
   {
     icon: <IconCalendar />,
     title: "Class scheduling",
-    desc: "Recurring classes, one-offs, instructor assignment, and live rosters — all visible to staff and members.",
+    desc: "Recurring classes, one-offs, instructor assignment, and live rosters — with booking, waitlists, and automatic waitlist promotion.",
   },
   {
     icon: <IconCreditCard />,
-    title: "Integrated billing",
-    desc: "Square-powered subscriptions, POS for gear and day passes, and automatic renewal retries for failed payments.",
+    title: "Integrated billing & POS",
+    desc: "Stripe and Square subscriptions, an in-person card terminal, a point of sale for gear and day passes, and automatic retries on failed payments.",
   },
   {
     icon: <IconMail />,
     title: "Automated outreach",
-    desc: "Email and SMS campaigns, at-risk member alerts, and automated waiver reminders — set it and forget it.",
+    desc: "Email and SMS workflows triggered by inactivity, birthdays, trial expiry, failed payments, and promotions — plus automated waiver reminders.",
+  },
+  {
+    icon: <IconPhone />,
+    title: "Member portal",
+    desc: "Members get their own login to book classes, see their schedule and attendance, follow the curriculum, and track belt progress — with web push notifications.",
+  },
+  {
+    icon: <IconChart />,
+    title: "Reports & insights",
+    desc: "Track MRR, member growth, retention, attendance trends, and belt distribution — plus an at-risk view that flags members who've stopped showing up. Export to CSV.",
+  },
+  {
+    icon: <IconUserPlus />,
+    title: "Lead capture & trials",
+    desc: "Embed a lead form on your site, manage prospects in a pipeline, and run trials with automatic trial-expiry follow-ups to turn visitors into members.",
   },
 ];
 
@@ -386,9 +431,10 @@ const PLANS = [
     desc: "For growing gyms that need the full stack.",
     features: [
       "Unlimited members",
-      "Belt progression tracking",
-      "Square billing & POS",
-      "Email & SMS campaigns",
+      "Belt progression & curriculum",
+      "Stripe & Square billing + POS",
+      "Member portal & reports",
+      "Email & SMS automation",
       "Waiver management",
       "Priority support",
     ],
@@ -399,13 +445,13 @@ const PLANS = [
     name: "Academy",
     price: "$99",
     period: "/month",
-    desc: "For multi-location academies and affiliates.",
+    desc: "For larger schools ready to scale.",
     features: [
       "Everything in Pro",
-      "Multiple locations",
-      "Staff role management",
-      "Custom branding",
-      "API access",
+      "Staff roles & permissions",
+      "Custom branding & logo",
+      "Square data import / migration",
+      "Multiple locations (coming soon)",
       "Dedicated support",
     ],
     cta: "Contact us",
@@ -485,55 +531,74 @@ function Pricing() {
   );
 }
 
-// ── Testimonials ──────────────────────────────────────────────────────────────
-const TESTIMONIALS = [
+// ── FAQ ───────────────────────────────────────────────────────────────────────
+const FAQS = [
   {
-    quote:
-      "We went from a whiteboard and a spreadsheet to having everything — check-ins, billing, belt tracking — in one place. My front desk time dropped to basically zero.",
-    name: "Carlos Mendes",
-    title: "Head Instructor, Gracie Barra Riverside",
-    initials: "CM",
+    q: "What is MatConnect?",
+    a: "MatConnect is all-in-one management software built for BJJ and martial arts schools. It handles member check-in, profiles, belt progression, class scheduling, billing, and automated marketing — so you can spend less time on admin and more time coaching.",
   },
   {
-    quote:
-      "The kiosk alone was worth it. Students tap in themselves, new people can sign up on the spot, and I get a live roster before class even starts. It just works.",
-    name: "Jen Okafor",
-    title: "Owner, Triangle MMA & Fitness",
-    initials: "JO",
+    q: "How long does setup take?",
+    a: "Most schools are up and running in a day. A setup wizard walks you through adding your gym details, building your class schedule, configuring belts, and inviting staff. There are no mandatory onboarding calls and no IT work required.",
   },
   {
-    quote:
-      "Belt progression tracking changed how we evaluate students. We set the requirements once, and now every student can see exactly where they stand. No more guessing.",
-    name: "Derek Lau",
-    title: "Professor, Evolve Academy",
-    initials: "DL",
+    q: "Can I switch from my current software?",
+    a: "Yes. If you're on Square today, you can import your customers, subscriptions, and payment history directly. Moving from another platform is straightforward too — reach out and we'll help you bring your members, plans, and waivers over.",
+  },
+  {
+    q: "Which payment processors do you support?",
+    a: "Both Stripe and Square. You can run recurring memberships, sell gear and day passes through the point of sale, and take in-person payments with a Square Terminal card reader. Use whichever processor you already have and keep your own rates.",
+  },
+  {
+    q: "Do members get their own login?",
+    a: "Yes. Every member gets a portal where they can book classes, view their schedule and attendance, follow the curriculum, and track their progress toward the next belt — plus opt-in push notifications for reminders and waitlist spots. It runs in any browser; a native mobile app is on the roadmap.",
+  },
+  {
+    q: "What hardware do I need for the kiosk?",
+    a: "Just a tablet with a web browser. Mount it at your door and members tap in themselves — new students can sign up and sign their waiver on the spot. No proprietary hardware to buy.",
+  },
+  {
+    q: "Does it track belt progression?",
+    a: "Yes — it's built for martial arts. Set the class, time-in-rank, and technique requirements for each belt, build week-by-week curriculum and lesson plans, and let members see exactly how close they are to their next promotion.",
+  },
+  {
+    q: "How does billing work for families?",
+    a: "Link parents and children into a single family account, and apply an automatic family discount across their memberships. Failed payments are retried automatically, and at-risk and past-due members are flagged for follow-up.",
+  },
+  {
+    q: "Is there a free trial or a contract?",
+    a: "Pro plans include a 14-day free trial with no credit card required, and there are no setup fees. Billing is month to month — cancel any time.",
+  },
+  {
+    q: "Can MatConnect manage multiple locations?",
+    a: "Today MatConnect is built for a single school. Multi-location support for academies and affiliates is on the roadmap — if you're running more than one location, get in touch and we'll talk through your timeline.",
   },
 ];
 
-function Testimonials() {
+function FAQ() {
   return (
-    <section className="py-28 px-6 bg-[#0a0b10] border-y border-gray-800/60">
-      <div className="mx-auto max-w-6xl">
+    <section id="faq" className="py-28 px-6">
+      <div className="mx-auto max-w-3xl">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-black tracking-tight text-white mb-4">
-            Coaches trust MatConnect
+            Frequently asked questions
           </h2>
-          <p className="text-gray-400 text-lg">From single-location schools to multi-site academies.</p>
+          <p className="text-gray-400 text-lg">Everything you need to know before you start.</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {TESTIMONIALS.map(({ quote, name, title, initials }) => (
-            <div key={name} className="bg-[#0f1117] border border-gray-700/50 rounded-2xl p-6 flex flex-col">
-              <p className="text-gray-300 leading-relaxed flex-1 mb-6 text-sm">&ldquo;{quote}&rdquo;</p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-300 flex items-center justify-center text-xs font-bold flex-shrink-0">
-                  {initials}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-white">{name}</p>
-                  <p className="text-xs text-gray-500">{title}</p>
-                </div>
-              </div>
-            </div>
+        <div className="space-y-3">
+          {FAQS.map(({ q, a }) => (
+            <details
+              key={q}
+              className="group bg-[#0f1117] border border-gray-700/50 rounded-2xl px-6 open:border-gray-600/60 transition"
+            >
+              <summary className="flex items-center justify-between gap-4 cursor-pointer py-5 list-none [&::-webkit-details-marker]:hidden">
+                <span className="text-base font-semibold text-white">{q}</span>
+                <span className="text-gray-500 flex-shrink-0 transition-transform group-open:rotate-180">
+                  <IconChevron />
+                </span>
+              </summary>
+              <p className="text-sm text-gray-400 leading-relaxed pb-6 -mt-1">{a}</p>
+            </details>
           ))}
         </div>
       </div>
@@ -578,6 +643,7 @@ function Footer() {
         <div className="flex items-center gap-6 text-sm text-gray-500">
           <a href="#features" className="hover:text-gray-300 transition">Features</a>
           <a href="#pricing" className="hover:text-gray-300 transition">Pricing</a>
+          <a href="#faq" className="hover:text-gray-300 transition">FAQ</a>
           <Link href="/login" className="hover:text-gray-300 transition">Sign in</Link>
         </div>
         <p className="text-sm text-gray-700">© {new Date().getFullYear()} MatConnect</p>
@@ -597,7 +663,8 @@ export default function LandingPage() {
         <Features />
         <HowItWorks />
         <Pricing />
-        <Testimonials />
+        {/* Testimonials removed until real customer quotes are available — re-add a <Testimonials /> section here. */}
+        <FAQ />
         <FinalCTA />
       </main>
       <Footer />
