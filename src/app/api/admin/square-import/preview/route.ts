@@ -21,10 +21,10 @@ export async function GET() {
     let planCount = 0;
     let cursor: string | undefined;
     do {
-      const res = (await client.catalog.list({ cursor })) as unknown as Record<
-        string,
-        unknown
-      >;
+      const res = (await client.catalog.list({
+        cursor,
+        types: "SUBSCRIPTION_PLAN",
+      })) as unknown as Record<string, unknown>;
       const objects = (res.objects as Array<unknown>) ?? [];
       planCount += objects.length;
       cursor = res.cursor as string | undefined;
