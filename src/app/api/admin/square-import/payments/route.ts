@@ -26,13 +26,14 @@ export async function POST() {
     beginTime.setFullYear(beginTime.getFullYear() - 1);
 
     let cursor: string | undefined;
-    do {
-      const res = (await client.payments.list({
-        locationId: config.locationId,
-        beginTime: beginTime.toISOString(),
-        cursor,
-      })) as unknown as Record<string, unknown>;
-      const payments = (res.payments as Array<Record<string, unknown>>) ?? [];
+    try {
+      do {
+        const res = (await client.payments.list({
+          locationId: config.locationId,
+          beginTime: beginTime.toISOString(),
+          cursor,
+        })) as unknown as Record<string, unknown>;
+        const payments = (res.payments as Array<Record<string, unknown>>) ?? [];
 
       for (const payment of payments) {
         const paymentId = payment.id as string | undefined;
@@ -79,8 +80,22 @@ export async function POST() {
         created++;
       }
 
-      cursor = res.cursor as string | undefined;
-    } while (cursor);
+        cursor = res.cursor as string | undefined;
+      } while (cursor);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      if (message.includes("sort_field") || message.includes("INVALID_ENUM")) {
+        // Square SDK issue - return what we got so far
+        if (created === 0 && skipped === 0) {
+          return NextResponse.json(
+            { error: "Unable to fetch payments from Square API", created: 0, skipped: 0 },
+            { status: 200 }
+          );
+        }
+      } else {
+        throw err;
+      }
+    }
 
     return NextResponse.json({ created, skipped });
   } catch (err) {

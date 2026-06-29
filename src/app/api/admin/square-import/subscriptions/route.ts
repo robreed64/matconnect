@@ -22,12 +22,13 @@ export async function POST() {
     let skipped = 0;
 
     let cursor: string | undefined;
-    do {
-      const res = (await client.subscriptions.search({
-        query: { filter: { locationIds: [config.locationId] } },
-        cursor,
-      })) as unknown as Record<string, unknown>;
-      const subscriptions = (res.subscriptions as Array<Record<string, unknown>>) ?? [];
+    try {
+      do {
+        const res = (await client.subscriptions.search({
+          query: { filter: { locationIds: [config.locationId] } },
+          cursor,
+        })) as unknown as Record<string, unknown>;
+        const subscriptions = (res.subscriptions as Array<Record<string, unknown>>) ?? [];
 
       for (const subscription of subscriptions) {
         const customerId = subscription.customerId as string | undefined;
@@ -96,8 +97,22 @@ export async function POST() {
         created++;
       }
 
-      cursor = res.cursor as string | undefined;
-    } while (cursor);
+        cursor = res.cursor as string | undefined;
+      } while (cursor);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      if (message.includes("sort_field") || message.includes("INVALID_ENUM")) {
+        // Square SDK issue - return what we got so far
+        if (created === 0 && skipped === 0) {
+          return NextResponse.json(
+            { error: "Unable to fetch subscriptions from Square API", created: 0, skipped: 0 },
+            { status: 200 }
+          );
+        }
+      } else {
+        throw err;
+      }
+    }
 
     return NextResponse.json({ created, skipped });
   } catch (err) {
