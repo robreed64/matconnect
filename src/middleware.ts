@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import NextAuth from "next-auth";
 import { authConfig } from "./auth.config";
 
+// Instantiate once at module level — not per-request
+const { auth: nextAuthGuard } = NextAuth(authConfig);
+
 export async function middleware(request: NextRequest) {
   const host = request.nextUrl.hostname;
   const siteDomain = process.env.NEXT_PUBLIC_SITE_DOMAIN ?? "";
@@ -9,6 +12,8 @@ export async function middleware(request: NextRequest) {
   // Phase 1: rewrite custom domain → /site
   if (siteDomain && (host === siteDomain || host === `www.${siteDomain}`)) {
     const { pathname } = request.nextUrl;
+    // Guard: /site sub-path on custom domain would double-nest to /site/site
+    if (pathname.startsWith("/site")) return NextResponse.next();
     if (
       !pathname.startsWith("/admin") &&
       !pathname.startsWith("/portal") &&
@@ -22,9 +27,20 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Phase 2: existing auth guard — run NextAuth middleware for protected routes
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (NextAuth(authConfig).auth as any)(request);
+  // Phase 2: auth guard — only for the routes NextAuth was previously protecting.
+  // Scoping prevents a redirect loop: mustChangePassword users sent to /change-password
+  // would otherwise hit the guard again and be redirected back indefinitely.
+  const p = request.nextUrl.pathname;
+  if (
+    p.startsWith("/admin") ||
+    p.startsWith("/portal") ||
+    p.startsWith("/member") ||
+    p.startsWith("/kiosk")
+  ) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (nextAuthGuard as any)(request);
+  }
+  return NextResponse.next();
 }
 
 export const config = {
