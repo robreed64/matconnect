@@ -22,6 +22,7 @@ export default async function SetupHubPage() {
   const cats = (settings.posCategories as string[]) ?? ["drinks", "gear", "events"];
 
   const hasSquare = !!(settings as Record<string, unknown>).squareAccessToken;
+  const siteEnabled = ((settings.siteConfig as { enabled?: boolean } | null)?.enabled) === true;
 
   const cards = [
     { href: "/admin/setup/members",    icon: "👥", label: "Members",    desc: `${memberCount} member${memberCount !== 1 ? "s" : ""}` },
@@ -33,6 +34,7 @@ export default async function SetupHubPage() {
     { href: "/admin/setup/pos",        icon: "🛒", label: "POS",        desc: `${cats.length} categories · ${itemCount} items` },
     { href: "/admin/setup/kiosk",      icon: "📲", label: "Kiosk",      desc: "Lock mode & exit PIN" },
     { href: "/admin/setup/features",   icon: "🔲", label: "Features",   desc: `${(((settings as Record<string, unknown>).hiddenFeatures as string[] | null) ?? []).length} hidden` },
+    { href: "/admin/setup/website",    icon: "🌐", label: "Website",    desc: siteEnabled ? "Published" : "Draft" },
     ...(hasSquare ? [{ href: "/admin/setup/square-import", icon: "📊", label: "Import Square", desc: "Customers, plans & history" }] : []),
   ];
 

@@ -361,6 +361,7 @@ model GymSettings {
   vapidPrivateKey        String? @map("vapid_private_key")
   hiddenFeatures         Json     @default("[]") @map("hidden_features")
   cashDrawerSound        Boolean  @default(false) @map("cash_drawer_sound")
+  siteConfig             Json     @default("{}") @map("site_config")
   updatedAt            DateTime @updatedAt @map("updated_at")
 
   @@map("gym_settings")

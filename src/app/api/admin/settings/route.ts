@@ -30,6 +30,7 @@ export async function PATCH(req: Request) {
     "brevoApiKey", "brevoSenderEmail", "brevoSenderName", "brevoSmsFrom",
     "familyDiscountEnabled", "familyDiscountPercent",
     "trialLengthDays", "hiddenFeatures", "cashDrawerSound",
+    "siteConfig",
   ];
   const data: Record<string, unknown> = {};
   for (const key of allowed) {
@@ -67,6 +68,12 @@ export async function PATCH(req: Request) {
   if (data.hiddenFeatures !== undefined) {
     if (!Array.isArray(data.hiddenFeatures)) {
       return NextResponse.json({ error: "hiddenFeatures must be an array" }, { status: 400 });
+    }
+  }
+
+  if (data.siteConfig !== undefined) {
+    if (typeof data.siteConfig !== "object" || data.siteConfig === null || Array.isArray(data.siteConfig)) {
+      return NextResponse.json({ error: "siteConfig must be an object" }, { status: 400 });
     }
   }
 
