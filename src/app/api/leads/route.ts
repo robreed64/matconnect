@@ -7,7 +7,10 @@ export async function POST(req: NextRequest) {
   const { name, email, phone, ageGroup, trainingType } = await req.json();
 
   if (!name?.trim() || !email?.trim()) {
-    return NextResponse.json({ error: "Name and email are required" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Name and email are required" },
+      { status: 400, headers: { "Access-Control-Allow-Origin": "*" } }
+    );
   }
 
   // Avoid duplicate leads for the same email
@@ -16,7 +19,10 @@ export async function POST(req: NextRequest) {
   });
   if (existing) {
     // Return success silently — don't reveal whether the email is in the system
-    return NextResponse.json({ success: true });
+    return NextResponse.json(
+      { success: true },
+      { headers: { "Access-Control-Allow-Origin": "*" } }
+    );
   }
 
   const member = await prisma.member.create({
@@ -53,5 +59,19 @@ export async function POST(req: NextRequest) {
     ).catch(() => {});
   }
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json(
+    { success: true },
+    { status: 201, headers: { "Access-Control-Allow-Origin": "*" } }
+  );
+}
+
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+  });
 }
