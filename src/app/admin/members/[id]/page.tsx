@@ -13,6 +13,8 @@ import BeltStripesEditor from "./BeltStripesEditor";
 import { getNextBelt } from "@/lib/belt-data";
 import { getGymSettings } from "@/lib/gym-settings";
 import { trialDaysLeft, trialBadge } from "@/lib/trial";
+import { getMemberRisk, SCORED_STATUSES } from "@/lib/scored-members";
+import { RiskPill, RiskReasons } from "../RiskBadge";
 import MemberQRCode from "./MemberQRCode";
 import WaiverToggle from "./WaiverToggle";
 
@@ -80,6 +82,11 @@ export default async function MemberDetailPage({ params }: { params: Params }) {
   const pill = STATUS_PILL[member.status] ?? STATUS_PILL.inactive;
   const sub  = member.subscriptions[0];
 
+  // Churn risk — only for current members (active / trial / past_due)
+  const risk = (SCORED_STATUSES as readonly string[]).includes(member.status)
+    ? await getMemberRisk(memberId, new Date())
+    : null;
+
   // Belt stripes config
   const beltConfig = (gymSettings.beltConfig as Array<{ key: string; maxStripes: number }> | null) ?? [];
   const beltEntry = beltConfig.find(b => b.key === member.beltRank?.toLowerCase());
@@ -117,7 +124,13 @@ export default async function MemberDetailPage({ params }: { params: Params }) {
                 ? trialBadge(member.trialStartedAt, gymSettings.trialLengthDays)
                 : member.status.replace("_", " ")}
             </span>
+            {risk && <RiskPill score={risk.score} band={risk.band} />}
           </div>
+          {risk && risk.reasons.length > 0 && (
+            <div className="mt-2">
+              <RiskReasons reasons={risk.reasons} max={4} />
+            </div>
+          )}
           <div className="mt-2 flex items-center gap-3 flex-wrap">
             {belt && (
               <span className={`px-3 py-1 rounded-full text-sm font-semibold ${belt.bg} ${belt.text}`}>
