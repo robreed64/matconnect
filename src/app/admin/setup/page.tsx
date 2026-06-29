@@ -21,6 +21,8 @@ export default async function SetupHubPage() {
   const itemCount   = await prisma.item.count();
   const cats = (settings.posCategories as string[]) ?? ["drinks", "gear", "events"];
 
+  const hasSquare = !!(settings as Record<string, unknown>).squareAccessToken;
+
   const cards = [
     { href: "/admin/setup/members",    icon: "👥", label: "Members",    desc: `${memberCount} member${memberCount !== 1 ? "s" : ""}` },
     { href: "/admin/setup/plans",      icon: "💳", label: "Plans",      desc: `${planCount} plan${planCount !== 1 ? "s" : ""}` },
@@ -31,6 +33,7 @@ export default async function SetupHubPage() {
     { href: "/admin/setup/pos",        icon: "🛒", label: "POS",        desc: `${cats.length} categories · ${itemCount} items` },
     { href: "/admin/setup/kiosk",      icon: "📲", label: "Kiosk",      desc: "Lock mode & exit PIN" },
     { href: "/admin/setup/features",   icon: "🔲", label: "Features",   desc: `${(((settings as Record<string, unknown>).hiddenFeatures as string[] | null) ?? []).length} hidden` },
+    ...(hasSquare ? [{ href: "/admin/setup/square-import", icon: "📊", label: "Import Square", desc: "Customers, plans & history" }] : []),
   ];
 
   return (
