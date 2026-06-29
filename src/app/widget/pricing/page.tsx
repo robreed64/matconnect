@@ -38,6 +38,8 @@ export default async function PricingWidgetPage({ searchParams }: { searchParams
               )}
               <a
                 href="/enroll"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="mt-3 inline-block w-full text-center py-2 px-4 rounded-lg text-white text-sm font-semibold transition hover:opacity-90"
                 style={{ backgroundColor: color }}
               >

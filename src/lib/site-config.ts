@@ -84,7 +84,10 @@ export function resolveSiteConfig(raw: unknown, gymName: string = ""): SiteConfi
     showTestimonials: r.showTestimonials === true,
     faq: faq,
     showFaq: r.showFaq === true,
-    mapEmbedUrl: str(r.mapEmbedUrl),
+    mapEmbedUrl: (() => {
+      const rawMapUrl = str(r.mapEmbedUrl);
+      return rawMapUrl.startsWith("https://www.google.com/maps/embed") ? rawMapUrl : "";
+    })(),
     showMap: r.showMap === true,
   };
 }

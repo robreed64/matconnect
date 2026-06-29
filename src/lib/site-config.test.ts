@@ -92,12 +92,20 @@ describe("resolveSiteConfig", () => {
   it("applies map fields override", () => {
     const c = resolveSiteConfig(
       {
-        mapEmbedUrl: "https://maps.google.com/embed?...",
+        mapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12",
         showMap: true,
       },
       "My Gym",
     );
-    expect(c.mapEmbedUrl).toBe("https://maps.google.com/embed?...");
+    expect(c.mapEmbedUrl).toBe("https://www.google.com/maps/embed?pb=!1m18!1m12");
     expect(c.showMap).toBe(true);
+  });
+
+  it("rejects mapEmbedUrl that does not start with the Google Maps embed prefix", () => {
+    const c = resolveSiteConfig(
+      { mapEmbedUrl: "https://maps.google.com/embed?..." },
+      "My Gym",
+    );
+    expect(c.mapEmbedUrl).toBe("");
   });
 });

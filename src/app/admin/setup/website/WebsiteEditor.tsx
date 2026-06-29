@@ -148,9 +148,6 @@ export default function WebsiteEditor({
   const leadSnippet =
     `<iframe\n  src="${baseUrl}/widget/lead?color=${encodedColor}"\n  width="100%"\n  height="520"\n  frameborder="0"\n  style="border-radius:12px;border:none"\n></iframe>`;
 
-  const autoResizeSnippet =
-    `<!-- Add an id to your iframe, e.g. id="mc-schedule" -->\n<script>\nwindow.addEventListener("message", function(e) {\n  if (e.data && e.data.mcHeight && e.data.mcId) {\n    var el = document.getElementById(e.data.mcId);\n    if (el) el.style.height = e.data.mcHeight + "px";\n  }\n});\n</script>`;
-
   async function save() {
     setStatus("saving");
     setError(null);
@@ -408,19 +405,6 @@ export default function WebsiteEditor({
                 copied={copiedId === "lead"}
                 onCopy={() => handleCopy("lead", leadSnippet)}
               />
-              <div className="space-y-2 border-t border-gray-700/50 pt-4">
-                <p className="text-xs font-medium text-gray-400">Advanced: Auto-resize</p>
-                <p className="text-xs text-gray-500">
-                  Add an <code className="rounded bg-gray-800 px-1 py-0.5 text-blue-300">id</code> attribute to your iframe (e.g.{" "}
-                  <code className="rounded bg-gray-800 px-1 py-0.5 text-blue-300">id=&quot;mc-schedule&quot;</code>), then paste this script once per page.
-                </p>
-                <SnippetBlock
-                  label=""
-                  snippet={autoResizeSnippet}
-                  copied={copiedId === "autoresize"}
-                  onCopy={() => handleCopy("autoresize", autoResizeSnippet)}
-                />
-              </div>
             </div>
           </Accordion>
         </div>
