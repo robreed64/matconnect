@@ -107,14 +107,14 @@ export default async function MemberDetailPage({ params }: { params: Params }) {
       </Link>
 
       {/* Profile header */}
-      <div className="mt-4 flex items-start gap-6">
+      <div className="mt-4 flex items-start gap-6 flex-wrap">
         <div className="relative w-20 h-20 rounded-full bg-gray-700 flex items-center justify-center text-2xl font-bold text-gray-300 flex-shrink-0 overflow-hidden border-2 border-gray-600">
           {member.photoUrl
             ? <Image src={member.photoUrl} alt={member.name} fill sizes="80px" className="object-cover" />
             : initials(member.name).toUpperCase()
           }
         </div>
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-[240px]">
           <div className="flex items-center gap-3 flex-wrap">
             <h1 className="text-2xl font-bold text-white">{member.name}</h1>
             <span className={`px-2.5 py-0.5 rounded-full border text-xs font-medium ${
