@@ -15,6 +15,7 @@ import { getGymSettings } from "@/lib/gym-settings";
 import { trialDaysLeft, trialBadge } from "@/lib/trial";
 import { getMemberRisk, SCORED_STATUSES } from "@/lib/scored-members";
 import { RiskPill, RiskReasons } from "../RiskBadge";
+import OutreachComposer from "./OutreachComposer";
 import MemberQRCode from "./MemberQRCode";
 import WaiverToggle from "./WaiverToggle";
 
@@ -45,6 +46,7 @@ export default async function MemberDetailPage({ params }: { params: Params }) {
   const session   = await auth();
   const role      = (session?.user as { role?: string } | undefined)?.role;
   const canManage = can(role, "manage_members");
+  const canMarket = can(role, "marketing");
 
   const [member, gymSettings] = await Promise.all([
     prisma.member.findUnique({
@@ -158,6 +160,13 @@ export default async function MemberDetailPage({ params }: { params: Params }) {
         </div>
         {canManage && (
           <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
+            {canMarket && (
+              <OutreachComposer
+                memberId={member.id}
+                hasEmail={!!member.email}
+                hasPhone={!!member.phone}
+              />
+            )}
             <CreateMemberAccount
               memberId={member.id}
               memberName={member.name}
