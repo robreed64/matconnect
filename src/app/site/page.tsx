@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { getGymSettings, formatCurrency } from "@/lib/gym-settings";
 import { resolveSiteConfig } from "@/lib/site-config";
 import SiteLeadForm from "./SiteLeadForm";
+import { SiteFaqAccordion } from "./SiteFaqAccordion";
 
 export const dynamic = "force-dynamic";
 
@@ -199,6 +200,72 @@ export default async function GymSitePage({ searchParams }: { searchParams: Sear
                   <a href="#contact" className={`${btn} mt-6 w-full`} style={{ backgroundColor: theme }}>Get started</a>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Testimonials */}
+      {site.showTestimonials && site.testimonials.length > 0 && (
+        <section className="py-16 bg-gray-50">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <h2 className="mb-10 text-center text-2xl font-bold text-gray-900 sm:text-3xl">
+              What our members say
+            </h2>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {site.testimonials.map((t, i) => (
+                <blockquote key={i} className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
+                  <p className="text-sm leading-relaxed text-gray-700 italic">&ldquo;{t.text}&rdquo;</p>
+                  <footer className="mt-4 flex items-center gap-3">
+                    <div
+                      className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+                      style={{ backgroundColor: site.themeColor }}
+                      aria-hidden="true"
+                    >
+                      {t.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">{t.name}</p>
+                      <p className="text-xs text-gray-500">{t.belt}</p>
+                    </div>
+                  </footer>
+                </blockquote>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* FAQ */}
+      {site.showFaq && site.faq.length > 0 && (
+        <section className="py-16 bg-white">
+          <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+            <h2 className="mb-10 text-center text-2xl font-bold text-gray-900 sm:text-3xl">
+              Frequently asked questions
+            </h2>
+            <SiteFaqAccordion faq={site.faq} color={site.themeColor} />
+          </div>
+        </section>
+      )}
+
+      {/* Map */}
+      {site.showMap && site.mapEmbedUrl && (
+        <section className="py-16 bg-gray-50">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <h2 className="mb-10 text-center text-2xl font-bold text-gray-900 sm:text-3xl">
+              Find us
+            </h2>
+            <div className="overflow-hidden rounded-2xl shadow-sm ring-1 ring-gray-200">
+              <iframe
+                src={site.mapEmbedUrl}
+                width="100%"
+                height="400"
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Gym location map"
+                className="border-0"
+              />
             </div>
           </div>
         </section>
