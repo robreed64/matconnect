@@ -1,7 +1,13 @@
 "use client";
 
-import { useEffect, useState, FormEvent } from "react";
+import { Suspense, useEffect, useState, FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
+
+const HEX_RE = /^#[0-9a-fA-F]{3,8}$/;
+function safeColor(raw: string | null): string {
+  return raw && HEX_RE.test(raw) ? raw : "#2563eb";
+}
 
 type GymInfo = { gymName: string; logoUrl?: string | null };
 
@@ -12,7 +18,10 @@ const INTERESTS = [
   { value: "kids",        label: "Kids Program",   ageGroup: "kids",  trainingType: null },
 ];
 
-export default function LeadWidgetPage() {
+function LeadWidgetContent() {
+  const searchParams = useSearchParams();
+  const color = safeColor(searchParams.get("color"));
+
   const [gym, setGym]     = useState<GymInfo | null>(null);
   const [form, setForm]   = useState({ name: "", email: "", phone: "", interest: "" });
   const [loading, setLoading] = useState(false);
@@ -139,7 +148,8 @@ export default function LeadWidgetPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold text-sm rounded-lg transition mt-1"
+            className="w-full py-2.5 px-4 disabled:opacity-50 text-white font-semibold text-sm rounded-lg transition mt-1"
+            style={{ backgroundColor: color }}
           >
             {loading ? "Sending…" : "Request a free class →"}
           </button>
@@ -150,5 +160,13 @@ export default function LeadWidgetPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function LeadWidgetPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen text-gray-400 text-sm">Loading…</div>}>
+      <LeadWidgetContent />
+    </Suspense>
   );
 }
