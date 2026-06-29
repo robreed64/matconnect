@@ -34,7 +34,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-export default function WebsiteEditor({ initial }: { initial: SiteConfig }) {
+export default function WebsiteEditor({ initial, siteDomain }: { initial: SiteConfig; siteDomain: string }) {
   const [cfg, setCfg] = useState<SiteConfig>(initial);
   const [status, setStatus] = useState<"idle" | "saving" | "saved">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -99,6 +99,61 @@ export default function WebsiteEditor({ initial }: { initial: SiteConfig }) {
           label={cfg.enabled ? "Published" : "Draft"}
           hint={cfg.enabled ? "Your site is live at /site" : "Only visible to you via Preview until published"}
         />
+
+        <Section title="Custom Domain">
+          {siteDomain ? (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="inline-flex items-center rounded-full bg-green-900/40 px-3 py-1 text-xs font-semibold text-green-400 ring-1 ring-inset ring-green-700/50">
+                  Configured
+                </span>
+                <span className="text-sm text-gray-300">{siteDomain}</span>
+              </div>
+              <a
+                href={`https://${siteDomain}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-blue-400 transition hover:text-blue-300"
+              >
+                View live site →
+              </a>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="rounded-lg border border-gray-700/60 bg-gray-900/50 px-4 py-3">
+                <p className="mb-3 text-sm font-medium text-white">Set up a custom domain</p>
+                <ol className="space-y-2 text-sm text-gray-400">
+                  <li>
+                    <span className="font-medium text-gray-300">1.</span> Add your domain in the{" "}
+                    <span className="text-gray-300">Vercel dashboard → Project → Settings → Domains</span>
+                  </li>
+                  <li>
+                    <span className="font-medium text-gray-300">2.</span> Set the{" "}
+                    <code className="rounded bg-gray-800 px-1.5 py-0.5 text-xs text-blue-300">NEXT_PUBLIC_SITE_DOMAIN</code>{" "}
+                    environment variable to your domain (e.g.{" "}
+                    <code className="rounded bg-gray-800 px-1.5 py-0.5 text-xs text-blue-300">mygym.com</code>
+                    ) in Vercel env vars, then redeploy
+                  </li>
+                </ol>
+              </div>
+              <div>
+                <p className="mb-2 text-xs font-medium text-gray-400">DNS records</p>
+                <div className="rounded-lg border border-gray-700/60 bg-gray-900 px-4 py-3 font-mono text-xs text-gray-300 space-y-1.5">
+                  <div className="grid grid-cols-[auto_1fr_auto] gap-x-4">
+                    <span className="text-gray-500">A</span>
+                    <span>mygym.com</span>
+                    <span className="text-blue-300">76.76.21.21</span>
+                  </div>
+                  <div className="grid grid-cols-[auto_1fr_auto] gap-x-4">
+                    <span className="text-gray-500">CNAME</span>
+                    <span>www.mygym.com</span>
+                    <span className="text-blue-300">cname.vercel-dns.com</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </Section>
 
         <Section title="Branding">
           <div>
@@ -182,7 +237,7 @@ export default function WebsiteEditor({ initial }: { initial: SiteConfig }) {
         <a href="/site?preview=1" target="_blank" rel="noopener noreferrer" className="rounded-lg bg-gray-800 px-5 py-2.5 text-sm font-medium text-gray-200 transition hover:bg-gray-700">
           Preview
         </a>
-        {cfg.enabled && (
+        {cfg.enabled && !siteDomain && (
           <a href="/site" target="_blank" rel="noopener noreferrer" className="text-sm text-blue-400 transition hover:text-blue-300">
             View live site →
           </a>

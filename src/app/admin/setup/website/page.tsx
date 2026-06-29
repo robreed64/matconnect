@@ -12,5 +12,5 @@ export default async function WebsiteSetupPage() {
   const settings = await getGymSettings();
   const site = resolveSiteConfig(settings.siteConfig, settings.gymName);
 
-  return <WebsiteEditor initial={site} />;
+  return <WebsiteEditor initial={site} siteDomain={process.env.NEXT_PUBLIC_SITE_DOMAIN ?? ""} />;
 }
