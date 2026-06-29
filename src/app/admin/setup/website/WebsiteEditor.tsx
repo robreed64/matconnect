@@ -4,6 +4,34 @@ import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import type { SiteConfig } from "@/lib/site-config";
 
+function SnippetBlock({
+  label,
+  snippet,
+  copied,
+  onCopy,
+}: {
+  label: string;
+  snippet: string;
+  copied: boolean;
+  onCopy: () => void;
+}) {
+  return (
+    <div className="space-y-2">
+      <p className="text-xs font-medium text-gray-400">{label}</p>
+      <pre className="w-full overflow-x-auto rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 font-mono text-xs text-gray-300">
+        <code>{snippet}</code>
+      </pre>
+      <button
+        type="button"
+        onClick={onCopy}
+        className="rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-600"
+      >
+        {copied ? "Copied ✓" : "Copy code"}
+      </button>
+    </div>
+  );
+}
+
 // Defined at module scope (not inside the component) so their identity is stable
 // across renders — otherwise inputs inside them remount and lose focus on each
 // keystroke.
@@ -34,10 +62,19 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-export default function WebsiteEditor({ initial, siteDomain }: { initial: SiteConfig; siteDomain: string }) {
+export default function WebsiteEditor({
+  initial,
+  siteDomain,
+  appUrl,
+}: {
+  initial: SiteConfig;
+  siteDomain: string;
+  appUrl: string;
+}) {
   const [cfg, setCfg] = useState<SiteConfig>(initial);
   const [status, setStatus] = useState<"idle" | "saving" | "saved">("idle");
   const [error, setError] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   function set<K extends keyof SiteConfig>(key: K, value: SiteConfig[K]) {
     setCfg((p) => ({ ...p, [key]: value }));
@@ -55,6 +92,30 @@ export default function WebsiteEditor({ initial, siteDomain }: { initial: SiteCo
     setCfg((p) => ({ ...p, seo: { ...p.seo, [key]: value } }));
     setStatus("idle");
   }
+
+  function handleCopy(id: string, text: string) {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  }
+
+  const baseUrl = siteDomain
+    ? `https://${siteDomain}`
+    : appUrl || "https://your-app-domain.com";
+
+  const encodedColor = cfg.themeColor.replace("#", "%23");
+
+  const scheduleSnippet =
+    `<iframe\n  src="${baseUrl}/widget/schedule?color=${encodedColor}"\n  width="100%"\n  height="400"\n  frameborder="0"\n  style="border-radius:12px;border:none"\n></iframe>`;
+
+  const pricingSnippet =
+    `<iframe\n  src="${baseUrl}/widget/pricing?color=${encodedColor}"\n  width="100%"\n  height="400"\n  frameborder="0"\n  style="border-radius:12px;border:none"\n></iframe>`;
+
+  const leadSnippet =
+    `<iframe\n  src="${baseUrl}/widget/lead?color=${encodedColor}"\n  width="100%"\n  height="520"\n  frameborder="0"\n  style="border-radius:12px;border:none"\n></iframe>`;
+
+  const autoResizeSnippet =
+    `<!-- Add an id to your iframe, e.g. id="mc-schedule" -->\n<script>\nwindow.addEventListener("message", function(e) {\n  if (e.data && e.data.mcHeight && e.data.mcId) {\n    var el = document.getElementById(e.data.mcId);\n    if (el) el.style.height = e.data.mcHeight + "px";\n  }\n});\n</script>`;
 
   async function save() {
     setStatus("saving");
@@ -224,6 +285,47 @@ export default function WebsiteEditor({ initial, siteDomain }: { initial: SiteCo
             <input value={cfg.seo.ogImageUrl} onChange={(e) => setSeo("ogImageUrl", e.target.value)} className={input} placeholder="https://…" />
           </div>
         </Section>
+
+        {/* Embed Codes */}
+        <div className="rounded-2xl border border-gray-700/50 bg-[#0f1117] p-6">
+          <h2 className="mb-2 text-sm font-semibold text-white">WordPress Embed Codes</h2>
+          <p className="mb-4 text-xs text-gray-500">
+            Paste these iframe snippets into your WordPress pages to embed MatConnect widgets. The accent color above is pre-filled.
+          </p>
+          <div className="space-y-6">
+            <SnippetBlock
+              label="Class Schedule"
+              snippet={scheduleSnippet}
+              copied={copiedId === "schedule"}
+              onCopy={() => handleCopy("schedule", scheduleSnippet)}
+            />
+            <SnippetBlock
+              label="Membership Pricing"
+              snippet={pricingSnippet}
+              copied={copiedId === "pricing"}
+              onCopy={() => handleCopy("pricing", pricingSnippet)}
+            />
+            <SnippetBlock
+              label="Trial Signup Form"
+              snippet={leadSnippet}
+              copied={copiedId === "lead"}
+              onCopy={() => handleCopy("lead", leadSnippet)}
+            />
+            <div className="space-y-2 border-t border-gray-700/50 pt-4">
+              <p className="text-xs font-medium text-gray-400">Advanced: Auto-resize</p>
+              <p className="text-xs text-gray-500">
+                Add an <code className="rounded bg-gray-800 px-1 py-0.5 text-blue-300">id</code> attribute to your iframe (e.g.{" "}
+                <code className="rounded bg-gray-800 px-1 py-0.5 text-blue-300">id=&quot;mc-schedule&quot;</code>), then paste this script once per page.
+              </p>
+              <SnippetBlock
+                label=""
+                snippet={autoResizeSnippet}
+                copied={copiedId === "autoresize"}
+                onCopy={() => handleCopy("autoresize", autoResizeSnippet)}
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="sticky bottom-0 mt-6 flex items-center gap-3 border-t border-gray-800 bg-gray-950/80 py-4 backdrop-blur">
