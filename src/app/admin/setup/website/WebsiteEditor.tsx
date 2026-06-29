@@ -1,8 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import type { SiteConfig } from "@/lib/site-config";
+
+// Defined at module scope (not inside the component) so their identity is stable
+// across renders — otherwise inputs inside them remount and lose focus on each
+// keystroke.
+function Toggle({ checked, onChange, label, hint }: { checked: boolean; onChange: (v: boolean) => void; label: string; hint?: string }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      className="flex w-full items-center justify-between rounded-lg border border-gray-700/60 bg-[#0f1117] px-4 py-3 text-left transition hover:border-gray-600"
+    >
+      <span>
+        <span className="block text-sm font-medium text-white">{label}</span>
+        {hint && <span className="block text-xs text-gray-500">{hint}</span>}
+      </span>
+      <span className={`relative h-6 w-11 flex-shrink-0 rounded-full transition ${checked ? "bg-blue-600" : "bg-gray-700"}`}>
+        <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all ${checked ? "left-[22px]" : "left-0.5"}`} />
+      </span>
+    </button>
+  );
+}
+
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div className="rounded-2xl border border-gray-700/50 bg-[#0f1117] p-6">
+      <h2 className="mb-4 text-sm font-semibold text-white">{title}</h2>
+      <div className="space-y-4">{children}</div>
+    </div>
+  );
+}
 
 export default function WebsiteEditor({ initial }: { initial: SiteConfig }) {
   const [cfg, setCfg] = useState<SiteConfig>(initial);
@@ -51,33 +81,6 @@ export default function WebsiteEditor({ initial }: { initial: SiteConfig }) {
   const input =
     "w-full rounded-lg bg-gray-900 border border-gray-700 px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500";
   const labelCls = "block text-xs font-medium text-gray-400 mb-1";
-
-  function Toggle({ checked, onChange, label, hint }: { checked: boolean; onChange: (v: boolean) => void; label: string; hint?: string }) {
-    return (
-      <button
-        type="button"
-        onClick={() => onChange(!checked)}
-        className="flex w-full items-center justify-between rounded-lg border border-gray-700/60 bg-[#0f1117] px-4 py-3 text-left transition hover:border-gray-600"
-      >
-        <span>
-          <span className="block text-sm font-medium text-white">{label}</span>
-          {hint && <span className="block text-xs text-gray-500">{hint}</span>}
-        </span>
-        <span className={`relative h-6 w-11 flex-shrink-0 rounded-full transition ${checked ? "bg-blue-600" : "bg-gray-700"}`}>
-          <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all ${checked ? "left-[22px]" : "left-0.5"}`} />
-        </span>
-      </button>
-    );
-  }
-
-  function Section({ title, children }: { title: string; children: React.ReactNode }) {
-    return (
-      <div className="rounded-2xl border border-gray-700/50 bg-[#0f1117] p-6">
-        <h2 className="mb-4 text-sm font-semibold text-white">{title}</h2>
-        <div className="space-y-4">{children}</div>
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-3xl p-8">
