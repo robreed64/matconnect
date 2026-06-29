@@ -17,7 +17,7 @@ function SnippetBlock({
 }) {
   return (
     <div className="space-y-2">
-      <p className="text-xs font-medium text-gray-400">{label}</p>
+      {label && <p className="text-xs font-medium text-gray-400">{label}</p>}
       <pre className="w-full overflow-x-auto rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 font-mono text-xs text-gray-300">
         <code>{snippet}</code>
       </pre>
@@ -26,7 +26,7 @@ function SnippetBlock({
         onClick={onCopy}
         className="rounded-lg bg-gray-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-600"
       >
-        {copied ? "Copied ✓" : "Copy code"}
+        {copied ? "Copied!" : "Copy"}
       </button>
     </div>
   );
@@ -94,9 +94,10 @@ export default function WebsiteEditor({
   }
 
   function handleCopy(id: string, text: string) {
-    navigator.clipboard.writeText(text);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    }).catch(() => {});
   }
 
   const baseUrl = siteDomain
