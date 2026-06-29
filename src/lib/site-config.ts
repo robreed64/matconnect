@@ -2,6 +2,17 @@
 // Stored as GymSettings.siteConfig (Json). resolveSiteConfig merges stored
 // values over sensible defaults so the template always has complete data.
 
+export type Testimonial = {
+  name: string;
+  belt: string;
+  text: string;
+};
+
+export type FaqItem = {
+  question: string;
+  answer: string;
+};
+
 export type SiteConfig = {
   enabled: boolean;
   themeColor: string;
@@ -11,6 +22,13 @@ export type SiteConfig = {
   showPricing: boolean;
   socials: { instagram: string; facebook: string; youtube: string };
   seo: { title: string; description: string; ogImageUrl: string };
+  presetTheme: "custom" | "light" | "dark" | "bold";
+  testimonials: Testimonial[];
+  showTestimonials: boolean;
+  faq: FaqItem[];
+  showFaq: boolean;
+  mapEmbedUrl: string;
+  showMap: boolean;
 };
 
 const DEFAULT_THEME = "#2563eb"; // blue-600
@@ -25,12 +43,18 @@ function obj(v: unknown): Record<string, unknown> {
   return v && typeof v === "object" ? (v as Record<string, unknown>) : {};
 }
 
+function arr(v: unknown): unknown[] {
+  return Array.isArray(v) ? v : [];
+}
+
 /** Merge stored siteConfig over defaults. `gymName` seeds the hero headline. */
-export function resolveSiteConfig(raw: unknown, gymName: string): SiteConfig {
+export function resolveSiteConfig(raw: unknown, gymName: string = ""): SiteConfig {
   const r = obj(raw);
   const hero = obj(r.hero);
   const socials = obj(r.socials);
   const seo = obj(r.seo);
+  const testimonials = arr(r.testimonials) as Testimonial[];
+  const faq = arr(r.faq) as FaqItem[];
 
   return {
     enabled: r.enabled === true,
@@ -55,5 +79,12 @@ export function resolveSiteConfig(raw: unknown, gymName: string): SiteConfig {
       description: str(seo.description),
       ogImageUrl: str(seo.ogImageUrl),
     },
+    presetTheme: (r.presetTheme && ["light", "dark", "bold"].includes(String(r.presetTheme))) ? (r.presetTheme as "light" | "dark" | "bold") : "custom",
+    testimonials: testimonials,
+    showTestimonials: r.showTestimonials === true,
+    faq: faq,
+    showFaq: r.showFaq === true,
+    mapEmbedUrl: str(r.mapEmbedUrl),
+    showMap: r.showMap === true,
   };
 }
