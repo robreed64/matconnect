@@ -1,14 +1,58 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 
+// ─── Register all blocks server-side ────────────────────────────────────────
+
 add_action( 'init', function () {
-    $blocks = [ 'schedule', 'pricing', 'lead-form', 'testimonials', 'faq' ];
-    foreach ( $blocks as $block ) {
-        register_block_type( MATCONNECT_PLUGIN_DIR . 'blocks/' . $block . '/block.json' );
-    }
+    register_block_type( 'matconnect/schedule', [
+        'render_callback' => 'matconnect_render_schedule',
+        'attributes'      => [
+            'daysAhead' => [ 'type' => 'integer', 'default' => 7 ],
+        ],
+    ] );
+
+    register_block_type( 'matconnect/pricing', [
+        'render_callback' => 'matconnect_render_pricing',
+        'attributes'      => [
+            'showCta'  => [ 'type' => 'boolean', 'default' => true ],
+            'ctaLabel' => [ 'type' => 'string',  'default' => 'Get started' ],
+        ],
+    ] );
+
+    register_block_type( 'matconnect/lead-form', [
+        'render_callback' => 'matconnect_render_lead_form',
+        'attributes'      => [
+            'successMessage' => [ 'type' => 'string', 'default' => '' ],
+        ],
+    ] );
+
+    register_block_type( 'matconnect/testimonials', [
+        'render_callback' => 'matconnect_render_testimonials',
+        'attributes'      => [
+            'maxItems' => [ 'type' => 'integer', 'default' => 0 ],
+        ],
+    ] );
+
+    register_block_type( 'matconnect/faq', [
+        'render_callback' => 'matconnect_render_faq',
+        'attributes'      => [],
+    ] );
 } );
 
-// Enqueue shared stylesheet on front end when any block is present
+// ─── Enqueue editor JS (registers blocks in Gutenberg inserter) ──────────────
+
+add_action( 'enqueue_block_editor_assets', function () {
+    wp_enqueue_script(
+        'matconnect-blocks-editor',
+        MATCONNECT_PLUGIN_URL . 'assets/js/editor.js',
+        [ 'wp-blocks', 'wp-element' ],
+        MATCONNECT_VERSION,
+        true
+    );
+} );
+
+// ─── Enqueue shared front-end stylesheet ────────────────────────────────────
+
 add_action( 'wp_enqueue_scripts', function () {
     wp_register_style(
         'matconnect-blocks',
@@ -18,7 +62,8 @@ add_action( 'wp_enqueue_scripts', function () {
     );
 } );
 
-// Lead form JS — enqueue globally (lightweight, only runs if form present)
+// ─── Lead form JS ───────────────────────────────────────────────────────────
+
 add_action( 'wp_enqueue_scripts', function () {
     $settings = MatConnect_Settings::get();
     wp_register_script(
@@ -34,7 +79,8 @@ add_action( 'wp_enqueue_scripts', function () {
     ] );
 } );
 
-// FAQ accordion JS
+// ─── FAQ accordion JS ───────────────────────────────────────────────────────
+
 add_action( 'wp_enqueue_scripts', function () {
     wp_register_script(
         'matconnect-faq',
@@ -198,7 +244,6 @@ function matconnect_render_testimonials( array $attrs ): string {
 
     $items = $data['testimonials'] ?? [];
     if ( $max > 0 ) $items = array_slice( $items, 0, $max );
-
     if ( empty( $items ) ) return '';
 
     ob_start();
@@ -261,7 +306,6 @@ function matconnect_not_configured(): string {
     if ( current_user_can( 'manage_options' ) ) {
         return '<p class="matconnect-error">' .
             sprintf(
-                /* translators: %s: settings URL */
                 esc_html__( 'MatConnect: Please configure your URL and API key in %s.', 'matconnect' ),
                 '<a href="' . esc_url( admin_url( 'options-general.php?page=matconnect' ) ) . '">Settings → MatConnect</a>'
             ) . '</p>';

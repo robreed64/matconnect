@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: MatConnect for WordPress
- * Plugin URI:  https://matconnect.app
+ * Plugin URI:  https://getmatconnect.com
  * Description: Display live MatConnect data on your WordPress site — class schedule, pricing, lead form, testimonials, and FAQ. Requires a MatConnect account and API key.
  * Version:     1.0.0
  * Author:      MatConnect
- * Author URI:  https://matconnect.app
+ * Author URI:  https://getmatconnect.com
  * License:     GPL-2.0-or-later
  * Requires at least: 6.0
  * Requires PHP: 7.4
