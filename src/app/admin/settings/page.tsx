@@ -101,32 +101,45 @@ function IntegrationsSection() {
   const [keys, setKeys] = useState<ApiKeyRecord[]>([]);
   const [newKeyName, setNewKeyName] = useState("");
   const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState("");
   const [rawKey, setRawKey] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
   const loadKeys = useCallback(async () => {
-    const res = await fetch("/api/admin/api-keys");
-    if (res.ok) setKeys(await res.json());
+    try {
+      const res = await fetch("/api/admin/api-keys");
+      if (res.ok) setKeys(await res.json());
+    } catch { /* silently ignore on mount */ }
   }, []);
 
   useEffect(() => { loadKeys(); }, [loadKeys]);
 
   async function handleCreate(e: FormEvent) {
     e.preventDefault();
-    if (!newKeyName.trim()) return;
+    const name = newKeyName.trim();
+    if (!name) { setCreateError("Enter a label for this key."); return; }
+    setCreateError("");
     setCreating(true);
-    const res = await fetch("/api/admin/api-keys", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: newKeyName.trim() }),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setRawKey(data.rawKey);
-      setNewKeyName("");
-      loadKeys();
+    try {
+      const res = await fetch("/api/admin/api-keys", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setRawKey(data.rawKey);
+        setNewKeyName("");
+        loadKeys();
+      } else {
+        const body = await res.json().catch(() => ({}));
+        setCreateError(body.error ?? `Error ${res.status} — please try again.`);
+      }
+    } catch {
+      setCreateError("Network error — please try again.");
+    } finally {
+      setCreating(false);
     }
-    setCreating(false);
   }
 
   async function toggleEnabled(id: string, enabled: boolean) {
@@ -182,21 +195,25 @@ function IntegrationsSection() {
         </div>
       )}
 
-      <form onSubmit={handleCreate} className="flex gap-2">
-        <input
-          value={newKeyName}
-          onChange={e => setNewKeyName(e.target.value)}
-          placeholder="Key label (e.g. My WordPress Site)"
-          className={input + " flex-1"}
-        />
-        <button
-          type="submit"
-          disabled={creating || !newKeyName.trim()}
-          className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white text-sm font-semibold transition shrink-0"
-        >
-          {creating ? "Creating…" : "Generate Key"}
-        </button>
-      </form>
+      <div className="space-y-2">
+        <label className="block text-xs font-medium text-gray-400">Key label</label>
+        <form onSubmit={handleCreate} className="flex gap-2">
+          <input
+            value={newKeyName}
+            onChange={e => { setNewKeyName(e.target.value); setCreateError(""); }}
+            placeholder="e.g. My WordPress Site"
+            className={input + " flex-1"}
+          />
+          <button
+            type="submit"
+            disabled={creating}
+            className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-semibold transition shrink-0"
+          >
+            {creating ? "Creating…" : "Generate Key"}
+          </button>
+        </form>
+        {createError && <p className="text-xs text-red-400">{createError}</p>}
+      </div>
 
       {keys.length > 0 && (
         <div className="overflow-x-auto rounded-xl border border-gray-700">
