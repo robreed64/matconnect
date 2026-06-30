@@ -27,6 +27,7 @@ model Member {
   // Square has no default-payment-method on the customer, so we track it ourselves
   squareCardId     String?   @map("square_card_id")
   checkinToken     String?   @unique @map("checkin_token")
+  rfidToken        String?   @unique @map("rfid_token")
   beltStripes      Int       @default(0) @map("belt_stripes")
   notes            String?
   waiverSignedAt    DateTime? @map("waiver_signed_at")
