@@ -322,6 +322,18 @@ model TerminalCheckout {
   @@map("terminal_checkouts")
 }
 
+model ApiKey {
+  id         String    @id @default(cuid())
+  name       String
+  keyHash    String    @unique @map("key_hash")
+  prefix     String
+  lastUsedAt DateTime? @map("last_used_at")
+  enabled    Boolean   @default(true)
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  @@map("api_keys")
+}
+
 model GymSettings {
   id             Int      @id @default(1)
   gymName        String   @default("My Gym") @map("gym_name")

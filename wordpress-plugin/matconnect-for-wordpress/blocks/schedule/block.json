@@ -1,0 +1,23 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "matconnect/schedule",
+  "title": "MatConnect Schedule",
+  "description": "Display the upcoming class schedule from your MatConnect account.",
+  "category": "widgets",
+  "icon": "calendar",
+  "keywords": ["matconnect", "schedule", "classes", "bjj", "jiu-jitsu"],
+  "textdomain": "matconnect",
+  "attributes": {
+    "daysAhead": {
+      "type": "integer",
+      "default": 7
+    }
+  },
+  "supports": {
+    "html": false,
+    "align": ["wide", "full"]
+  },
+  "render": "file:./render.php",
+  "editorScript": "file:./edit.js"
+}

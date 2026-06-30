@@ -1,0 +1,18 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "matconnect/pricing",
+  "title": "MatConnect Pricing",
+  "description": "Display your MatConnect membership plans.",
+  "category": "widgets",
+  "icon": "tag",
+  "keywords": ["matconnect", "pricing", "plans", "membership"],
+  "textdomain": "matconnect",
+  "attributes": {
+    "showCta": { "type": "boolean", "default": true },
+    "ctaLabel": { "type": "string", "default": "Get started" }
+  },
+  "supports": { "html": false, "align": ["wide", "full"] },
+  "render": "file:./render.php",
+  "editorScript": "file:./edit.js"
+}

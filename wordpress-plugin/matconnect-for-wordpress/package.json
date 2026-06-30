@@ -1,0 +1,12 @@
+{
+  "name": "matconnect-for-wordpress",
+  "version": "1.0.0",
+  "description": "Build toolchain for MatConnect Gutenberg blocks",
+  "scripts": {
+    "build": "wp-scripts build blocks/schedule/edit.js blocks/pricing/edit.js blocks/lead-form/edit.js blocks/testimonials/edit.js blocks/faq/edit.js --output-path=blocks",
+    "start": "wp-scripts start blocks/schedule/edit.js blocks/pricing/edit.js blocks/lead-form/edit.js blocks/testimonials/edit.js blocks/faq/edit.js --output-path=blocks"
+  },
+  "devDependencies": {
+    "@wordpress/scripts": "^30.0.0"
+  }
+}

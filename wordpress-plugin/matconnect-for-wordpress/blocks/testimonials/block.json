@@ -1,0 +1,17 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "matconnect/testimonials",
+  "title": "MatConnect Testimonials",
+  "description": "Display member testimonials configured in your MatConnect website settings.",
+  "category": "widgets",
+  "icon": "format-quote",
+  "keywords": ["matconnect", "testimonials", "reviews"],
+  "textdomain": "matconnect",
+  "attributes": {
+    "maxItems": { "type": "integer", "default": 0 }
+  },
+  "supports": { "html": false, "align": ["wide", "full"] },
+  "render": "file:./render.php",
+  "editorScript": "file:./edit.js"
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, FormEvent } from "react";
+import { useState, useEffect, useRef, FormEvent, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import PasswordInput from "@/components/PasswordInput";
 
@@ -85,6 +85,170 @@ function SaveButton({ loading, status }: { loading: boolean; status: "idle" | "l
     >
       {loading ? "Saving…" : status === "ok" ? "Saved ✓" : "Save"}
     </button>
+  );
+}
+
+type ApiKeyRecord = {
+  id: string;
+  name: string;
+  prefix: string;
+  lastUsedAt: string | null;
+  enabled: boolean;
+  createdAt: string;
+};
+
+function IntegrationsSection() {
+  const [keys, setKeys] = useState<ApiKeyRecord[]>([]);
+  const [newKeyName, setNewKeyName] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [rawKey, setRawKey] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const loadKeys = useCallback(async () => {
+    const res = await fetch("/api/admin/api-keys");
+    if (res.ok) setKeys(await res.json());
+  }, []);
+
+  useEffect(() => { loadKeys(); }, [loadKeys]);
+
+  async function handleCreate(e: FormEvent) {
+    e.preventDefault();
+    if (!newKeyName.trim()) return;
+    setCreating(true);
+    const res = await fetch("/api/admin/api-keys", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: newKeyName.trim() }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setRawKey(data.rawKey);
+      setNewKeyName("");
+      loadKeys();
+    }
+    setCreating(false);
+  }
+
+  async function toggleEnabled(id: string, enabled: boolean) {
+    await fetch(`/api/admin/api-keys/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ enabled }),
+    });
+    loadKeys();
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm("Delete this API key? Any integration using it will stop working immediately.")) return;
+    await fetch(`/api/admin/api-keys/${id}`, { method: "DELETE" });
+    loadKeys();
+  }
+
+  function copyKey() {
+    if (!rawKey) return;
+    navigator.clipboard.writeText(rawKey).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
+  return (
+    <Section title="Integrations — API Keys">
+      <p className="text-sm text-gray-400">
+        Use API keys to connect external tools like WordPress plugins to your MatConnect data.
+        Each key is shown only once when created.
+      </p>
+
+      {rawKey && (
+        <div className="bg-green-900/20 border border-green-700 rounded-xl p-4 space-y-2">
+          <p className="text-sm text-green-300 font-semibold">API key created — copy it now, it won't be shown again.</p>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 bg-gray-900 rounded-lg px-3 py-2 text-xs text-green-200 font-mono break-all">
+              {rawKey}
+            </code>
+            <button
+              onClick={copyKey}
+              className="px-3 py-2 rounded-lg bg-green-700 hover:bg-green-600 text-white text-xs font-medium transition shrink-0"
+            >
+              {copied ? "Copied ✓" : "Copy"}
+            </button>
+          </div>
+          <button
+            onClick={() => setRawKey(null)}
+            className="text-xs text-gray-500 hover:text-gray-400 transition"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      <form onSubmit={handleCreate} className="flex gap-2">
+        <input
+          value={newKeyName}
+          onChange={e => setNewKeyName(e.target.value)}
+          placeholder="Key label (e.g. My WordPress Site)"
+          className={input + " flex-1"}
+        />
+        <button
+          type="submit"
+          disabled={creating || !newKeyName.trim()}
+          className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white text-sm font-semibold transition shrink-0"
+        >
+          {creating ? "Creating…" : "Generate Key"}
+        </button>
+      </form>
+
+      {keys.length > 0 && (
+        <div className="overflow-x-auto rounded-xl border border-gray-700">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-gray-700 text-left text-xs text-gray-500 uppercase tracking-wide">
+                <th className="px-4 py-2">Name</th>
+                <th className="px-4 py-2">Key prefix</th>
+                <th className="px-4 py-2">Last used</th>
+                <th className="px-4 py-2">Status</th>
+                <th className="px-4 py-2"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {keys.map((k) => (
+                <tr key={k.id} className="border-b border-gray-800 last:border-0">
+                  <td className="px-4 py-3 text-white font-medium">{k.name}</td>
+                  <td className="px-4 py-3 font-mono text-gray-400 text-xs">{k.prefix}…</td>
+                  <td className="px-4 py-3 text-gray-400">
+                    {k.lastUsedAt ? new Date(k.lastUsedAt).toLocaleDateString() : "Never"}
+                  </td>
+                  <td className="px-4 py-3">
+                    <button
+                      onClick={() => toggleEnabled(k.id, !k.enabled)}
+                      className={`text-xs font-medium px-2 py-0.5 rounded-full transition ${
+                        k.enabled
+                          ? "bg-green-900/40 text-green-400 hover:bg-red-900/40 hover:text-red-400"
+                          : "bg-red-900/40 text-red-400 hover:bg-green-900/40 hover:text-green-400"
+                      }`}
+                    >
+                      {k.enabled ? "Active" : "Disabled"}
+                    </button>
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <button
+                      onClick={() => handleDelete(k.id)}
+                      className="text-xs text-gray-600 hover:text-red-400 transition"
+                    >
+                      Revoke
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {keys.length === 0 && !rawKey && (
+        <p className="text-sm text-gray-600">No API keys yet. Generate one above to connect your WordPress plugin.</p>
+      )}
+    </Section>
   );
 }
 
@@ -737,6 +901,9 @@ export default function SettingsPage() {
           </div>
         </div>
       </Section>
+
+      {/* Integrations — API Keys */}
+      <IntegrationsSection />
 
       {/* Change Password */}
       <Section title="Change Password">
