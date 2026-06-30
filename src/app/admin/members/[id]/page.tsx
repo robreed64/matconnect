@@ -17,6 +17,7 @@ import { getMemberRisk, SCORED_STATUSES } from "@/lib/scored-members";
 import { RiskPill, RiskReasons } from "../RiskBadge";
 import OutreachComposer from "./OutreachComposer";
 import MemberQRCode from "./MemberQRCode";
+import WristbandManager from "./WristbandManager";
 import WaiverToggle from "./WaiverToggle";
 
 const BELT_STYLES: Record<string, { bg: string; text: string }> = {
@@ -226,6 +227,17 @@ export default async function MemberDetailPage({ params }: { params: Params }) {
               memberName={member.name}
               gymName={gymSettings.gymName}
               beltRank={member.beltRank}
+            />
+          </Section>
+        )}
+
+        {/* NFC wristband */}
+        {showCheckins && (
+          <Section title="NFC Wristband">
+            <WristbandManager
+              memberId={member.id}
+              initialRfidToken={member.rfidToken ?? null}
+              readOnly={!canManage}
             />
           </Section>
         )}
