@@ -92,10 +92,14 @@ export default function WristbandManager({
         </div>
       )}
 
+      {!showModal && error && (
+        <p className="text-xs text-red-400">{error}</p>
+      )}
+
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="bg-[#0f1117] border border-gray-700 rounded-xl p-6 w-full max-w-sm mx-4 shadow-xl">
-            <h3 className="text-sm font-semibold text-white mb-4">Assign Wristband</h3>
+        <div role="dialog" aria-modal="true" aria-labelledby="wristband-modal-title" className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="bg-[#0f1117] border border-gray-700/50 rounded-xl p-6 w-full max-w-sm mx-4 shadow-xl">
+            <h3 id="wristband-modal-title" className="text-sm font-semibold text-white mb-4">Assign Wristband</h3>
 
             <div className="space-y-3">
               {tapMode ? (
@@ -111,6 +115,7 @@ export default function WristbandManager({
               <input
                 ref={inputRef}
                 type="text"
+                aria-label="Wristband UID"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value.toUpperCase())}
                 onKeyDown={(e) => { if (e.key === "Enter") handleAssign(); }}
