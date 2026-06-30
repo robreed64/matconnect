@@ -4,6 +4,7 @@
 import os
 import time
 import signal
+import atexit
 import sys
 
 from dotenv import load_dotenv
@@ -83,6 +84,7 @@ def cleanup(sig=None, _frame=None) -> None:
 
 signal.signal(signal.SIGTERM, cleanup)
 signal.signal(signal.SIGINT, cleanup)
+atexit.register(cleanup)
 
 reader = mfrc522.MFRC522()
 print("MatConnect NFC reader running. Ctrl+C to stop.")

@@ -170,7 +170,7 @@ model Attendance {
   classId   Int?     @map("class_id")
   class     Class?   @relation(fields: [classId], references: [id])
   timestamp DateTime @default(now())
-  source    String   // 'kiosk','staff','app'
+  source    String   // 'kiosk','staff','app','rfid'
 
   // Milestone counts and inactivity scans hit this table on hot paths
   @@index([memberId, timestamp])

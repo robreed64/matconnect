@@ -51,7 +51,7 @@ sudo reboot
 
 ```bash
 sudo apt update && sudo apt install -y python3-pip python3-dev
-pip3 install mfrc522 RPi.GPIO requests python-dotenv
+pip3 install -r requirements.txt  # requirements.txt is in the repo's pi/ directory
 ```
 
 ### 4. Deploy the script
@@ -110,6 +110,19 @@ sudo journalctl -u matconnect-checkin -f
 ```
 
 Tap a wristband. You should see `Tag: AABBCCDD` in the logs and get LED/buzzer feedback.
+
+**Important — verify UID length matches:** After tapping a wristband, note the hex UID printed
+in the logs (e.g. `Tag: A3F2C1D4` or `Tag: A3F2C1D4E5`). Then tap the same wristband on the
+admin desk USB reader and observe what it types into the UID field. Both must produce the same
+string. If the Pi logs show 10 characters but the USB reader outputs 8, the library is including
+the BCC byte — strip it in `checkin.py` by changing:
+```python
+hex_uid = "".join(f"{b:02X}" for b in uid)
+```
+to:
+```python
+hex_uid = "".join(f"{b:02X}" for b in uid[:4])
+```
 
 ## Wristband Assignment
 

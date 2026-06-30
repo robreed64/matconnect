@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { vi } from "vitest";
 import { NextRequest } from "next/server";
 
@@ -184,5 +184,64 @@ describe("POST /api/checkin", () => {
     expect(prisma.booking.create).toHaveBeenCalledWith({
       data: { memberId: 5, classId: 12, status: "attended" },
     });
+  });
+});
+
+function rfidRequest(body: object, apiKey?: string) {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (apiKey !== undefined) headers["X-RFID-Key"] = apiKey;
+  return new NextRequest("http://localhost/api/checkin", {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+  });
+}
+
+describe("POST /api/checkin — RFID path", () => {
+  beforeEach(() => { process.env.RFID_API_KEY = "test-secret"; });
+  afterEach(() => { delete process.env.RFID_API_KEY; });
+
+  it("401s when X-RFID-Key header is missing", async () => {
+    const res = await POST(rfidRequest({ rfidToken: "AABBCCDD" }));
+    expect(res.status).toBe(401);
+    expect(prisma.member.findUnique).not.toHaveBeenCalled();
+  });
+
+  it("401s when X-RFID-Key header is wrong", async () => {
+    const res = await POST(rfidRequest({ rfidToken: "AABBCCDD" }, "wrong-key"));
+    expect(res.status).toBe(401);
+    expect(prisma.member.findUnique).not.toHaveBeenCalled();
+  });
+
+  it("404s for unknown rfidToken", async () => {
+    prisma.member.findUnique.mockResolvedValue(null);
+    const res = await POST(rfidRequest({ rfidToken: "AABBCCDD" }, "test-secret"));
+    expect(res.status).toBe(404);
+    expect(prisma.member.findUnique).toHaveBeenCalledWith({ where: { rfidToken: "AABBCCDD" } });
+  });
+
+  it("checks in with rfidToken and auto-detects active class", async () => {
+    prisma.member.findUnique.mockResolvedValue(member);
+    const activeClass = {
+      id: 7,
+      startTime: new Date(Date.now() - 30 * 60_000),
+      endTime: new Date(Date.now() + 30 * 60_000),
+    };
+    prisma.class.findMany.mockResolvedValue([activeClass] as never);
+    prisma.attendance.findFirst.mockResolvedValue(null);
+    prisma.attendance.create.mockResolvedValue({ id: 200 } as never);
+    prisma.attendance.count.mockResolvedValue(50);
+    prisma.booking.findFirst.mockResolvedValue(null);
+
+    const res = await POST(rfidRequest({ rfidToken: "AABBCCDD" }, "test-secret"));
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.success).toBe(true);
+    expect(prisma.attendance.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ classId: 7, source: "rfid" }),
+      })
+    );
   });
 });
