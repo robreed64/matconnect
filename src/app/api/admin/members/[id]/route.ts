@@ -57,6 +57,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
         waiverSignedAt: body.waiverSigned ? new Date() : null,
         ...(body.waiverSigned === false && { waiverDocumentUrl: null }),
       }),
+      ...(body.rfidToken !== undefined && { rfidToken: body.rfidToken || null }),
     },
   });
   return NextResponse.json(member);
