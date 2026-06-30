@@ -146,7 +146,7 @@ function Nav() {
 // ── App Preview Mockup ────────────────────────────────────────────────────────
 function AppPreview() {
   return (
-    <div className="relative w-full max-w-2xl mx-auto select-none pointer-events-none">
+    <div className="relative w-full max-w-2xl lg:mx-auto select-none pointer-events-none">
       <div className="rounded-2xl overflow-hidden border border-gray-700/60 shadow-2xl shadow-blue-950/40 bg-[#0c0e14]">
         {/* Browser chrome */}
         <div className="flex items-center gap-1.5 px-4 py-3 bg-[#0a0b10] border-b border-gray-800/60">
@@ -237,14 +237,14 @@ function AppPreview() {
 // ── Hero ──────────────────────────────────────────────────────────────────────
 function Hero() {
   return (
-    <section className="relative min-h-dvh flex flex-col items-center justify-center px-6 pt-32 pb-24 text-center overflow-hidden">
+    <section className="relative min-h-dvh flex flex-col items-start lg:items-center justify-center px-6 pt-32 pb-24 text-left lg:text-center overflow-hidden">
       {/* Ambient glow */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-blue-600/8 blur-[140px]" />
         <div className="absolute left-1/4 top-1/3 h-[300px] w-[400px] rounded-full bg-indigo-600/6 blur-[100px]" />
       </div>
 
-      <div className="relative z-10 max-w-4xl mx-auto">
+      <div className="relative z-10 max-w-4xl lg:mx-auto">
         <div className="inline-flex items-center gap-2 text-xs font-semibold text-blue-400 bg-blue-500/10 border border-blue-500/20 px-3 py-1.5 rounded-full mb-8">
           <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
           Built for BJJ &amp; martial arts schools
@@ -256,12 +256,12 @@ function Hero() {
           <span className="text-blue-400">Not spreadsheets.</span>
         </h1>
 
-        <p className="text-lg sm:text-xl text-gray-400 leading-relaxed max-w-2xl mx-auto mb-10">
+        <p className="text-lg sm:text-xl text-gray-400 leading-relaxed max-w-2xl lg:mx-auto mb-10">
           MatConnect handles member check-in, belt progression, scheduling, and billing —
           so you can stay on the mats instead of behind a desk.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
+        <div className="flex flex-col sm:flex-row items-start justify-start lg:items-center lg:justify-center gap-4 mb-20">
           <Link
             href="/login"
             className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-7 py-3.5 rounded-xl transition active:scale-[0.98] shadow-lg shadow-blue-700/25 text-base"
@@ -367,11 +367,11 @@ function Features() {
   return (
     <section id="features" className="py-28 px-6">
       <div className="mx-auto max-w-6xl">
-        <div className="text-center mb-16">
+        <div className="text-left lg:text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-black tracking-tight text-white mb-4">
             Everything your gym needs
           </h2>
-          <p className="text-gray-400 text-lg max-w-xl mx-auto">
+          <p className="text-gray-400 text-lg max-w-xl lg:mx-auto">
             Built specifically for martial arts schools — not watered down from generic gym software.
           </p>
         </div>
@@ -417,11 +417,11 @@ function HowItWorks() {
   return (
     <section id="how-it-works" className="py-28 px-6 bg-[#0a0b10] border-y border-gray-800/60">
       <div className="mx-auto max-w-6xl">
-        <div className="text-center mb-16">
+        <div className="text-left lg:text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-black tracking-tight text-white mb-4">
             Up and running in a day
           </h2>
-          <p className="text-gray-400 text-lg max-w-xl mx-auto">
+          <p className="text-gray-400 text-lg max-w-xl lg:mx-auto">
             No onboarding calls. No IT setup. Just sign up and start training.
           </p>
         </div>
@@ -493,11 +493,11 @@ function Pricing() {
   return (
     <section id="pricing" className="py-28 px-6">
       <div className="mx-auto max-w-6xl">
-        <div className="text-center mb-16">
+        <div className="text-left lg:text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-black tracking-tight text-white mb-4">
             Simple, honest pricing
           </h2>
-          <p className="text-gray-400 text-lg max-w-xl mx-auto">
+          <p className="text-gray-400 text-lg max-w-xl lg:mx-auto">
             No setup fees. Cancel any time. Pro plans include a 14-day free trial.
           </p>
         </div>
@@ -617,7 +617,7 @@ function FAQ() {
   return (
     <section id="faq" className="py-28 px-6">
       <div className="mx-auto max-w-3xl">
-        <div className="text-center mb-16">
+        <div className="text-left lg:text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-black tracking-tight text-white mb-4">
             Frequently asked questions
           </h2>
@@ -651,11 +651,11 @@ function FinalCTA() {
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-blue-600/8 blur-[120px] rounded-full" />
       </div>
-      <div className="relative z-10 mx-auto max-w-3xl text-center">
+      <div className="relative z-10 max-w-3xl text-left lg:text-center">
         <h2 className="text-4xl md:text-5xl font-black tracking-tight text-white mb-5">
           Ready to take your gym off spreadsheets?
         </h2>
-        <p className="text-gray-400 text-lg mb-10 max-w-xl mx-auto">
+        <p className="text-gray-400 text-lg mb-10 max-w-xl lg:mx-auto">
           Start your 14-day free trial. No credit card required. Cancel any time.
         </p>
         <Link
