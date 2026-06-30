@@ -72,7 +72,7 @@ def checkin(hex_uid: str) -> bool | None:
             timeout=5,
         )
         return r.status_code == 200 and r.json().get("success") is True
-    except requests.exceptions.RequestException:
+    except (requests.exceptions.RequestException, ValueError):
         return None
 
 
