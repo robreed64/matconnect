@@ -161,7 +161,7 @@ function IntegrationsSection() {
 
       {rawKey && (
         <div className="bg-green-900/20 border border-green-700 rounded-xl p-4 space-y-2">
-          <p className="text-sm text-green-300 font-semibold">API key created — copy it now, it won't be shown again.</p>
+          <p className="text-sm text-green-300 font-semibold">API key created — copy it now, it won&apos;t be shown again.</p>
           <div className="flex items-center gap-2">
             <code className="flex-1 bg-gray-900 rounded-lg px-3 py-2 text-xs text-green-200 font-mono break-all">
               {rawKey}
