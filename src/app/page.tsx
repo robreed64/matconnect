@@ -89,6 +89,22 @@ function IconUserPlus() {
     </svg>
   );
 }
+function IconGlobe() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="2" y1="12" x2="22" y2="12"/>
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+    </svg>
+  );
+}
+function IconShield() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+  );
+}
 function IconChevron() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -327,13 +343,23 @@ const FEATURES = [
   },
   {
     icon: <IconChart />,
-    title: "Reports & insights",
-    desc: "Track MRR, member growth, retention, attendance trends, and belt distribution — plus an at-risk view that flags members who've stopped showing up. Export to CSV.",
+    title: "Reports & churn scoring",
+    desc: "Track MRR, attendance trends, belt distribution, and member growth. Every active member gets a 0–100 churn risk score with plain-English reasons — so you know who to reach out to before they quit.",
   },
   {
     icon: <IconUserPlus />,
     title: "Lead capture & trials",
     desc: "Embed a lead form on your site, manage prospects in a pipeline, and run trials with automatic trial-expiry follow-ups to turn visitors into members.",
+  },
+  {
+    icon: <IconGlobe />,
+    title: "Built-in gym website",
+    desc: "Publish a public website for your gym in minutes — hero, schedule, pricing, testimonials, FAQ, and Google Maps, all pulled live from your MatConnect data. Edit in a side-by-side preview with preset themes.",
+  },
+  {
+    icon: <IconShield />,
+    title: "WordPress & Elementor",
+    desc: "Already on WordPress? Drop MatConnect blocks directly onto any page — schedule, pricing, lead form, testimonials, and FAQ — using Gutenberg blocks, shortcodes, or Elementor widgets.",
   },
 ];
 
@@ -426,7 +452,7 @@ const PLANS = [
   },
   {
     name: "Pro",
-    price: "$49",
+    price: "$99",
     period: "/month",
     desc: "For growing gyms that need the full stack.",
     features: [
@@ -434,6 +460,8 @@ const PLANS = [
       "Belt progression & curriculum",
       "Stripe & Square billing + POS",
       "Member portal & reports",
+      "Churn risk scoring",
+      "Built-in gym website",
       "Email & SMS automation",
       "Waiver management",
       "Priority support",
@@ -443,15 +471,17 @@ const PLANS = [
   },
   {
     name: "Academy",
-    price: "$99",
+    price: "$179",
     period: "/month",
-    desc: "For larger schools ready to scale.",
+    desc: "For multi-location schools and growing academies.",
     features: [
       "Everything in Pro",
+      "Up to 3 locations (+$49 each additional)",
+      "Native mobile app",
       "Staff roles & permissions",
       "Custom branding & logo",
       "Square data import / migration",
-      "Multiple locations (coming soon)",
+      "WordPress & Elementor plugin",
       "Dedicated support",
     ],
     cta: "Contact us",
@@ -535,7 +565,7 @@ function Pricing() {
 const FAQS = [
   {
     q: "What is MatConnect?",
-    a: "MatConnect is all-in-one management software built for BJJ and martial arts schools. It handles member check-in, profiles, belt progression, class scheduling, billing, and automated marketing — so you can spend less time on admin and more time coaching.",
+    a: "MatConnect is all-in-one management software built for BJJ and martial arts schools. It handles member check-in, profiles, belt progression, class scheduling, billing, automated marketing, churn risk scoring, and a built-in public website — so you can spend less time on admin and more time coaching.",
   },
   {
     q: "How long does setup take?",
@@ -552,6 +582,14 @@ const FAQS = [
   {
     q: "Do members get their own login?",
     a: "Yes. Every member gets a portal where they can book classes, view their schedule and attendance, follow the curriculum, and track their progress toward the next belt — plus opt-in push notifications for reminders and waitlist spots. It runs in any browser; a native mobile app is on the roadmap.",
+  },
+  {
+    q: "Does MatConnect include a website for my gym?",
+    a: "Yes. Every account gets a public gym website hosted under your MatConnect URL — with a hero section, live class schedule, pricing, testimonials, FAQ, Google Maps, and social links, all pulled from your account data. You edit it in a side-by-side preview with preset themes. If you already have a WordPress site, you can also drop MatConnect blocks directly onto any page using Gutenberg blocks or Elementor widgets.",
+  },
+  {
+    q: "How does churn risk scoring work?",
+    a: "MatConnect calculates a 0–100 risk score for every active member based on six signals: days since last check-in, whether training frequency is dropping compared to last month, payment status, trial ending with low engagement, belt progression stalled, and slow start for new members. Each score comes with plain-English reasons — so you can see at a glance who needs a call, not just a list of absent names.",
   },
   {
     q: "What hardware do I need for the kiosk?",

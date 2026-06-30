@@ -1,7 +1,7 @@
 # MatConnect Features
 
-**Last Updated**: 2026-06-29
-**Source**: Verified against codebase (`prisma/schema.prisma`, `src/app/**`, `src/lib/**`)
+**Last Updated**: 2026-06-30 (v2.3)
+**Source**: Verified against codebase (`prisma/schema.prisma`, `src/app/**`, `src/lib/**`, `wordpress-plugin/**`)
 
 > This document is verified against the actual code, not marketing copy. Where an
 > earlier draft of this file made claims based on marketing copy, those are
@@ -24,7 +24,13 @@
 - Training type (Gi / No-Gi / Both)
 - Status lifecycle: `lead` → `trial` → `active` → `past_due` → `canceled` → `inactive`
 - Staff notes, waiver history, attendance history per member
-- **At-risk members view** — active members with no check-in for 14/21/30/60 days, sorted by longest absence, showing last automated outreach (`src/app/admin/members/at-risk`). **Rule-based, not ML.**
+- **Churn risk scoring** — composite 0–100 risk score per member with explainable signals (`src/lib/risk-scoring.ts`, `src/lib/scored-members.ts`):
+  - 6 weighted signals: inactivity (primary), training frequency drop vs prior month, payment past due, trial ending with low engagement, belt progression stalled, new member slow start
+  - Risk band: Low / Medium / High (cutoffs at 30 and 60)
+  - Weights and thresholds are exported config (`RISK_WEIGHTS`, `RISK_THRESHOLDS`) — tunable without code changes
+  - Pure scoring core has no DB dependency — fully unit-tested (`src/lib/risk-scoring.test.ts`)
+- **At-risk members view** — members ranked by churn risk score with filter tabs (Needs Attention / High / Medium / All); shows risk pill (band + score), reason chips explaining each signal, last check-in, last automated outreach (`src/app/admin/members/at-risk`)
+- **Risk score on member profile** — individual risk badge visible on the member detail page
 
 ### Belt Progression & Curriculum
 - **Per-rank requirements** — minimum classes, months, and techniques to promote (`BeltRequirement`)
@@ -81,6 +87,45 @@
 - Recent sales
 - **CSV export** (`ExportBar`)
 
+### Website Builder
+- **Public gym website** hosted at the gym's MatConnect URL (`src/app/site/`) — fully rendered, SEO-friendly page served by Next.js:
+  - Hero section (headline, subhead, hero image, CTA button)
+  - About section
+  - Live class schedule (next 7 days pulled from the gym's own schedule)
+  - Live membership pricing (pulled from active plans)
+  - Testimonials grid
+  - FAQ accordion
+  - Google Maps embed
+  - Social links (Instagram, Facebook, YouTube)
+  - Full SEO metadata (title, description, Open Graph image)
+  - Enable/disable toggle — site is hidden until published; admins can preview at `?preview=1`
+- **In-app website editor** (`src/app/admin/setup/website/`) with side-by-side live preview:
+  - Preset themes: Light, Dark, Bold, Custom
+  - Custom theme color picker
+  - Per-section toggles: schedule, pricing, testimonials, FAQ, map
+  - Testimonials manager — add/edit/delete entries (name, belt rank, quote)
+  - FAQ manager — add/edit/delete items (question + answer) with accordion preview
+  - Google Maps embed URL field (validated to `maps.google.com/maps/embed` origin)
+  - Social links and SEO fields
+- Site config stored as JSON in `GymSettings.siteConfig`; `resolveSiteConfig()` merges stored values over sensible defaults so the site always renders cleanly (`src/lib/site-config.ts`)
+
+### WordPress Integration
+- **API key system** — generate named API keys in Settings → Integrations; keys are bcrypt-hashed (never stored in plain text), prefix-displayed for identification, toggleable enabled/disabled, revokable (`ApiKey` model, `src/lib/api-keys.ts`)
+- **Public REST API** (`/api/v1/*`) — JSON endpoints authenticated via `Authorization: Bearer` header; all support CORS:
+  - `GET /api/v1/gym` — gym name, logo, contact info, instructor names, program types
+  - `GET /api/v1/schedule?days=N` — next N days of classes with times, instructor, spots available
+  - `GET /api/v1/plans` — membership plan names, prices, billing intervals
+  - `GET /api/v1/testimonials` — member testimonials from site config
+  - `GET /api/v1/faq` — FAQ items from site config
+  - `POST /api/v1/leads` — **public** (no key required) — captures leads, notifies gym owner by email
+- **"MatConnect for WordPress" plugin** (`wordpress-plugin/matconnect-for-wordpress/`) — installable WordPress plugin:
+  - 5 **Gutenberg blocks** (server-side PHP render, SEO-friendly, no iframes): Schedule, Pricing, Lead Form, Testimonials, FAQ
+  - 5 matching **shortcodes**: `[matconnect_schedule]`, `[matconnect_pricing]`, `[matconnect_lead_form]`, `[matconnect_testimonials]`, `[matconnect_faq]`
+  - **Elementor widget support** — same 5 widgets available in Elementor's page builder under a "MatConnect" category
+  - WordPress transient caching (schedule: 5 min; other data: 1 hr)
+  - API key stored in WordPress options, never exposed to the browser
+  - Settings page at Settings → MatConnect with Test Connection and Clear Cache
+
 ### Admin & Operations
 - Staff user accounts (`User`) with roles
 - **Feature visibility toggles** — hide modules you don't use (`hiddenFeatures`, `src/app/admin/setup/features`)
@@ -95,9 +140,7 @@
 | Gap | Notes |
 |-----|-------|
 | **Multi-location** | Single `GymSettings` row (`id @default(1)`) — single-tenant / single-location |
-| **Predictive/ML churn scoring** | Only the rule-based at-risk view exists (attendance gap) |
 | **Native mobile app** | Member portal is web; notifications are web-push |
-| **Website builder** | No gym-website builder (Gymdesk bundles one) |
 | **WOD tracking / leaderboards** | Not built (CrossFit-specific; not relevant unless targeting that vertical) |
 | **Event/tournament management** | Not a dedicated module |
 | **Payment processors beyond Stripe/Square** | No PayPal, Authorize.net, GoCardless, etc. |
@@ -124,11 +167,11 @@
 | Member portal (web) | ✅ | ✅ | ✅ | ✅ |
 | Web push notifications | ✅ | ➖ | ➖ | ✅ |
 | Reports + CSV export | ✅ | ✅ | ✅ | ✅ |
-| At-risk members (rule-based) | ✅ | ✅ (AI) | ❌ | ✅ (AI 2026) |
-| **Predictive/ML churn scoring** | ❌ | ✅ | ❌ | ✅ |
+| Churn risk scoring (explainable) | ✅ | ✅ | ❌ | ✅ |
 | **Multi-location** | ❌ | ❌ | ✅ | ❌ |
-| **Website builder** | ❌ | ✅ | ✅ | ➖ |
+| **Website builder** | ✅ | ✅ | ✅ | ➖ |
 | **Native mobile app** | ❌ | ✅ | ✅ | ✅ |
+| **Public API + third-party integration** | ✅ | ➖ | ➖ | ➖ |
 
 Legend: ✅ has it · ➖ partial/limited/unclear · ❌ not present
 

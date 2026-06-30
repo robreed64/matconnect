@@ -1,6 +1,6 @@
 # MatConnect: Competitive Position & Strategic Plan
 
-**Date**: 2026-06-29 (code-verified)
+**Date**: 2026-06-30 v2.3 (code-verified)
 **Audience**: Leadership / Board
 **Time to Read**: 5 minutes
 
@@ -34,7 +34,9 @@ MatConnect is **not** an early MVP. Verified in code, it already ships:
 - **Web member portal** (profile, schedule, attendance, curriculum, progress)
 - **Web push notifications**
 - **Reports** (MRR, status, attendance, belts, trends, CSV export)
-- Rule-based at-risk members view
+- **Churn risk scoring** — composite 0–100 score per member with 6 explainable signals (inactivity, frequency drop, payment past due, trial ending, progression stalled, slow start); Low/Medium/High bands; at-risk view ranked by score with reason chips
+- **Website builder** — hosted public gym website with hero, schedule, pricing, testimonials, FAQ, map, social links, SEO metadata, preset themes, and a side-by-side in-app editor; enable/disable toggle with admin preview
+- **Public API + WordPress plugin** — API key system, `/api/v1/*` JSON endpoints, WordPress plugin with Gutenberg blocks, shortcodes, and Elementor widget support
 
 **Implication**: On core features, MatConnect is at or near parity with DojoChamp
 and Gymdesk **today**. The strategic question is not "how do we catch up" — it's
@@ -61,12 +63,10 @@ on data MatConnect already collects.
 
 | Gap | Who has it | Priority |
 |-----|-----------|----------|
-| **Predictive/ML churn scoring** | DojoChamp, PushPress | 🔴 P0 — close with explainable risk scoring |
 | **Multi-location** | Gymdesk | 🟡 P1 — single-tenant today; blocks chains |
 | **Native mobile app** | DojoChamp, Gymdesk, PushPress | 🟡 P1 — portal is web-only |
-| **Website builder** | DojoChamp, Gymdesk | 🟡 P2 — table-stakes bundling |
 
-Member app, analytics, automation, waitlists, in-person payments — **already shipped.**
+Member app, analytics, automation, waitlists, in-person payments, churn risk scoring, website builder, public API, WordPress integration — **already shipped.**
 
 ---
 
@@ -81,10 +81,9 @@ Mindbody's price or complexity."**
 - Pricing: $99–150/month flat (match DojoChamp, undercut Mindbody)
 - Lead differentiators: **transparent retention insights**, all-in-one breadth, both Stripe+Square, responsive support
 
-### Phase 1 (Months 1–2): Win the Retention Narrative
-- **Churn risk scoring** — composite 0–100 score on existing data (attendance trend, payments, stalled progression, trial status) with "why + suggested action," wired to existing workflows
-- **Win-back workflow templates** on the existing automation engine
-- *This closes DojoChamp's main marketing advantage using infrastructure that already exists.*
+### ✅ Phase 1 (Complete): Win the Retention Narrative
+- **Churn risk scoring** — shipped. Composite 0–100 score with 6 explainable signals, ranked at-risk view, risk badge on member profiles. Closes DojoChamp's headline differentiator.
+- **Win-back workflow templates** — next step: add pre-built inactivity/trial-expiry workflow templates to the existing automation engine
 
 ### Phase 2 (Months 3–5): Open New Markets
 - **Multi-location** (real re-architecture; unlocks chains/franchises stuck on Mindbody)
@@ -138,10 +137,9 @@ is materially lower than the prior estimate.
 
 ## ✅ Recommendation
 
-Lead with **Phase 1 (churn scoring)** — it's cheap, fast (~3 weeks), and neutralizes
-DojoChamp's only real feature advantage by building on data and plumbing that
-already exist. Run **multi-location** as the parallel revenue-expansion track.
-Defer native mobile until the retention and multi-location wins are banked.
+**Phases 1 and 2 are largely complete** — churn scoring and website builder are shipped.
+The next priority is **multi-location** as the primary revenue-expansion track.
+Defer native mobile until multi-location wins are banked.
 
 **The headline**: MatConnect is further along than the earlier docs implied.
 The win condition is positioning + closing 1–2 real gaps, not a feature catch-up sprint.
@@ -150,4 +148,4 @@ The win condition is positioning + closing 1–2 real gaps, not a feature catch-
 
 *Detailed competitor analysis: `/competitor-profiles/`. Verified feature list: `docs/FEATURES.md`. Roadmap: `docs/ROADMAP.md`.*
 
-**Document Version**: 2.0 (code-verified)
+**Document Version**: 2.3 (code-verified)
