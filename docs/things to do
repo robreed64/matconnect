@@ -1,0 +1,11 @@
+ **Multi-location** | Single `GymSettings` row (`id @default(1)`) — single-tenant / single-location |
+
+| **Native mobile app** | Member portal is web; notifications are web-push |
+
+|*WOD tracking / leaderboards** | Not built (CrossFit-specific; not relevant unless targeting that vertical) |
+
+
+| **Event/tournament management** | Not a dedicated module |
+
+
+| **Payment processors beyond Stripe/Square** | No PayPal, Authorize.net, GoCardless, etc. |

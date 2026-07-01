@@ -1,0 +1,44 @@
+
+This is a strategy question, not a coding task — I'll answer it directly.
+
+Your current pricing is underpriced. $49/month Pro is leaving money on the table. Here's the competitive picture:
+
+┌────────────┬────────────────────┬─────────────────────────────────────────────────────┐
+│ Competitor │       Price        │              Notable gap vs MatConnect              │
+├────────────┼────────────────────┼─────────────────────────────────────────────────────┤
+│ Mindbody   │ $250–500+/mo       │ Bloated, hated, losing customers                    │
+├────────────┼────────────────────┼─────────────────────────────────────────────────────┤
+│ DojoChamp  │ $99/mo             │ No multi-location, no native app (you'll have both) │
+├────────────┼────────────────────┼─────────────────────────────────────────────────────┤
+│ Gymdesk    │ $75–200/mo         │ Multi-location but weak martial arts features       │
+├────────────┼────────────────────┼─────────────────────────────────────────────────────┤
+│ PushPress  │ Freemium + add-ons │ No belt/curriculum, no churn scoring                │
+└────────────┴────────────────────┴─────────────────────────────────────────────────────┘
+
+With multi-location and a native app shipping this week/soon, my recommendation:
+
+┌──────────────────────┬────────────────────┬────────────────────────────────────────────────────────────┐
+│         Tier         │       Price        │                        Who it's for                        │
+├──────────────────────┼────────────────────┼────────────────────────────────────────────────────────────┤
+│ Starter              │ Free (≤30 members) │ Keep as lead-gen / trial conversion                        │
+├──────────────────────┼────────────────────┼────────────────────────────────────────────────────────────┤
+│ Pro                  │ $99/month          │ Single gym, full feature set incl. website + churn scoring │
+├──────────────────────┼────────────────────┼────────────────────────────────────────────────────────────┤
+│ Academy              │ $179/month         │ Up to 3 locations + native app priority access             │
+├──────────────────────┼────────────────────┼────────────────────────────────────────────────────────────┤
+│ Additional locations │ +$49/location      │ Chains and affiliates                                      │
+└──────────────────────┴────────────────────┴────────────────────────────────────────────────────────────┘
+
+Why $99 for Pro:
+- DojoChamp charges $99 and has less — no multi-location, no website builder, no WordPress plugin
+- At $49 you're signaling you're a budget product, which makes sales harder not easier
+- $99 is still 75% cheaper than Mindbody — "Mindbody alternative" SEO and ads become very compelling
+
+Why $179 for Academy/multi-location:
+- Gymdesk charges $150–200 and that's their main differentiator — match it
+- Multi-location customers have higher willingness to pay (they're running a real business)
+- You can always negotiate for large chains
+
+One thing to decide: Do you raise prices for existing customers or grandfather them? I'd grandfather analty matters more than the delta — and move new signups to the new pricing immediately whenmulti-location ships.
+
+The headline pitch writes itself: "Everything DojoChamp does, plus multi-location and a native app, for the same price."

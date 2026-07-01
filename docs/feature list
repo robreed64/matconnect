@@ -1,0 +1,74 @@
+MatConnect — Actual Feature List
+
+Check-in & Front Desk
+
+- Self-service kiosk — tablet check-in, no staff needed
+- QR / token check-in — members check in via a personal QR code
+- Walk-in support — sell to or check in non-members
+- Check-in sources tracked: kiosk, staff, app
+
+Member Management
+
+- Full profiles — photo, contact, address, date of birth, age group (kids/adult)
+- Family accounts — parent/child linking with automatic family discounts
+- Belt rank + belt stripes tracking
+- Training type (Gi / No-Gi / Both)
+- Status lifecycle: lead → trial → active → past due → canceled → inactive
+- Staff notes, attendance history, waiver history per member
+- At-risk member view — flags members likely to churn
+
+Belt Progression & Curriculum
+
+- Per-rank requirements — minimum classes, months, and techniques to promote
+- Technique progress tracking per member
+- Curriculum builder — multi-week lesson plans with warmups, techniques, video links, day-of-week scheduling
+- Members track their own progress toward the next belt
+
+Class Scheduling
+
+- Recurring + one-off classes
+- Programs/class types (Gi, No-Gi, Youth, Seminar, Intro, Private)
+- Instructor assignment, capacity limits
+- Live rosters, booking + waitlist support, no-show tracking
+
+Billing & Payments
+
+- Stripe and Square supported (switchable payment provider)
+- Recurring membership subscriptions
+- Card on file, new card, cash, and Square Terminal (in-person card reader)
+- Failed-payment retries / dunning
+- Trials with configurable trial length
+- Point of Sale — retail/gear/day passes, barcode scanning, inventory/stock, tax rates, cash drawer
+
+Marketing & Automation
+
+- Automation workflows triggered by: trial attendance, inactivity, birthday, failed payment, belt promotion
+- Multi-channel messaging — email, SMS, web push, in-app
+- Lead capture widget (embeddable) + leads pipeline
+- Self-serve enrollment flow
+- Automated class reminders & waiver reminders (cron-driven)
+- Email/SMS powered by Brevo
+
+Member Portal (this exists — earlier doc was wrong)
+
+- Profile, schedule, attendance history, curriculum, and progress views
+- Payment method management
+- Web push notifications
+
+Admin & Operations
+
+- Reports/analytics
+- Staff user accounts & roles
+- Feature visibility toggles (hide modules you don't use)
+- Square data import (migrate customers/subscriptions/payments)
+- Multi-currency, locale, and timezone settings
+- Guided setup wizard
+
+The real gaps are predictive churn scoring, multi-location, 
+
+native mobile, and website builder.
+
+
+delete the merged branch, calibrate the risk weights, or move on to the multi-location track?
+update the excutive summary, roadmap, features docs as well as the landing page.
+
